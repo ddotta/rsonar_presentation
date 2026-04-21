@@ -1,0 +1,25 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Présentation rsonar"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Accueil
+
+format:
+  revealjs:
+    theme: [default]
+    slide-number: true
+    controls: true
+    progress: true
+    toc: false
+    transition: fade
+    center: false
+
+execute:
+  echo: true
+  warning: false
+  message: false

@@ -1,0 +1,131 @@
+---
+title: "rsonar en pratique"
+subtitle: "Mesurer simplement la qualité de code R"
+author: "Damien Dotta"
+lang: fr
+format:
+  revealjs:
+    theme: default
+    slide-number: true
+    transition: fade
+    progress: true
+---
+
+## rsonar, c'est quoi ?
+
+::: columns
+::: {.column width="70%"}
+`rsonar` aide à mesurer la qualité de code R, un peu comme SonarQube:
+
+- analyse statique (lintr)
+- style de code (styler)
+- couverture de tests (covr)
+- bonnes pratiques package (goodpractice)
+- dette technique + Quality Gate
+:::
+::: {.column width="30%"}
+![](images/hex_rsonar.png){width=90%}
+:::
+:::
+
+## Pourquoi c'est utile ?
+
+Sans `rsonar`, on lance plusieurs outils séparément et on assemble les résultats à la main.
+
+Avec `rsonar`:
+
+- une commande d'analyse
+- un résumé clair
+- un rapport HTML
+- un score qualité en pourcentage
+- des exports pour CI
+
+## 1) Analyse complète
+
+```{r}
+library(rsonar)
+
+res <- sonar_analyse("path/to/project")
+print(res)
+```
+
+`res` contient les métriques, la dette technique et les détails lint/style/couverture.
+
+## 2) Score qualité en % (rapide, IDE)
+
+```{r}
+# Vérification rapide sans dépendre de la CI
+quality_score(".")
+
+# ou sur un résultat déjà calculé
+quality_score(res)
+```
+
+Ce score est lisible immédiatement et complète la note A/B/C/D/E.
+
+## 3) Rapport HTML
+
+```{r}
+sonar_report(res, output = "quality.html", open = FALSE)
+```
+
+Le rapport affiche:
+
+- score qualité (%)
+- note SQALE
+- couverture
+- lint/style
+- dette technique détaillée
+
+## 4) Bloquer les régressions (Quality Gate)
+
+```{r}
+quality_gate(
+  res,
+  coverage_min = 80,
+  lint_errors_max = 0,
+  style_issues_max = 0,
+  rating_min = "C",
+  fail_on_error = TRUE
+)
+```
+
+Si le gate échoue, le pipeline CI peut échouer automatiquement.
+
+## 5) Exports pour la CI
+
+```{r}
+export_junit(res, "junit-results.xml")      # GitLab/Jenkins/GitHub
+export_sarif(res, "results.sarif")          # GitHub Code Scanning
+export_sonar_json(res, "sonar-issues.json") # SonarQube Generic Import
+```
+
+## 6) Suivi dans le temps
+
+```{r}
+# Comparer deux analyses
+old_res <- sonar_analyse("path/to/project")
+new_res <- sonar_analyse("path/to/project")
+sonar_diff(new_res, old_res)
+
+# Sauvegarder l'historique
+sonar_trend(new_res, file = "rsonar-history.json")
+```
+
+## Démo simple recommandée
+
+1. Lancer `sonar_analyse(".")`
+2. Lire `print(res)`
+3. Lancer `quality_score(res)`
+4. Générer `sonar_report(res, "quality.html")`
+5. Ajouter un `quality_gate()` en CI
+
+## Conclusion
+
+`rsonar` permet d'aller vite, avec des résultats compréhensibles:
+
+- pour les développeurs (IDE)
+- pour l'équipe (CI)
+- pour le pilotage qualité (score + dette + tendances)
+
+Merci.
