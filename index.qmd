@@ -5,7 +5,7 @@ author: "Damien Dotta"
 lang: fr
 format:
   revealjs:
-    theme: default
+    theme: league
     slide-number: true
     transition: fade
     progress: true
