@@ -29,5 +29,7 @@ quarto preview index.qmd
 - Score qualité en % avec `quality_score()`
 - Rapport HTML avec `sonar_report()`
 - Quality Gate avec `quality_gate()`
+- **Auto-fix avec `air`** : formatage automatique du code R via `sonar_fix()` et `install_air()`
+- **Mécanique fix → MR GitLab** : création automatique de Merge Requests avec les corrections
 - Exports CI (`export_junit()`, `export_sarif()`, `export_sonar_json()`)
 - Comparaison et tendances (`sonar_diff()`, `sonar_trend()`)

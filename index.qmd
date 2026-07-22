@@ -379,7 +379,70 @@ Très utile quand on veut:
 - `sonar-issues.json` : import dans SonarQube via Generic Issue Import
 - `quality.html` : rapport lisible par l'équipe, sans outil supplémentaire
 
-## 6) Suivi dans le temps
+## 6) Corriger automatiquement avec air
+
+```{r}
+library(rsonar)
+
+# Installer air (une seule fois)
+install_air()
+
+# Voir ce qui serait modifié (dry-run)
+fix_dry <- sonar_fix(".", dry_run = TRUE)
+print(fix_dry)
+
+# Appliquer les corrections
+fix <- sonar_fix(".")
+
+# En CI GitLab : créer une Merge Request
+fix <- sonar_fix(".", create_mr = TRUE)
+```
+
+`air` est le formateur R de Posit. Combiné à `rsonar`, il permet de :
+- formater automatiquement le code
+- ne rien appliquer sans revue humaine (dry-run, MR)
+
+## La mécanique fix → MR dans GitLab
+
+Le job CI `rsonar-fix` (déclenché manuellement) :
+
+1. Installe `air` via `install_air()`
+2. Lance `sonar_fix('.', create_mr = TRUE)`
+3. Crée une branche `rsonar/auto-fix-YYYYMMDD-HHMMSS`
+4. Pousse la branche avec les corrections
+5. Ouvre une Merge Request via les push options GitLab
+
+```
+Developer push  -->  Pipeline auto (lint/style/coverage/gate/report)
+                      |
+                      +-- Si problèmes de style :
+                          |
+                          +--> Clic "rsonar-fix" (manuel)
+                                 |
+                                 +--> air formate le code
+                                 +--> MR créée : "Auto-fix: R code style"
+                                 +--> Developer review et merge
+```
+
+## Exemple concret de configuration GitLab
+
+Dans `.gitlab-ci.yml` du projet :
+
+```yaml
+include:
+  - project: "ssp/bmis/templates/ci-templates-r"
+    ref: master
+    file: "/r-quality.yml"
+
+variables:
+  R_QUALITY_IMAGE: "rocker/r-base:latest"
+```
+
+Prérequis GitLab :
+- Variable `GITLAB_TOKEN` (PAT avec scope `write_repository`)
+- Autoriser les branches `rsonar/auto-fix-*` pour le job CI
+
+## 7) Suivi dans le temps
 
 ```{r}
 # Comparer deux analyses
