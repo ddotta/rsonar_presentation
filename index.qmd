@@ -57,7 +57,7 @@ Objectif: montrer ce que `rsonar` remonte concrètement.
 
 Extrait de `rsonar-examples/R/messy_code.R`:
 
-```{r}
+```{r.}
 fizzbuzz <- function(n) {
   result=character(n)
   for(i in 1:n){
@@ -87,7 +87,7 @@ Problèmes visibles:
 
 ## 1) Analyse complète
 
-```{r}
+```{r.}
 library(rsonar)
 
 res <- sonar_analyse("path/to/project")
@@ -126,7 +126,7 @@ Lecture simple:
 
 ## 2) Score qualité en % (rapide, IDE)
 
-```{r}
+```{r.}
 # Vérification rapide sans dépendre de la CI
 quality_score(".")
 
@@ -140,7 +140,7 @@ Ce score est lisible immédiatement et complète la note A/B/C/D/E.
 
 Quand on veut juste un indicateur rapide sans lancer toute une CI:
 
-```{r}
+```{r.}
 quality_score(".")
 ```
 
@@ -162,7 +162,7 @@ Usage typique:
 
 ## 3) Rapport HTML
 
-```{r}
+```{r.}
 sonar_report(res, output = "quality.html", open = FALSE)
 ```
 
@@ -178,7 +178,7 @@ Le rapport affiche:
 
 Dans `rsonar-examples/examples/04_export_formats.R`:
 
-```{r}
+```{r.}
 res <- sonar_analyse(".")
 
 sonar_report(res, output = "output/quality-report.html", open = FALSE)
@@ -200,7 +200,7 @@ All exports generated in output/
 
 ## 4) Bloquer les régressions (Quality Gate)
 
-```{r}
+```{r.}
 quality_gate(
   res,
   coverage_min = 80,
@@ -255,7 +255,7 @@ Le **quality score (%)** est une lecture plus directe de cette même logique.
 
 Dans `examples/02_technical_debt.R`:
 
-```{r}
+```{r.}
 res <- sonar_analyse(".")
 
 debt_default <- debt_index(res)
@@ -306,7 +306,7 @@ Lecture simple:
 
 Sur un projet de démo volontairement imparfait, on peut choisir un gate réaliste:
 
-```{r}
+```{r.}
 quality_gate(
   res,
   coverage_min = 30,
@@ -341,7 +341,7 @@ Et sur un projet plus exigeant:
 
 ## 5) Exports pour la CI
 
-```{r}
+```{r.}
 export_junit(res, "junit-results.xml")      # GitLab/Jenkins/GitHub
 export_sarif(res, "results.sarif")          # GitHub Code Scanning
 export_sonar_json(res, "sonar-issues.json") # SonarQube Generic Import
@@ -352,7 +352,7 @@ export_sonar_json(res, "sonar-issues.json") # SonarQube Generic Import
 Dans `examples/05_selective_analysis.R`, on peut lancer seulement une partie
 de l'analyse.
 
-```{r}
+```{r.}
 res_lint <- sonar_analyse(".",
   include_style = FALSE,
   include_coverage = FALSE,
@@ -406,7 +406,7 @@ Très utile quand on veut:
 
 **Utilisation :**
 
-```{r}
+```{r.}
 # Aperçu (ne modifie rien)
 fix <- sonar_fix(".", dry_run = TRUE)
 
@@ -425,7 +425,7 @@ fix <- sonar_fix(".", formatter = "air")
 
 `sonar_autofix()` automatise tout le workflow en une seule fonction :
 
-```{r}
+```{r.}
 library(rsonar)
 
 # GitLab : analyse + commit + push + Merge Request
@@ -489,7 +489,7 @@ git push
 
 ## 7) Suivi dans le temps
 
-```{r}
+```{r.}
 # Comparer deux analyses
 old_res <- sonar_analyse("path/to/project")
 new_res <- sonar_analyse("path/to/project")
@@ -503,7 +503,7 @@ sonar_trend(new_res, file = "rsonar-history.json")
 
 Dans `examples/06_diff_comparison.R`:
 
-```{r}
+```{r.}
 baseline <- sonar_analyse(".", include_coverage = FALSE, include_goodpractice = FALSE)
 current  <- sonar_analyse(".", include_coverage = FALSE, include_goodpractice = FALSE)
 
@@ -521,7 +521,7 @@ Exemple de lecture:
 
 Dans `examples/07_trend_tracking.R`:
 
-```{r}
+```{r.}
 res <- sonar_analyse(".", include_coverage = FALSE, include_goodpractice = FALSE)
 sonar_trend(res, file = "output/rsonar-history.json")
 ```
@@ -558,7 +558,7 @@ Cela permet:
 
 Dans `examples/08_project_setup.R`:
 
-```{r}
+```{r.}
 use_rsonar_lintr(".", overwrite = TRUE)
 use_rsonar_ci("github", path = ".", overwrite = TRUE)
 use_rsonar_ci("gitlab", path = ".", overwrite = TRUE)
