@@ -379,7 +379,115 @@ Très utile quand on veut:
 - `sonar-issues.json` : import dans SonarQube via Generic Issue Import
 - `quality.html` : rapport lisible par l'équipe, sans outil supplémentaire
 
-## 6) Suivi dans le temps
+## 6) Corriger automatiquement avec sonar_fix()
+
+`sonar_fix()` applique des corrections automatiques sur le code R.
+
+**16 catégories de corrections :**
+
+| Catégorie | Description | Exemple |
+|-----------|------------|---------|
+| `styler` | Formatage tidyverse (ou `air`) | `styler::style_dir()` |
+| `spacing` | Espaces autour des opérateurs | `x<-1` → `x <- 1` |
+| `true_false` | T/F → TRUE/FALSE | `if(T)` → `if(TRUE)` |
+| `null` | NULL avec `<-` | `x=NULL` → `x <- NULL` |
+| `commas` | Espaces après virgules | `c(1,2,3)` → `c(1, 2, 3)` |
+| `parens` | Parenthèses inutiles | `return((x))` → `return(x)` |
+| `cleanup` | Lignes vides, commentaires | Trailing whitespace, fin de ligne |
+| `simplify` | Booléens simplifiés | `if(x==TRUE)` → `if(x)` |
+| `pipes` | `%>%` → `|>` | `x %>% f()` → `x |> f()` |
+| `return` | Formatage return() | Multi-ligne → une ligne |
+| `assignment` | `=` → `<-` (hors fonctions) | `x = 1` → `x <- 1` |
+| `comments` | Séparateurs uniformes | `##########` → `#----------` |
+| `magrittr` | `%<>%` → base R | (transformation) |
+| `library` | Détection imports inutiles | (rapport uniquement) |
+| `namespace` | Suggestion `::` | `library(dplyr)` → `dplyr::` |
+| `dead_code` | Code mort | `1+1` sans effet |
+
+**Utilisation :**
+
+```{r}
+# Aperçu (ne modifie rien)
+fix <- sonar_fix(".", dry_run = TRUE)
+
+# Appliquer toutes les corrections
+fix <- sonar_fix(".", dry_run = FALSE)
+
+# Appliquer seulement certaines catégories
+fix <- sonar_fix(".", fixes = c("spacing", "styler"))
+
+# Avec air (formateur Posit, plus rapide)
+install_air()
+fix <- sonar_fix(".", formatter = "air")
+```
+
+## La mécanique auto-fix → Merge Request
+
+`sonar_autofix()` automatise tout le workflow en une seule fonction :
+
+```{r}
+library(rsonar)
+
+# GitLab : analyse + commit + push + Merge Request
+sonar_autofix(provider = "gitlab")
+
+# GitHub : analyse + commit + push + Pull Request
+sonar_autofix(provider = "github")
+
+# Auto-détection de la plateforme
+sonar_autofix()  # détecte GitLab CI ou GitHub Actions
+```
+
+**Ce qui se passe :**
+1. `sonar_fix()` corrige le code (16 catégories)
+2. Crée une branche `auto/rsonar-fix`
+3. Commit avec message `style: automatic fixes by rsonar`
+4. Push + création de MR/PR via les push options GitLab
+
+## Pipeline CI complet
+
+```yaml
+stages:
+  - quality
+  - autofix
+
+rsonar-check:
+  stage: quality
+  script:
+    - R -e "sonar_analyse('.'); export_junit(); export_sonar_json()"
+
+rsonar-autofix:
+  stage: autofix
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    - when: manual
+  script:
+    - R -e "sonar_autofix(provider='gitlab', verbose=TRUE)"
+```
+
+**Workflow développeur :**
+```
+git push
+  |
+  +--> CI : rsonar-check (analyse automatique)
+  |
+  +--> Si problèmes de style :
+         |
+         +--> Clic "rsonar-autofix" (manuel)
+                |
+                +--> sonar_fix() corrige le code
+                +--> Branche auto/rsonar-fix créée
+                +--> Merge Request ouverte automatiquement
+                +--> Developer review et merge
+```
+
+**Prérequis GitLab :**
+- `PROJECT_TOKEN` dans CI/CD Variables (scope `write_repository`)
+- Autoriser les branches `auto/rsonar-fix*` en push
+- Le token est utilisé en oauth2 : `https://oauth2:${PROJECT_TOKEN}@...`
+
+## 7) Suivi dans le temps
 
 ```{r}
 # Comparer deux analyses
