@@ -50,7 +50,7 @@ Goal: show what `rsonar` detects.
 
 ## Problematic code example
 
-```{r}
+```{.r}
 messy_function <- function(x,y) {
   res=x+y
   very_long_variable_name_that_exceeds_80 <- ifelse(res > 0, T, F)
@@ -63,7 +63,7 @@ Issues: missing spaces, `T`/`F`, long lines, `=` assignments, bad style.
 
 ## 1) Full analysis
 
-```{r}
+```{.r}
 library(rsonar)
 res <- sonar_analyse(".")
 print(res)
@@ -88,7 +88,7 @@ One object contains: lint issues, style violations, coverage %, goodpractice fai
 
 ## 2) Quick quality score (IDE)
 
-```{r}
+```{.r}
 quality_score(".")
 ```
 
@@ -103,7 +103,7 @@ Use before commits, during local reviews, to track improvement.
 
 ## 3) HTML report
 
-```{r}
+```{.r}
 sonar_report(res, output = "quality.html")
 ```
 
@@ -111,7 +111,7 @@ Shows: quality %, SQALE rating, coverage, lint/style, detailed technical debt.
 
 ## 4) Block regressions (Quality Gate)
 
-```{r}
+```{.r}
 quality_gate(res,
   coverage_min    = 80,
   lint_errors_max = 0,
@@ -136,7 +136,7 @@ Estimates correction time (minutes) vs. project effort.
 
 ## 5) CI exports
 
-```{r}
+```{.r}
 export_junit(res, "junit-results.xml")      # GitLab/Jenkins
 export_sarif(res, "results.sarif")          # GitHub Code Scanning
 export_sonar_json(res, "sonar-issues.json") # SonarQube
@@ -161,7 +161,7 @@ Produces: JUnit XML, SARIF 2.1.0, SonarQube Generic Issue Import.
 
 ## Fix usage
 
-```{r}
+```{.r}
 # Dry-run: preview changes
 fix <- sonar_fix(".", dry_run = TRUE)
 
@@ -180,7 +180,7 @@ fix <- sonar_fix(".", formatter = "air")
 
 One function for the entire fix workflow:
 
-```{r}
+```{.r}
 sonar_autofix(provider = "gitlab")   # Analyse + commit + push + MR
 sonar_autofix(provider = "github")   # Analyse + commit + push + PR
 sonar_autofix()                      # Auto-detect platform
@@ -276,7 +276,7 @@ Step 4: Uncomment rsonar-autofix in .gitlab-ci.yml
 
 ## 8) Time tracking
 
-```{r}
+```{.r}
 # Compare two analyses
 sonar_diff(new_res, old_res)
 
