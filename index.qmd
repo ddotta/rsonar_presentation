@@ -1,36 +1,609 @@
-# Présentation du package rsonar (FR)
+---
+title: "rsonar en pratique"
+subtitle: "Mesurer simplement la qualité de code R"
+author: "Damien Dotta"
+lang: fr
+format:
+  revealjs:
+    theme: default
+    slide-number: true
+    transition: fade
+    progress: true
+---
 
-Ce répertoire contient une présentation Quarto en français, simple et orientée usage, pour expliquer les fonctionnalités principales de `rsonar`.
+## rsonar, c'est quoi ?
 
-## Contenu
+::: columns
+::: {.column width="70%"}
+`rsonar` aide à mesurer la qualité de code R, un peu comme SonarQube:
 
-- `index.qmd` : slides RevealJS
-- `_quarto.yml` : configuration du projet Quarto
-- `images/` : visuels
+- analyse statique (lintr)
+- style de code (styler)
+- couverture de tests (covr)
+- bonnes pratiques package (goodpractice)
+- dette technique + Quality Gate
+:::
+::: {.column width="30%"}
+![](images/hex_rsonar.png){width=90%}
+:::
+:::
 
-## Générer la présentation
+## Pourquoi c'est utile ?
 
-```bash
-quarto render index.qmd
+Sans `rsonar`, on lance plusieurs outils séparément et on assemble les résultats à la main.
+
+Avec `rsonar`:
+
+- une commande d'analyse
+- un résumé clair
+- un rapport HTML
+- un score qualité en pourcentage
+- des exports pour CI
+
+## Fil rouge de la démo
+
+On s'appuie sur le dépôt `rsonar-examples`.
+
+Ce dépôt contient:
+
+- du code propre dans `R/clean_code.R`
+- du code volontairement problématique dans `R/messy_code.R`
+- peu de tests sur certaines fonctions
+- plusieurs workflows CI déjà prêts
+
+Objectif: montrer ce que `rsonar` remonte concrètement.
+
+## Exemple de code problématique
+
+Extrait de `rsonar-examples/R/messy_code.R`:
+
+```{r}
+fizzbuzz <- function(n) {
+  result=character(n)
+  for(i in 1:n){
+    if(i%%15==0){result[i]="FizzBuzz"
+    }else if(i%%3==0){result[i]="Fizz"
+    }else if(i%%5==0){result[i]="Buzz"
+    }else{result[i]=as.character(i)}
+  }
+  result
+}
+
+messy_function <- function(x,y) {
+  res=x+y
+  very_long_variable_name_that_exceeds_the_recommended_line_length <- ifelse(res > 0, T, F)
+  output = list(sum=res, positive=very_long_variable_name_that_exceeds_the_recommended_line_length)
+  return(output)
+}
 ```
 
-Le rendu est généré dans `docs/`.
+Problèmes visibles:
 
-## Ouvrir localement
+- espaces manquants
+- `T` / `F`
+- lignes trop longues
+- affectations avec `=`
+- style non conforme
 
-```bash
-quarto preview index.qmd
+## 1) Analyse complète
+
+```{r}
+library(rsonar)
+
+res <- sonar_analyse("path/to/project")
+print(res)
 ```
 
-## Points couverts
+`res` contient les métriques, la dette technique et les détails lint/style/couverture.
 
-- Pourquoi utiliser `rsonar`
-- Analyse complète avec `sonar_analyse()`
-- Score qualité en % avec `quality_score()`
-- Rapport HTML avec `sonar_report()`
-- Quality Gate avec `quality_gate()`
-- **Auto-fix avec `sonar_fix()`** : 16 catégories de corrections automatiques (formatting, spacing, TRUE/FALSE, NULL, commas, parens, cleanup, simplify, pipes, return, assignment, comments, magrittr, library, namespace, dead_code)
-- **`sonar_autofix()`** : automatisation complète du workflow GitLab/GitHub (analyse + commit + push + Merge Request) en une seule fonction, avec auto-détection de la plateforme CI
-- **Pipeline CI complet** : description du workflow développeur avec les jobs `rsonar-check` (automatique) et `rsonar-autofix` (manuel)
-- Exports CI (`export_junit()`, `export_sarif()`, `export_sonar_json()`)
-- Comparaison et tendances (`sonar_diff()`, `sonar_trend()`)
+## Sortie console obtenue
+
+Exemple de sortie typique sur `rsonar-examples`:
+
+```
+── rsonar — Quality Report ─────────────────────────────────
+ℹ Project  : /path/to/rsonar-examples
+ℹ Analysis : 2026-04-21 14:10
+ℹ Files    : 12 R file(s)
+
+── Metrics ─────────────────────────────────────────────────
+  Lint        : 8 issue(s) (0 err / 4 warn / 4 style)
+  Style       : 1 non-compliant file(s)
+  Coverage    : 42.3%
+  Goodpractice: 1 failure(s)
+
+── Technical Debt ──────────────────────────────────────────
+🟠 SQALE rating: E
+⭐ Quality score: 37.8%
+⏱  Estimated duration: 3.1h (186 min)
+```
+
+Lecture simple:
+
+- le projet est analysé en une fois
+- on voit immédiatement le volume de problèmes
+- le score `%` complète la note SQALE
+
+## 2) Score qualité en % (rapide, IDE)
+
+```{r}
+# Vérification rapide sans dépendre de la CI
+quality_score(".")
+
+# ou sur un résultat déjà calculé
+quality_score(res)
+```
+
+Ce score est lisible immédiatement et complète la note A/B/C/D/E.
+
+## Sortie rapide dans l'IDE
+
+Quand on veut juste un indicateur rapide sans lancer toute une CI:
+
+```{r}
+quality_score(".")
+```
+
+Sortie typique:
+
+```
+── Quick Quality Score ─────────────────────────────────────
+ℹ Path   : /path/to/rsonar-examples
+ℹ Score  : 37.8%
+ℹ Rating : E
+ℹ Time   : 2026-04-21 14:12
+```
+
+Usage typique:
+
+- avant un commit
+- pendant une revue locale
+- pour suivre l'amélioration après une correction
+
+## 3) Rapport HTML
+
+```{r}
+sonar_report(res, output = "quality.html", open = FALSE)
+```
+
+Le rapport affiche:
+
+- score qualité (%)
+- note SQALE
+- couverture
+- lint/style
+- dette technique détaillée
+
+## Exemple concret d'exports
+
+Dans `rsonar-examples/examples/04_export_formats.R`:
+
+```{r}
+res <- sonar_analyse(".")
+
+sonar_report(res, output = "output/quality-report.html", open = FALSE)
+export_sonar_json(res, output = "output/sonar-issues.json")
+export_junit(res, output = "output/junit-lint.xml")
+export_sarif(res, output = "output/rsonar-lint.sarif")
+```
+
+Sortie attendue:
+
+```
+HTML report:   output/quality-report.html
+SonarQube JSON: output/sonar-issues.json
+JUnit XML:     output/junit-lint.xml
+SARIF:         output/rsonar-lint.sarif
+
+All exports generated in output/
+```
+
+## 4) Bloquer les régressions (Quality Gate)
+
+```{r}
+quality_gate(
+  res,
+  coverage_min = 80,
+  lint_errors_max = 0,
+  style_issues_max = 0,
+  rating_min = "C",
+  fail_on_error = TRUE
+)
+```
+
+Si le gate échoue, le pipeline CI peut échouer automatiquement.
+
+## La note SQALE, c'est quoi ?
+
+La note **SQALE** est une façon simple de résumer la dette technique.
+
+L'idée est la suivante:
+
+- `rsonar` estime un **temps de correction** en minutes
+- ce temps est comparé à un **effort de base** du projet
+- plus le ratio est élevé, plus la note se dégrade
+
+En pratique:
+
+- **A** : très bonne qualité
+- **B** : bonne qualité
+- **C** : qualité correcte
+- **D** : dette importante
+- **E** : dette très forte
+
+Autrement dit, la note SQALE ne mesure pas seulement le nombre d'erreurs, mais
+le **coût estimé pour remettre le code en bon état**.
+
+## Comment rsonar calcule cette note
+
+`rsonar` additionne plusieurs coûts:
+
+- erreurs et warnings de lint
+- problèmes de style
+- couverture manquante
+- échecs `goodpractice`
+
+Puis il calcule un ratio de dette:
+
+$$ratio = \frac{dette\ technique}{effort\ de\ base}$$
+
+Ensuite ce ratio est converti en note `A` à `E`.
+
+Le **quality score (%)** est une lecture plus directe de cette même logique.
+
+## Exemple dette technique depuis rsonar-examples
+
+Dans `examples/02_technical_debt.R`:
+
+```{r}
+res <- sonar_analyse(".")
+
+debt_default <- debt_index(res)
+print(debt_default)
+
+debt_strict <- debt_index(
+  res,
+  cost_lint_error = 60,
+  cost_lint_warning = 15,
+  cost_style = 2,
+  coverage_target = 90
+)
+print(debt_strict)
+```
+
+Idée clé:
+
+- avec le modèle par défaut, on obtient une première note
+- avec un modèle plus strict, la dette peut augmenter
+- cela permet d'adapter l'évaluation au contexte métier
+
+## Exemple de sortie dette technique
+
+Sortie typique:
+
+```
+── rsonar Technical Debt ───────────────────────────────────
+ℹ Estimated duration: 3.1h (186 min)
+ℹ SQALE rating: E
+
+── Breakdown by category ──────────────────────────────────
+             category issues minutes
+1      Lint (errors)      0       0
+2    Lint (warnings)      4      40
+3       Lint (style)      4       8
+4     Style (styler)      1       5
+5    Best practices       1      20
+6          Coverage       8     113
+```
+
+Lecture simple:
+
+- ici, la couverture pèse lourd dans la dette
+- ce n'est donc pas seulement un problème de style
+- la priorisation des corrections devient plus claire
+
+## Exemple de Quality Gate
+
+Sur un projet de démo volontairement imparfait, on peut choisir un gate réaliste:
+
+```{r}
+quality_gate(
+  res,
+  coverage_min = 30,
+  lint_errors_max = 50,
+  style_issues_max = 10,
+  rating_min = "E",
+  fail_on_error = TRUE
+)
+```
+
+Exemple de sortie:
+
+```
+── Quality Gate : PASSED ──
+
+✔ Coverage >= 30% [42.3%]
+✔ Lint errors <= 50 [0]
+✔ Style issues <= 10 [1]
+✔ SQALE rating >= E [E]
+```
+
+Et sur un projet plus exigeant:
+
+```
+── Quality Gate : FAILED ──
+
+✘ Coverage >= 80% [42.3%]
+✔ Lint errors <= 0 [0]
+✘ Style issues <= 0 [1]
+✘ SQALE rating >= C [E]
+```
+
+## 5) Exports pour la CI
+
+```{r}
+export_junit(res, "junit-results.xml")      # GitLab/Jenkins/GitHub
+export_sarif(res, "results.sarif")          # GitHub Code Scanning
+export_sonar_json(res, "sonar-issues.json") # SonarQube Generic Import
+```
+
+## Autre exemple: analyse sélective
+
+Dans `examples/05_selective_analysis.R`, on peut lancer seulement une partie
+de l'analyse.
+
+```{r}
+res_lint <- sonar_analyse(".",
+  include_style = FALSE,
+  include_coverage = FALSE,
+  include_goodpractice = FALSE
+)
+
+res_style <- sonar_analyse(".",
+  include_lint = FALSE,
+  include_coverage = FALSE,
+  include_goodpractice = FALSE
+)
+```
+
+Très utile quand on veut:
+
+- un feedback rapide dans l'IDE
+- un job CI spécialisé par étape
+- isoler un type de problème
+
+## Ce que voient les outils derrière
+
+- `junit-results.xml` : exploitable par GitLab, Jenkins, GitHub Actions
+- `results.sarif` : affichage des alertes dans GitHub Code Scanning
+- `sonar-issues.json` : import dans SonarQube via Generic Issue Import
+- `quality.html` : rapport lisible par l'équipe, sans outil supplémentaire
+
+## 6) Corriger automatiquement avec sonar_fix()
+
+`sonar_fix()` applique des corrections automatiques sur le code R.
+
+**16 catégories de corrections :**
+
+| Catégorie | Description | Exemple |
+|-----------|------------|---------|
+| `styler` | Formatage tidyverse (ou `air`) | `styler::style_dir()` |
+| `spacing` | Espaces autour des opérateurs | `x<-1` → `x <- 1` |
+| `true_false` | T/F → TRUE/FALSE | `if(T)` → `if(TRUE)` |
+| `null` | NULL avec `<-` | `x=NULL` → `x <- NULL` |
+| `commas` | Espaces après virgules | `c(1,2,3)` → `c(1, 2, 3)` |
+| `parens` | Parenthèses inutiles | `return((x))` → `return(x)` |
+| `cleanup` | Lignes vides, commentaires | Trailing whitespace, fin de ligne |
+| `simplify` | Booléens simplifiés | `if(x==TRUE)` → `if(x)` |
+| `pipes` | `%>%` → `|>` | `x %>% f()` → `x |> f()` |
+| `return` | Formatage return() | Multi-ligne → une ligne |
+| `assignment` | `=` → `<-` (hors fonctions) | `x = 1` → `x <- 1` |
+| `comments` | Séparateurs uniformes | `##########` → `#----------` |
+| `magrittr` | `%<>%` → base R | (transformation) |
+| `library` | Détection imports inutiles | (rapport uniquement) |
+| `namespace` | Suggestion `::` | `library(dplyr)` → `dplyr::` |
+| `dead_code` | Code mort | `1+1` sans effet |
+
+**Utilisation :**
+
+```{r}
+# Aperçu (ne modifie rien)
+fix <- sonar_fix(".", dry_run = TRUE)
+
+# Appliquer toutes les corrections
+fix <- sonar_fix(".", dry_run = FALSE)
+
+# Appliquer seulement certaines catégories
+fix <- sonar_fix(".", fixes = c("spacing", "styler"))
+
+# Avec air (formateur Posit, plus rapide)
+install_air()
+fix <- sonar_fix(".", formatter = "air")
+```
+
+## La mécanique auto-fix → Merge Request
+
+`sonar_autofix()` automatise tout le workflow en une seule fonction :
+
+```{r}
+library(rsonar)
+
+# GitLab : analyse + commit + push + Merge Request
+sonar_autofix(provider = "gitlab")
+
+# GitHub : analyse + commit + push + Pull Request
+sonar_autofix(provider = "github")
+
+# Auto-détection de la plateforme
+sonar_autofix()  # détecte GitLab CI ou GitHub Actions
+```
+
+**Ce qui se passe :**
+1. `sonar_fix()` corrige le code (16 catégories)
+2. Crée une branche `auto/rsonar-fix`
+3. Commit avec message `style: automatic fixes by rsonar`
+4. Push + création de MR/PR via les push options GitLab
+
+## Pipeline CI complet
+
+```yaml
+stages:
+  - quality
+  - autofix
+
+rsonar-check:
+  stage: quality
+  script:
+    - R -e "sonar_analyse('.'); export_junit(); export_sonar_json()"
+
+rsonar-autofix:
+  stage: autofix
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    - when: manual
+  script:
+    - R -e "sonar_autofix(provider='gitlab', verbose=TRUE)"
+```
+
+**Workflow développeur :**
+```
+git push
+  |
+  +--> CI : rsonar-check (analyse automatique)
+  |
+  +--> Si problèmes de style :
+         |
+         +--> Clic "rsonar-autofix" (manuel)
+                |
+                +--> sonar_fix() corrige le code
+                +--> Branche auto/rsonar-fix créée
+                +--> Merge Request ouverte automatiquement
+                +--> Developer review et merge
+```
+
+**Prérequis GitLab :**
+- `PROJECT_TOKEN` dans CI/CD Variables (scope `write_repository`)
+- Autoriser les branches `auto/rsonar-fix*` en push
+- Le token est utilisé en oauth2 : `https://oauth2:${PROJECT_TOKEN}@...`
+
+## 7) Suivi dans le temps
+
+```{r}
+# Comparer deux analyses
+old_res <- sonar_analyse("path/to/project")
+new_res <- sonar_analyse("path/to/project")
+sonar_diff(new_res, old_res)
+
+# Sauvegarder l'historique
+sonar_trend(new_res, file = "rsonar-history.json")
+```
+
+## Exemple diff: avant / après correction
+
+Dans `examples/06_diff_comparison.R`:
+
+```{r}
+baseline <- sonar_analyse(".", include_coverage = FALSE, include_goodpractice = FALSE)
+current  <- sonar_analyse(".", include_coverage = FALSE, include_goodpractice = FALSE)
+
+diff <- sonar_diff(current, baseline)
+print(diff)
+```
+
+Exemple de lecture:
+
+- `improved = TRUE` : le projet s'améliore
+- `new_issues` : nouveaux problèmes introduits
+- `fixed_issues` : problèmes supprimés
+
+## Exemple trend: historique qualité
+
+Dans `examples/07_trend_tracking.R`:
+
+```{r}
+res <- sonar_analyse(".", include_coverage = FALSE, include_goodpractice = FALSE)
+sonar_trend(res, file = "output/rsonar-history.json")
+```
+
+Exemple de résultat lisible:
+
+```
+History entries: 3
+           timestamp n_lint_issues n_style_issues debt_rating
+1 2026-04-19 09:12:00             9              2           E
+2 2026-04-20 11:03:00             8              1           E
+3 2026-04-21 14:10:00             6              1           D
+```
+
+Ici, on voit une amélioration progressive dans le temps.
+
+## Exemple de pipeline CI GitHub Actions
+
+Dans `rsonar-examples/.github/workflows/06-full-pipeline.yml`:
+
+- job `lint`
+- job `style`
+- job `coverage`
+- job `gate`
+- job `report`
+
+Cela permet:
+
+- d'avoir un feedback rapide par étape
+- de publier des artefacts
+- d'échouer proprement si le gate ne passe pas
+
+## Exemple setup rapide d'un projet
+
+Dans `examples/08_project_setup.R`:
+
+```{r}
+use_rsonar_lintr(".", overwrite = TRUE)
+use_rsonar_ci("github", path = ".", overwrite = TRUE)
+use_rsonar_ci("gitlab", path = ".", overwrite = TRUE)
+```
+
+En quelques commandes, un projet récupère:
+
+- une config `.lintr`
+- un workflow GitHub Actions
+- un pipeline GitLab CI
+
+## Cas d'usage concret
+
+Un développeur modifie `messy_code.R`.
+
+Avec `rsonar`, il peut:
+
+1. lancer `quality_score(".")` dans l'IDE
+2. voir que le score passe de 38% à 61%
+3. relancer `sonar_analyse(".")`
+4. générer `quality.html`
+5. pousser son code et laisser la CI vérifier le gate
+
+## Ce qu'il faut retenir
+
+`rsonar` est utile à 3 niveaux:
+
+- **localement**: score qualité rapide dans l'IDE
+- **dans la CI**: gate + exports + rapports
+- **dans le temps**: dette, diff, tendance
+
+## Démo simple recommandée
+
+1. Lancer `sonar_analyse(".")`
+2. Lire `print(res)`
+3. Lancer `quality_score(res)`
+4. Générer `sonar_report(res, "quality.html")`
+5. Ajouter un `quality_gate()` en CI
+
+## Conclusion
+
+`rsonar` permet d'aller vite, avec des résultats compréhensibles:
+
+- pour les développeurs (IDE)
+- pour l'équipe (CI)
+- pour le pilotage qualité (score + dette + tendances)
+
+Merci.
