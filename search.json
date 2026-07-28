@@ -1,0 +1,331 @@
+[
+  {
+    "objectID": "index.html#rsonar-cest-quoi",
+    "href": "index.html#rsonar-cest-quoi",
+    "title": "rsonar en pratique",
+    "section": "rsonar, c’est quoi ?",
+    "text": "rsonar, c’est quoi ?\nrsonar mesure la qualite de code R, inspire de SonarQube :\n\nAnalyse statique (lintr)\nStyle de code (styler)\nCouverture de tests (covr)\nBonnes pratiques package (goodpractice)\nDette technique + Quality Gate"
+  },
+  {
+    "objectID": "index.html#pourquoi-cest-utile",
+    "href": "index.html#pourquoi-cest-utile",
+    "title": "rsonar en pratique",
+    "section": "Pourquoi c’est utile ?",
+    "text": "Pourquoi c’est utile ?\nUne seule commande, tout est centralise :\n\nResume console\nRapport HTML\nScore qualite en %\nExports pour la CI (JUnit, SARIF, JSON)"
+  },
+  {
+    "objectID": "index.html#demo-depot-rsonar-examples",
+    "href": "index.html#demo-depot-rsonar-examples",
+    "title": "rsonar en pratique",
+    "section": "Demo : depot rsonar-examples",
+    "text": "Demo : depot rsonar-examples\n\nCode propre : R/clean_code.R\nCode volontairement sale : R/messy_code.R\nTests partiels\nWorkflows CI pre-configures"
+  },
+  {
+    "objectID": "index.html#exemple-de-code-problematique",
+    "href": "index.html#exemple-de-code-problematique",
+    "title": "rsonar en pratique",
+    "section": "Exemple de code problematique",
+    "text": "Exemple de code problematique\nmessy_function &lt;- function(x,y) {\n  res=x+y\n  vlong &lt;- ifelse(res &gt; 0, T, F)\n  output = list(sum=res, positive=vlong)\n  return(output)\n}\nProblemes : espaces, T/F, affectations =, style non conforme."
+  },
+  {
+    "objectID": "index.html#analyse-complete",
+    "href": "index.html#analyse-complete",
+    "title": "rsonar en pratique",
+    "section": "1) Analyse complete",
+    "text": "1) Analyse complete\nlibrary(rsonar)\nres &lt;- sonar_analyse(\".\")\nprint(res)\nUn seul objet contient : lint, style, couverture, bonnes pratiques, dette."
+  },
+  {
+    "objectID": "index.html#sortie-console",
+    "href": "index.html#sortie-console",
+    "title": "rsonar en pratique",
+    "section": "Sortie console",
+    "text": "Sortie console\n-- rsonar -- Quality Report --\n  Fichiers : 12 R\n  Lint     : 8 (0 err / 4 warn / 4 style)\n  Style    : 1 non-conforme\n  Coverage : 42.3%\n\n-- Dette Technique --\n  SQALE: E | Score: 37.8% | Duree: 3.1h"
+  },
+  {
+    "objectID": "index.html#score-qualite-rapide-ide",
+    "href": "index.html#score-qualite-rapide-ide",
+    "title": "rsonar en pratique",
+    "section": "2) Score qualite rapide (IDE)",
+    "text": "2) Score qualite rapide (IDE)\nquality_score(\".\")\nAvant un commit, pendant une revue, pour suivre l’amelioration."
+  },
+  {
+    "objectID": "index.html#rapport-html",
+    "href": "index.html#rapport-html",
+    "title": "rsonar en pratique",
+    "section": "3) Rapport HTML",
+    "text": "3) Rapport HTML\nsonar_report(res, output = \"quality.html\")\nAffiche : score %, note SQALE, couverture, lint/style, dette detaillee."
+  },
+  {
+    "objectID": "index.html#bloquer-les-regressions-quality-gate",
+    "href": "index.html#bloquer-les-regressions-quality-gate",
+    "title": "rsonar en pratique",
+    "section": "4) Bloquer les regressions (Quality Gate)",
+    "text": "4) Bloquer les regressions (Quality Gate)\nquality_gate(res,\n  coverage_min    = 80,\n  lint_errors_max = 0,\n  rating_min      = \"C\",\n  fail_on_error   = TRUE)\nSi le gate echoue, le pipeline CI bloque automatiquement."
+  },
+  {
+    "objectID": "index.html#la-note-sqale",
+    "href": "index.html#la-note-sqale",
+    "title": "rsonar en pratique",
+    "section": "La note SQALE",
+    "text": "La note SQALE\nEstime un temps de correction (minutes) vs effort du projet.\n\n\n\nRatio\nNote\nSignification\n\n\n\n\n&lt;5%\nA\nExcellent\n\n\n5-10%\nB\nBon\n\n\n10-20%\nC\nCorrect\n\n\n20-50%\nD\nDette importante\n\n\n&gt;50%\nE\nDette critique"
+  },
+  {
+    "objectID": "index.html#exports-ci",
+    "href": "index.html#exports-ci",
+    "title": "rsonar en pratique",
+    "section": "5) Exports CI",
+    "text": "5) Exports CI\nexport_junit(res, \"junit-results.xml\")      # GitLab/Jenkins\nexport_sarif(res, \"results.sarif\")          # GitHub Code Scanning\nexport_sonar_json(res, \"sonar-issues.json\") # SonarQube"
+  },
+  {
+    "objectID": "index.html#auto-fix-avec-sonar_fix",
+    "href": "index.html#auto-fix-avec-sonar_fix",
+    "title": "rsonar en pratique",
+    "section": "6) Auto-fix avec sonar_fix()",
+    "text": "6) Auto-fix avec sonar_fix()\n16 familles de corrections — 12 appliquees, 4 en rapport :\n\n\n\nCategorie\nExemple\n\n\n\n\nstyler / air\nFormatage complet\n\n\nspacing\nx&lt;-1 → x &lt;- 1\n\n\ntrue_false\nif(T) → if(TRUE)\n\n\ncommas\nc(1,2,3) → c(1, 2, 3)\n\n\nsimplify\nif(x==TRUE) → if(x)\n\n\npipes\n%&gt;% → |&gt;\n\n\nassignment\n= → &lt;-\n\n\ncleanup\nEspaces fin de ligne"
+  },
+  {
+    "objectID": "index.html#utilisation",
+    "href": "index.html#utilisation",
+    "title": "rsonar en pratique",
+    "section": "Utilisation",
+    "text": "Utilisation\n# Apercu (dry-run)\nfix &lt;- sonar_fix(\".\", dry_run = TRUE)\n\n# Appliquer toutes les corrections\nfix &lt;- sonar_fix(\".\", dry_run = FALSE)\n\n# Avec air (plus rapide)\ninstall_air()\nfix &lt;- sonar_fix(\".\", formatter = \"air\")"
+  },
+  {
+    "objectID": "index.html#workflow-complet-sonar_autofix",
+    "href": "index.html#workflow-complet-sonar_autofix",
+    "title": "rsonar en pratique",
+    "section": "7) Workflow complet : sonar_autofix()",
+    "text": "7) Workflow complet : sonar_autofix()\nUne fonction pour tout le processus :\nsonar_autofix(provider = \"gitlab\")   # Analyse + commit + push + MR\nsonar_autofix(provider = \"github\")   # Analyse + commit + push + PR\nsonar_autofix()                      # Auto-detection de la plateforme"
+  },
+  {
+    "objectID": "index.html#pipeline-ci",
+    "href": "index.html#pipeline-ci",
+    "title": "rsonar en pratique",
+    "section": "Pipeline CI",
+    "text": "Pipeline CI\nstages: [quality, autofix]\n\nrsonar-check:\n  stage: quality\n  script: R -e \"sonar_analyse('.'); export_junit()\"\n\nrsonar-autofix:\n  stage: autofix\n  when: manual\n  script: R -e \"sonar_autofix(provider='gitlab', verbose=TRUE)\""
+  },
+  {
+    "objectID": "index.html#installation-token-gitlab-etape-1",
+    "href": "index.html#installation-token-gitlab-etape-1",
+    "title": "rsonar en pratique",
+    "section": "Installation : token GitLab (etape 1)",
+    "text": "Installation : token GitLab (etape 1)\nSettings &gt; Access Tokens &gt; Create token\n\n\n\nChamp\nValeur\n\n\n\n\nToken name\nrsonar-fix\n\n\nRole\nMaintainer\n\n\nScopes\nwrite_repository\n\n\n\n📋 Copier immediatement la valeur du token.\nFormat : glpat-xxxxxxxxxxxxxxxxxxxx"
+  },
+  {
+    "objectID": "index.html#installation-project_token-etape-2",
+    "href": "index.html#installation-project_token-etape-2",
+    "title": "rsonar en pratique",
+    "section": "Installation : PROJECT_TOKEN (etape 2)",
+    "text": "Installation : PROJECT_TOKEN (etape 2)\nSettings &gt; CI/CD &gt; Variables &gt; Add variable\n\n\n\nChamp\nValeur\n\n\n\n\nKey\nPROJECT_TOKEN\n\n\nValue\nColler le token de l’etape 1\n\n\nFlags\n✅ Masquee\n\n\n\nLe job CI utilise ce token via oauth2 : https://oauth2:${PROJECT_TOKEN}@..."
+  },
+  {
+    "objectID": "index.html#installation-autoriser-les-branches-etape-3",
+    "href": "index.html#installation-autoriser-les-branches-etape-3",
+    "title": "rsonar en pratique",
+    "section": "Installation : autoriser les branches (etape 3)",
+    "text": "Installation : autoriser les branches (etape 3)\nSettings &gt; Repository &gt; Protected branches &gt; Add\n\n\n\nChamp\nValeur\n\n\n\n\nBranch\nauto/rsonar-fix-*\n\n\nPush\nMaintainers\n\n\n\nLe wildcard * accepte : auto/rsonar-fix-20260728-091500"
+  },
+  {
+    "objectID": "index.html#recapitulatif",
+    "href": "index.html#recapitulatif",
+    "title": "rsonar en pratique",
+    "section": "Recapitulatif",
+    "text": "Recapitulatif\nEtape 1 : Creer un token (scope write_repository)\n   |\nEtape 2 : Ajouter PROJECT_TOKEN en variables CI/CD\n   |\nEtape 3 : Autoriser le pattern auto/rsonar-fix-* (Maintainers)\nTermine ! Pusher du code, cliquer sur le job autofix, review et merger la MR."
+  },
+  {
+    "objectID": "index.html#resultat-dans-gitlab",
+    "href": "index.html#resultat-dans-gitlab",
+    "title": "rsonar en pratique",
+    "section": "Resultat dans Gitlab",
+    "text": "Resultat dans Gitlab"
+  },
+  {
+    "objectID": "index.html#suivi-dans-le-temps",
+    "href": "index.html#suivi-dans-le-temps",
+    "title": "rsonar en pratique",
+    "section": "Suivi dans le temps",
+    "text": "Suivi dans le temps\nsonar_diff(new_res, old_res)                   # Comparaison\nsonar_trend(res, file = \"rsonar-history.json\") # Historique\nAffiche : nouveaux problemes, problemes corriges, tendance."
+  },
+  {
+    "objectID": "index.html#ce-quil-faut-retenir",
+    "href": "index.html#ce-quil-faut-retenir",
+    "title": "rsonar en pratique",
+    "section": "Ce qu’il faut retenir",
+    "text": "Ce qu’il faut retenir\nrsonar a 3 niveaux d’utilisation : - Localement : score qualite rapide dans l’IDE - En CI : gate + exports + rapports - Dans le temps : dette, diff, tendance"
+  },
+  {
+    "objectID": "index.html#conclusion",
+    "href": "index.html#conclusion",
+    "title": "rsonar en pratique",
+    "section": "Conclusion",
+    "text": "Conclusion\nsonar_fix() + sonar_autofix() completent la suite rsonar :\n\nAnalyser le code\n\nCorriger automatiquement\n\nOuvrir une Merge Request pour review\n\nLe tout depuis le pipeline CI, en un clic."
+  },
+  {
+    "objectID": "index_en.html#what-is-rsonar",
+    "href": "index_en.html#what-is-rsonar",
+    "title": "rsonar in practice",
+    "section": "What is rsonar?",
+    "text": "What is rsonar?\n\n\nrsonar measures R code quality, inspired by SonarQube:\n\nStatic analysis (lintr)\nCode style (styler)\nTest coverage (covr)\nPackage best practices (goodpractice)\nTechnical debt + Quality Gate"
+  },
+  {
+    "objectID": "index_en.html#why-is-it-useful",
+    "href": "index_en.html#why-is-it-useful",
+    "title": "rsonar in practice",
+    "section": "Why is it useful?",
+    "text": "Why is it useful?\nWithout rsonar, you run multiple tools separately and assemble results manually.\nWith rsonar: - One analysis command - Clear summary - HTML report - Quality percentage score - CI exports (JUnit, SARIF, JSON)"
+  },
+  {
+    "objectID": "index_en.html#demo-the-rsonar-examples-repository",
+    "href": "index_en.html#demo-the-rsonar-examples-repository",
+    "title": "rsonar in practice",
+    "section": "Demo: the rsonar-examples repository",
+    "text": "Demo: the rsonar-examples repository\n\nClean code in R/clean_code.R\nIntentionally messy code in R/messy_code.R\nPartial test coverage\nPre-built CI workflows\n\nGoal: show what rsonar detects."
+  },
+  {
+    "objectID": "index_en.html#problematic-code-example",
+    "href": "index_en.html#problematic-code-example",
+    "title": "rsonar in practice",
+    "section": "Problematic code example",
+    "text": "Problematic code example\nmessy_function &lt;- function(x,y) {\n  res=x+y\n  very_long_variable_name_that_exceeds_80 &lt;- ifelse(res &gt; 0, T, F)\n  output = list(sum=res, positive=very_long_variable_name)\n  return(output)\n}\nIssues: missing spaces, T/F, long lines, = assignments, bad style."
+  },
+  {
+    "objectID": "index_en.html#full-analysis",
+    "href": "index_en.html#full-analysis",
+    "title": "rsonar in practice",
+    "section": "1) Full analysis",
+    "text": "1) Full analysis\nlibrary(rsonar)\nres &lt;- sonar_analyse(\".\")\nprint(res)\nOne object contains: lint issues, style violations, coverage %, goodpractice failures, technical debt."
+  },
+  {
+    "objectID": "index_en.html#console-output",
+    "href": "index_en.html#console-output",
+    "title": "rsonar in practice",
+    "section": "Console output",
+    "text": "Console output\n-- rsonar -- Quality Report --\n  Project  : /path/to/rsonar-examples\n  Files    : 12 R file(s)\n  Lint     : 8 issues (0 err / 4 warn / 4 style)\n  Style    : 1 non-compliant file\n  Coverage : 42.3%\n  Goodpractice: 1 failure\n\n-- Technical Debt --\n  SQALE: E | Score: 37.8% | Duration: 3.1h"
+  },
+  {
+    "objectID": "index_en.html#quick-quality-score-ide",
+    "href": "index_en.html#quick-quality-score-ide",
+    "title": "rsonar in practice",
+    "section": "2) Quick quality score (IDE)",
+    "text": "2) Quick quality score (IDE)\nquality_score(\".\")\nTypical output:\nQuick Quality Score\n  Score  : 37.8%\n  Rating : E\nUse before commits, during local reviews, to track improvement."
+  },
+  {
+    "objectID": "index_en.html#html-report",
+    "href": "index_en.html#html-report",
+    "title": "rsonar in practice",
+    "section": "3) HTML report",
+    "text": "3) HTML report\nsonar_report(res, output = \"quality.html\")\nShows: quality %, SQALE rating, coverage, lint/style, detailed technical debt."
+  },
+  {
+    "objectID": "index_en.html#block-regressions-quality-gate",
+    "href": "index_en.html#block-regressions-quality-gate",
+    "title": "rsonar in practice",
+    "section": "4) Block regressions (Quality Gate)",
+    "text": "4) Block regressions (Quality Gate)\nquality_gate(res,\n  coverage_min    = 80,\n  lint_errors_max = 0,\n  style_issues_max = 0,\n  rating_min      = \"C\",\n  fail_on_error   = TRUE)\nIf the gate fails, the CI pipeline blocks automatically."
+  },
+  {
+    "objectID": "index_en.html#the-sqale-rating",
+    "href": "index_en.html#the-sqale-rating",
+    "title": "rsonar in practice",
+    "section": "The SQALE rating",
+    "text": "The SQALE rating\nEstimates correction time (minutes) vs. project effort.\n\n\n\nRatio\nRating\nMeaning\n\n\n\n\n&lt;5%\nA\nExcellent\n\n\n5-10%\nB\nGood\n\n\n10-20%\nC\nAcceptable\n\n\n20-50%\nD\nSignificant debt\n\n\n&gt;50%\nE\nCritical debt"
+  },
+  {
+    "objectID": "index_en.html#ci-exports",
+    "href": "index_en.html#ci-exports",
+    "title": "rsonar in practice",
+    "section": "5) CI exports",
+    "text": "5) CI exports\nexport_junit(res, \"junit-results.xml\")      # GitLab/Jenkins\nexport_sarif(res, \"results.sarif\")          # GitHub Code Scanning\nexport_sonar_json(res, \"sonar-issues.json\") # SonarQube\nProduces: JUnit XML, SARIF 2.1.0, SonarQube Generic Issue Import."
+  },
+  {
+    "objectID": "index_en.html#auto-fix-with-sonar_fix",
+    "href": "index_en.html#auto-fix-with-sonar_fix",
+    "title": "rsonar in practice",
+    "section": "6) Auto-fix with sonar_fix()",
+    "text": "6) Auto-fix with sonar_fix()\n16 fix families — 12 applied automatically, 4 report-only:\n\n\n\nCategory\nExample\n\n\n\n\nstyler / air\nFull formatting\n\n\nspacing\nx&lt;-1 → x &lt;- 1\n\n\ntrue_false\nif(T) → if(TRUE)\n\n\ncommas\nc(1,2,3) → c(1, 2, 3)\n\n\nsimplify\nif(x==TRUE) → if(x)\n\n\npipes\n%&gt;% → |&gt;\n\n\nassignment\n= → &lt;-\n\n\ncleanup\nTrailing spaces, blank lines"
+  },
+  {
+    "objectID": "index_en.html#fix-usage",
+    "href": "index_en.html#fix-usage",
+    "title": "rsonar in practice",
+    "section": "Fix usage",
+    "text": "Fix usage\n# Dry-run: preview changes\nfix &lt;- sonar_fix(\".\", dry_run = TRUE)\n\n# Apply all fixes\nfix &lt;- sonar_fix(\".\", dry_run = FALSE)\n\n# Select categories\nfix &lt;- sonar_fix(\".\", fixes = c(\"spacing\", \"styler\"))\n\n# Use air formatter (fast)\ninstall_air()\nfix &lt;- sonar_fix(\".\", formatter = \"air\")"
+  },
+  {
+    "objectID": "index_en.html#full-workflow-sonar_autofix",
+    "href": "index_en.html#full-workflow-sonar_autofix",
+    "title": "rsonar in practice",
+    "section": "7) Full workflow: sonar_autofix()",
+    "text": "7) Full workflow: sonar_autofix()\nOne function for the entire fix workflow:\nsonar_autofix(provider = \"gitlab\")   # Analyse + commit + push + MR\nsonar_autofix(provider = \"github\")   # Analyse + commit + push + PR\nsonar_autofix()                      # Auto-detect platform\nWhat happens: 1. sonar_fix() corrects the code 2. Creates branch auto/rsonar-fix 3. Commits + pushes 4. Opens Merge/Pull Request automatically"
+  },
+  {
+    "objectID": "index_en.html#ci-pipeline",
+    "href": "index_en.html#ci-pipeline",
+    "title": "rsonar in practice",
+    "section": "CI Pipeline",
+    "text": "CI Pipeline\nstages: [quality, autofix]\n\nrsonar-check:\n  stage: quality\n  script: R -e \"sonar_analyse('.'); export_junit(); export_sonar_json()\"\n\nrsonar-autofix:\n  stage: autofix\n  when: manual\n  script: R -e \"sonar_autofix(provider='gitlab', verbose=TRUE)\""
+  },
+  {
+    "objectID": "index_en.html#setup-gitlab-token-step-1",
+    "href": "index_en.html#setup-gitlab-token-step-1",
+    "title": "rsonar in practice",
+    "section": "Setup: GitLab token (step 1)",
+    "text": "Setup: GitLab token (step 1)\nSettings &gt; Access Tokens &gt; Create token\n\n\n\nField\nValue\n\n\n\n\nToken name\nrsonar-fix\n\n\nRole\nMaintainer\n\n\nScopes\nwrite_repository\n\n\n\n📋 Copy the token value immediately — it’s shown only once.\nFormat: glpat-xxxxxxxxxxxxxxxxxxxx"
+  },
+  {
+    "objectID": "index_en.html#setup-add-project_token-step-2",
+    "href": "index_en.html#setup-add-project_token-step-2",
+    "title": "rsonar in practice",
+    "section": "Setup: Add PROJECT_TOKEN (step 2)",
+    "text": "Setup: Add PROJECT_TOKEN (step 2)\nSettings &gt; CI/CD &gt; Variables &gt; Add variable\n\n\n\nField\nValue\n\n\n\n\nKey\nPROJECT_TOKEN\n\n\nValue\nPaste the token from step 1\n\n\nFlags\n✅ Masked\n\n\n\nThe CI job uses this token via oauth2: https://oauth2:${PROJECT_TOKEN}@..."
+  },
+  {
+    "objectID": "index_en.html#setup-allow-fix-branches-step-3",
+    "href": "index_en.html#setup-allow-fix-branches-step-3",
+    "title": "rsonar in practice",
+    "section": "Setup: Allow fix branches (step 3)",
+    "text": "Setup: Allow fix branches (step 3)\nSettings &gt; Repository &gt; Protected branches &gt; Add\n\n\n\nField\nValue\n\n\n\n\nBranch\nauto/rsonar-fix-*\n\n\nPush\nMaintainers\n\n\n\nThe wildcard * accepts: auto/rsonar-fix-20260728-091500"
+  },
+  {
+    "objectID": "index_en.html#summary",
+    "href": "index_en.html#summary",
+    "title": "rsonar in practice",
+    "section": "Summary",
+    "text": "Summary\nStep 1: Create token (write_repository scope) — copy value\n   |\nStep 2: Add PROJECT_TOKEN in CI/CD Variables (Masked)\n   |\nStep 3: Protect branch pattern auto/rsonar-fix-* (Maintainers)\nDone! Push code, click the autofix job, review and merge the MR."
+  },
+  {
+    "objectID": "index_en.html#resultat-dans-gitlab",
+    "href": "index_en.html#resultat-dans-gitlab",
+    "title": "rsonar in practice",
+    "section": "Resultat dans Gitlab",
+    "text": "Resultat dans Gitlab"
+  },
+  {
+    "objectID": "index_en.html#time-tracking",
+    "href": "index_en.html#time-tracking",
+    "title": "rsonar in practice",
+    "section": "Time tracking",
+    "text": "Time tracking\n# Compare two analyses\nsonar_diff(new_res, old_res)\n\n# Save history\nsonar_trend(res, file = \"rsonar-history.json\")\nShows: new issues introduced, issues fixed, trend over time."
+  },
+  {
+    "objectID": "index_en.html#key-takeaways",
+    "href": "index_en.html#key-takeaways",
+    "title": "rsonar in practice",
+    "section": "Key takeaways",
+    "text": "Key takeaways\nrsonar at 3 levels: - Locally: quick quality score in the IDE - In CI: gate + exports + reports - Over time: debt, diff, trend"
+  },
+  {
+    "objectID": "index_en.html#recommended-demo",
+    "href": "index_en.html#recommended-demo",
+    "title": "rsonar in practice",
+    "section": "Recommended demo",
+    "text": "Recommended demo\n\nsonar_analyse(\".\")\nprint(res)\nquality_score(res)\nsonar_report(res, \"quality.html\")\nAdd a quality_gate() in CI\nTry sonar_fix(\".\") on messy code"
+  },
+  {
+    "objectID": "index_en.html#conclusion",
+    "href": "index_en.html#conclusion",
+    "title": "rsonar in practice",
+    "section": "Conclusion",
+    "text": "Conclusion\nsonar_fix() + sonar_autofix() complete the rsonar suite:\n\nAnalyse the code\n\nFix it automatically\n\nOpen a Merge Request for review\n\nAll from the CI pipeline, in one click.\nThank you."
+  }
+]
