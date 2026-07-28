@@ -213,21 +213,6 @@ Le job CI utilise ce token via oauth2 :
 
 Le wildcard `*` accepte : `auto/rsonar-fix-20260728-091500`
 
-## Installation : decommenter le job (etape 4)
-
-Avant :
-```yaml
-# rsonar-autofix:
-#   script: R -e "sonar_autofix()"
-```
-
-Apres :
-```yaml
-rsonar-autofix:
-  when: manual
-  script: R -e "sonar_autofix()"
-```
-
 ## Recapitulatif
 
 ```
@@ -236,13 +221,19 @@ Etape 1 : Creer un token (scope write_repository)
 Etape 2 : Ajouter PROJECT_TOKEN en variables CI/CD
    |
 Etape 3 : Autoriser le pattern auto/rsonar-fix-* (Maintainers)
-   |
-Etape 4 : Decommenter le job rsonar-autofix
 ```
 
 **Termine !** Pusher du code, cliquer sur le job autofix, review et merger la MR.
 
-## 8) Suivi dans le temps
+## Resultat dans Gitlab
+
+![](images/gitlab_mr.png){fig-align="center"}
+  
+  
+![](images/gitlab_mr_detail.png){fig-align="center"}
+
+
+## Suivi dans le temps
 
 ```{.r}
 sonar_diff(new_res, old_res)                   # Comparaison
@@ -262,8 +253,8 @@ Affiche : nouveaux problemes, problemes corriges, tendance.
 
 `sonar_fix()` + `sonar_autofix()` completent la suite rsonar :
 
-- Analyser le code
-- Corriger automatiquement
-- Ouvrir une Merge Request pour review
+- Analyser le code  
+- Corriger automatiquement  
+- Ouvrir une Merge Request pour review  
 
 Le tout depuis le pipeline CI, en un clic.

@@ -245,21 +245,6 @@ The CI job uses this token via oauth2:
 
 The wildcard `*` accepts: `auto/rsonar-fix-20260728-091500`
 
-## Setup: Uncomment the job (step 4)
-
-Before:
-```yaml
-# rsonar-autofix:
-#   script: R -e "sonar_autofix()"
-```
-
-After:
-```yaml
-rsonar-autofix:
-  when: manual
-  script: R -e "sonar_autofix()"
-```
-
 ## Summary
 
 ```
@@ -268,13 +253,18 @@ Step 1: Create token (write_repository scope) — copy value
 Step 2: Add PROJECT_TOKEN in CI/CD Variables (Masked)
    |
 Step 3: Protect branch pattern auto/rsonar-fix-* (Maintainers)
-   |
-Step 4: Uncomment rsonar-autofix in .gitlab-ci.yml
 ```
 
 **Done!** Push code, click the autofix job, review and merge the MR.
 
-## 8) Time tracking
+## Resultat dans Gitlab
+
+![](images/gitlab_mr.png){fig-align="center"}
+  
+  
+![](images/gitlab_mr_detail.png){fig-align="center"}
+
+## Time tracking
 
 ```{.r}
 # Compare two analyses
@@ -306,9 +296,9 @@ rsonar at 3 levels:
 
 `sonar_fix()` + `sonar_autofix()` complete the rsonar suite:
 
-- Analyse the code
-- Fix it automatically
-- Open a Merge Request for review
+- Analyse the code  
+- Fix it automatically  
+- Open a Merge Request for review  
 
 All from the CI pipeline, in one click.
 
