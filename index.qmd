@@ -39,7 +39,7 @@ Une seule commande, tout est centralise :
 
 ## Exemple de code problematique
 
-```{r}
+```{.r}
 messy_function <- function(x,y) {
   res=x+y
   vlong <- ifelse(res > 0, T, F)
@@ -52,7 +52,7 @@ Problemes : espaces, `T`/`F`, affectations `=`, style non conforme.
 
 ## 1) Analyse complete
 
-```{r}
+```{.r}
 library(rsonar)
 res <- sonar_analyse(".")
 print(res)
@@ -75,7 +75,7 @@ Un seul objet contient : lint, style, couverture, bonnes pratiques, dette.
 
 ## 2) Score qualite rapide (IDE)
 
-```{r}
+```{.r}
 quality_score(".")
 ```
 
@@ -83,7 +83,7 @@ Avant un commit, pendant une revue, pour suivre l'amelioration.
 
 ## 3) Rapport HTML
 
-```{r}
+```{.r}
 sonar_report(res, output = "quality.html")
 ```
 
@@ -91,7 +91,7 @@ Affiche : score %, note SQALE, couverture, lint/style, dette detaillee.
 
 ## 4) Bloquer les regressions (Quality Gate)
 
-```{r}
+```{.r}
 quality_gate(res,
   coverage_min    = 80,
   lint_errors_max = 0,
@@ -115,7 +115,7 @@ Estime un temps de correction (minutes) vs effort du projet.
 
 ## 5) Exports CI
 
-```{r}
+```{.r}
 export_junit(res, "junit-results.xml")      # GitLab/Jenkins
 export_sarif(res, "results.sarif")          # GitHub Code Scanning
 export_sonar_json(res, "sonar-issues.json") # SonarQube
@@ -138,7 +138,7 @@ export_sonar_json(res, "sonar-issues.json") # SonarQube
 
 ## Utilisation
 
-```{r}
+```{.r}
 # Apercu (dry-run)
 fix <- sonar_fix(".", dry_run = TRUE)
 
@@ -154,7 +154,7 @@ fix <- sonar_fix(".", formatter = "air")
 
 Une fonction pour tout le processus :
 
-```{r}
+```{.r}
 sonar_autofix(provider = "gitlab")   # Analyse + commit + push + MR
 sonar_autofix(provider = "github")   # Analyse + commit + push + PR
 sonar_autofix()                      # Auto-detection de la plateforme
@@ -244,7 +244,7 @@ Etape 4 : Decommenter le job rsonar-autofix
 
 ## 8) Suivi dans le temps
 
-```{r}
+```{.r}
 sonar_diff(new_res, old_res)                   # Comparaison
 sonar_trend(res, file = "rsonar-history.json") # Historique
 ```
