@@ -3,11 +3,13 @@ project:
   output-dir: _site
 
 website:
-  title: "Présentation rsonar"
+  title: "rsonar Presentation"
   navbar:
     left:
       - href: index.qmd
-        text: Accueil
+        text: Français
+      - href: index_en.qmd
+        text: English
 
 format:
   revealjs:
