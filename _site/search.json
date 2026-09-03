@@ -1,0 +1,268 @@
+[
+  {
+    "objectID": "index_en.html#what-is-rsonar",
+    "href": "index_en.html#what-is-rsonar",
+    "title": "rsonar in practice",
+    "section": "What is rsonar?",
+    "text": "What is rsonar?\n\n\nrsonar is the R equivalent of SonarQube: it centralizes R code quality measurement into one interactive report.\n\n\n\nTool\nRole\n\n\n\n\nlintr\nStatic analysis — bugs, style, complexity\n\n\nstyler\nCode formatting\n\n\ncovr\nTest coverage\n\n\ngoodpractice\nPackage best practices\n\n\n\n\n\n\nSonarQube vocabulary: issues, Coverage, Quality Gate."
+  },
+  {
+    "objectID": "index_en.html#the-plan-measure-improve-measure",
+    "href": "index_en.html#the-plan-measure-improve-measure",
+    "title": "rsonar in practice",
+    "section": "The plan: measure, improve, measure",
+    "text": "The plan: measure, improve, measure\nA loop, on a single running example:\n\nStart from problematic code\nMeasure quality with rsonar (score, rating, debt)\nImprove the code step by step\nRe-measure and watch the score go up"
+  },
+  {
+    "objectID": "index_en.html#the-starting-code-version-0",
+    "href": "index_en.html#the-starting-code-version-0",
+    "title": "rsonar in practice",
+    "section": "The starting code (version 0)",
+    "text": "The starting code (version 0)\nFile R/analysis.R:\naddcols &lt;- function(d,a,b){\n  if(nrow(d)==0){stop(\"empty\")}\n  total=d[[a]]+d[[b]]\n  positive &lt;- ifelse(total&gt;0,T,F)\n  result=list(total=total, positive=positive)\n  return(result)\n}\nProblems: naming, spacing, = vs &lt;-, T/F, no docs, no tests."
+  },
+  {
+    "objectID": "index_en.html#step-0-measure-the-initial-state",
+    "href": "index_en.html#step-0-measure-the-initial-state",
+    "title": "rsonar in practice",
+    "section": "Step 0 — Measure the initial state",
+    "text": "Step 0 — Measure the initial state\nlibrary(rsonar)\nres &lt;- sonar_analyse(\".\")\nprint(res)\n-- rsonar -- Quality Report --\n  Files       : 1 R\n  Lint        : 8 issues (0 err / 3 warn / 5 style)\n  Style       : 1 non-compliant file\n  Coverage    : 0%\n  Goodpractice: 3 failures\n\n-- Technical Debt --\n  SQALE: E | Score: 38% | Duration: 4.2h"
+  },
+  {
+    "objectID": "index_en.html#step-0-score-rating-and-hotspots",
+    "href": "index_en.html#step-0-score-rating-and-hotspots",
+    "title": "rsonar in practice",
+    "section": "Step 0 — Score, rating and hotspots",
+    "text": "Step 0 — Score, rating and hotspots\nquality_score(\".\")   # Score: 38% | Rating: E\ndebt_index(res)      # Rating: E (critical debt)\nsonar_hotspots(res)  # → R/analysis.R first\n\ndebt_index(): technical debt rating (A to E)\nsonar_hotspots(): files to fix first\nsonar_report(res): interactive HTML report"
+  },
+  {
+    "objectID": "index_en.html#step-1-fix-style-automatically",
+    "href": "index_en.html#step-1-fix-style-automatically",
+    "title": "rsonar in practice",
+    "section": "Step 1 — Fix style automatically",
+    "text": "Step 1 — Fix style automatically\nsonar_fix() is powered by air, Posit’s fast R formatter.\n# Preview without changing anything\nsonar_fix(\".\", dry_run = TRUE)\n\n# Apply the style fixes\nsonar_fix(\".\")\nFixes: spacing, = → &lt;-, braces, indentation."
+  },
+  {
+    "objectID": "index_en.html#step-1-result-version-1",
+    "href": "index_en.html#step-1-result-version-1",
+    "title": "rsonar in practice",
+    "section": "Step 1 — Result (version 1)",
+    "text": "Step 1 — Result (version 1)\naddcols &lt;- function(d, a, b) {\n  if (nrow(d) == 0) {\n    stop(\"empty\")\n  }\n  total &lt;- d[[a]] + d[[b]]\n  positive &lt;- ifelse(total &gt; 0, T, F)\n  result &lt;- list(total = total, positive = positive)\n  return(result)\n}\nStyle is fixed, but naming, complexity and docs remain.\nRe-measure: Score 62% · Rating D."
+  },
+  {
+    "objectID": "index_en.html#step-2-refactor-and-document",
+    "href": "index_en.html#step-2-refactor-and-document",
+    "title": "rsonar in practice",
+    "section": "Step 2 — Refactor and document",
+    "text": "Step 2 — Refactor and document\nManual improvements:\n\naddcols → add_columns, d/a/b → data/col1/col2\nifelse(x &gt; 0, T, F) → x &gt; 0\nroxygen documentation added\n\n#' Sum two columns and flag positive rows\n#'\n#' @param data A data frame.\n#' @param col1,col2 Column names to sum.\n#' @return A list with `total` and `positive`.\nadd_columns &lt;- function(data, col1, col2) {\n  if (nrow(data) == 0) {\n    stop(\"`data` must contain at least one row.\")\n  }\n  total &lt;- data[[col1]] + data[[col2]]\n  list(total = total, positive = total &gt; 0)\n}\nRe-measure: Score 78% · Rating C."
+  },
+  {
+    "objectID": "index_en.html#step-3-add-tests",
+    "href": "index_en.html#step-3-add-tests",
+    "title": "rsonar in practice",
+    "section": "Step 3 — Add tests",
+    "text": "Step 3 — Add tests\ntests/testthat/test-analysis.R:\ntest_that(\"add_columns sums and flags\", {\n  data &lt;- data.frame(a = c(1, -2, 3), b = c(0, 5, -5))\n  res &lt;- add_columns(data, \"a\", \"b\")\n\n  expect_equal(res$total, c(1, 3, -2))\n  expect_equal(res$positive, c(TRUE, TRUE, FALSE))\n})\nCoverage goes from 0% to 85%.\nRe-measure: Score 94% · Rating A."
+  },
+  {
+    "objectID": "index_en.html#the-progress-at-a-glance",
+    "href": "index_en.html#the-progress-at-a-glance",
+    "title": "rsonar in practice",
+    "section": "The progress at a glance",
+    "text": "The progress at a glance\n\n\n\nStep\nAction\nScore\nRating\nCoverage\n\n\n\n\n0\nStarting code\n38 %\nE\n0 %\n\n\n1\nAuto style (sonar_fix)\n62 %\nD\n0 %\n\n\n2\nRefactor + docs\n78 %\nC\n0 %\n\n\n3\nTests added\n94 %\nA\n85 %\n\n\n\nEach targeted improvement raises the score and lowers the debt."
+  },
+  {
+    "objectID": "index_en.html#step-4-block-regressions-quality-gate",
+    "href": "index_en.html#step-4-block-regressions-quality-gate",
+    "title": "rsonar in practice",
+    "section": "Step 4 — Block regressions (Quality Gate)",
+    "text": "Step 4 — Block regressions (Quality Gate)\nquality_gate(res,\n  coverage_min    = 80,\n  lint_errors_max = 0,\n  rating_min      = \"B\",\n  fail_on_error   = TRUE)\nIf a threshold is crossed, the CI pipeline blocks automatically.\nThis is the guard that prevents the rating from dropping back."
+  },
+  {
+    "objectID": "index_en.html#track-the-evolution-over-time",
+    "href": "index_en.html#track-the-evolution-over-time",
+    "title": "rsonar in practice",
+    "section": "Track the evolution over time",
+    "text": "Track the evolution over time\n# Compare two analyses (before / after)\nsonar_diff(res_v3, res_v0)\n\n# Save scores to plot the trend\nsonar_trend(res, file = \"rsonar-history.json\")\n\nsonar_diff(): new issues, fixed issues\nsonar_trend(): rating evolution curve"
+  },
+  {
+    "objectID": "index_en.html#export-results-ci",
+    "href": "index_en.html#export-results-ci",
+    "title": "rsonar in practice",
+    "section": "Export results (CI)",
+    "text": "Export results (CI)\nexport_junit(res, \"junit-results.xml\")      # GitLab/Jenkins\nexport_sarif(res, \"results.sarif\")          # GitHub Code Scanning\nexport_sonar_json(res, \"sonar-issues.json\") # SonarQube\nStandard formats: JUnit XML, SARIF 2.1.0, SonarQube Generic Issue Import."
+  },
+  {
+    "objectID": "index_en.html#going-further-automate-the-fixes",
+    "href": "index_en.html#going-further-automate-the-fixes",
+    "title": "rsonar in practice",
+    "section": "Going further: automate the fixes",
+    "text": "Going further: automate the fixes\nsonar_fix(\".\", create_mr = TRUE) opens a Merge/Pull Request directly.\nCI job rsonar-fix (optional manual task):\n\nInstalls air (install_air())\nFormats all R files (sonar_fix())\nOpens an MR/PR with the fixes\n\n→ No more manual reformatting: trigger, review, merge."
+  },
+  {
+    "objectID": "index_en.html#ci-pipeline-gitlab",
+    "href": "index_en.html#ci-pipeline-gitlab",
+    "title": "rsonar in practice",
+    "section": "CI Pipeline (GitLab)",
+    "text": "CI Pipeline (GitLab)\nstages: [quality, autofix]\n\nrsonar-check:\n  stage: quality\n  script: R -e \"sonar_analyse('.'); export_junit()\"\n\nrsonar-fix:\n  stage: autofix\n  when: manual\n  script: R -e \"sonar_fix('.', create_mr = TRUE)\""
+  },
+  {
+    "objectID": "index_en.html#key-takeaways",
+    "href": "index_en.html#key-takeaways",
+    "title": "rsonar in practice",
+    "section": "Key takeaways",
+    "text": "Key takeaways\nrsonar = measure, fix, secure:\n\nLocally: quality_score() and debt_index() for instant feedback\nIn depth: sonar_analyse() + sonar_report() + sonar_hotspots()\nOver time: sonar_diff() / sonar_trend() to watch the rating improve\nIn CI: quality_gate() + exports + sonar_fix(create_mr = TRUE)"
+  },
+  {
+    "objectID": "index_en.html#conclusion",
+    "href": "index_en.html#conclusion",
+    "title": "rsonar in practice",
+    "section": "Conclusion",
+    "text": "Conclusion\nThe pedagogical loop:\n\nStart from problematic code\nMeasure quality (score, rating, debt)\nImprove step by step (style → refactor → tests)\nWatch the rating climb: 38% → 62% → 78% → 94%"
+  },
+  {
+    "objectID": "article-rsonar.html#le-principe-un-sonarqube-pensé-pour-r",
+    "href": "article-rsonar.html#le-principe-un-sonarqube-pensé-pour-r",
+    "title": "rsonar Presentation",
+    "section": "Le principe : un SonarQube pensé pour R",
+    "text": "Le principe : un SonarQube pensé pour R\nrsonar part d’un constat simple : l’écosystème R dispose déjà d’excellents outils d’analyse de qualité (lintr, styler, covr, goodpractice), mais chacun produit son propre rapport, dans son propre format, sans vue d’ensemble. rsonar vient les orchestrer et centraliser leurs résultats dans un rapport unique, interactif, avec une estimation de la dette technique — un peu comme le ferait SonarQube pour d’autres langages.\n\n\n\nOutil\nRôle\n\n\n\n\nlintr\nAnalyse statique — bugs, style, complexité\n\n\nstyler\nFormatage du code (style tidyverse)\n\n\ncovr\nCouverture de tests\n\n\ngoodpractice\nBonnes pratiques de packaging R\n\n\n\nLe package reprend même le vocabulaire de SonarQube pour rester familier aux équipes qui en ont l’habitude : les issues de lintr deviennent les “issues”, la couverture covr alimente le “Coverage”, et un véritable Quality Gate (quality_gate()) permet de fixer des seuils bloquants (couverture minimale, zéro erreur de lint, etc.)."
+  },
+  {
+    "objectID": "article-rsonar.html#un-usage-pensé-pour-tous-les-contextes",
+    "href": "article-rsonar.html#un-usage-pensé-pour-tous-les-contextes",
+    "title": "rsonar Presentation",
+    "section": "Un usage pensé pour tous les contextes",
+    "text": "Un usage pensé pour tous les contextes\nCe qui rend rsonar particulièrement pratique, c’est qu’il s’utilise aussi bien en local que dans une CI :\n\nEn local, pour un feedback instantané : la fonction quality_score(\".\") affiche directement un pourcentage de qualité et une note (A à E) dans la console de l’IDE, sans configuration de CI ni de forge.\nEn profondeur, pour une analyse complète : sonar_analyse() lance l’ensemble des outils sur un package et retourne un objet exploitable par toutes les autres fonctions.\n\nParmi les fonctionnalités clés :\n\nsonar_report() génère un rapport HTML interactif.\ndebt_index() calcule un indice de dette technique noté de A à E, à la manière du “Maintainability Rating” de SonarQube.\nsonar_hotspots() classe les fichiers à corriger en priorité, en fonction de leur dette technique.\nsonar_diff() compare deux analyses pour détecter des régressions de qualité entre deux versions.\nsonar_trend() permet de suivre l’évolution de la qualité dans le temps.\nexport_sonar_json(), export_sarif() et export_junit() exportent les résultats dans des formats standards, respectivement compatibles avec l’import générique d’issues SonarQube, le Code Scanning GitHub (SARIF), et les artefacts de tests GitLab CI (JUnit XML)."
+  },
+  {
+    "objectID": "article-rsonar.html#la-correction-automatique-avec-air",
+    "href": "article-rsonar.html#la-correction-automatique-avec-air",
+    "title": "rsonar Presentation",
+    "section": "La correction automatique avec air",
+    "text": "La correction automatique avec air\nAutre atout notable : l’intégration avec air, le formateur de code R rapide développé par Posit. Avec sonar_fix(), rsonar peut :\n\ninstaller air via install_air() ;\nformater automatiquement l’ensemble des fichiers R du projet ;\net, en une seule option, ouvrir directement une Merge Request ou une Pull Request avec les corrections.\n\nlibrary(rsonar)\n\n# Voir ce qui serait modifié, sans rien changer\nfix &lt;- sonar_fix(\".\", dry_run = TRUE)\n\n# Corriger automatiquement le style du code\nfix &lt;- sonar_fix(\".\")\n\n# Corriger ET ouvrir une Merge Request\nfix &lt;- sonar_fix(\".\", create_mr = TRUE)"
+  },
+  {
+    "objectID": "article-rsonar.html#le-point-fort-la-création-automatique-de-mrpr",
+    "href": "article-rsonar.html#le-point-fort-la-création-automatique-de-mrpr",
+    "title": "rsonar Presentation",
+    "section": "Le point fort : la création automatique de MR/PR",
+    "text": "Le point fort : la création automatique de MR/PR\nC’est sans doute la fonctionnalité la plus intéressante pour un usage en équipe : intégré dans une pipeline CI, rsonar peut ouvrir tout seul une Merge Request (GitLab) ou une Pull Request (GitHub) contenant les corrections de style. Le job rsonar-fix est conçu comme une tâche manuelle optionnelle de la pipeline :\n\ninstallation du formateur air ;\nexécution de sonar_fix() sur l’ensemble des fichiers R ;\nouverture automatique d’une MR/PR avec les changements.\n\nRésultat : plus besoin de reformater son code à la main avant de commiter, ni de faire des allers-retours en revue de code sur de simples questions de style. Un développeur déclenche le job, et une MR toute prête arrive avec le diff de mise en forme — il ne reste plus qu’à la relire et la fusionner.\nDeux dépôts GitLab illustrent concrètement ce fonctionnement :\n\nrproject_for_rsonar : un projet R d’exemple, qui sert de terrain de test pour exécuter rsonar “en conditions réelles” et déclencher la génération automatique de MR.\nci-templates-r : un dépôt de templates de pipelines CI réutilisables, dans lequel est notamment défini le job rsonar-fix qui orchestre l’installation d’air, le passage de sonar_fix() et la création de la Merge Request.\n\nEn combinant les deux, une équipe peut brancher rsonar sur n’importe quel projet R en quelques lignes de configuration GitLab CI, et bénéficier immédiatement d’un contrôle qualité centralisé… jusqu’à la correction automatisée du style de code, sans jamais quitter sa forge."
+  },
+  {
+    "objectID": "index.html#rsonar-cest-quoi",
+    "href": "index.html#rsonar-cest-quoi",
+    "title": "rsonar en pratique",
+    "section": "rsonar, c’est quoi ?",
+    "text": "rsonar, c’est quoi ?\n\n\nrsonar est l’équivalent R de SonarQube : il centralise la mesure de la qualité du code R dans un rapport unique et interactif.\n\n\n\nOutil\nRôle\n\n\n\n\nlintr\nAnalyse statique — bugs, style, complexité\n\n\nstyler\nFormatage du code\n\n\ncovr\nCouverture de tests\n\n\ngoodpractice\nBonnes pratiques de packaging\n\n\n\n\n\n\nVocabulaire SonarQube : issues, Coverage, Quality Gate."
+  },
+  {
+    "objectID": "index.html#le-plan-mesurer-améliorer-mesurer",
+    "href": "index.html#le-plan-mesurer-améliorer-mesurer",
+    "title": "rsonar en pratique",
+    "section": "Le plan : mesurer, améliorer, mesurer",
+    "text": "Le plan : mesurer, améliorer, mesurer\nUne démarche en boucle, sur un exemple fil rouge :\n\nPartir d’un code problématique\nMesurer la qualité avec rsonar (score, note, dette)\nAméliorer le code pas à pas\nRe-mesurer et voir la note augmenter"
+  },
+  {
+    "objectID": "index.html#le-code-de-départ-version-0",
+    "href": "index.html#le-code-de-départ-version-0",
+    "title": "rsonar en pratique",
+    "section": "Le code de départ (version 0)",
+    "text": "Le code de départ (version 0)\nFichier R/analysis.R :\naddcols &lt;- function(d,a,b){\n  if(nrow(d)==0){stop(\"empty\")}\n  total=d[[a]]+d[[b]]\n  positive &lt;- ifelse(total&gt;0,T,F)\n  result=list(total=total, positive=positive)\n  return(result)\n}\nProblèmes : nommage, espaces, = vs &lt;-, T/F, pas de doc, aucun test."
+  },
+  {
+    "objectID": "index.html#étape-0-mesurer-létat-initial",
+    "href": "index.html#étape-0-mesurer-létat-initial",
+    "title": "rsonar en pratique",
+    "section": "Étape 0 — Mesurer l’état initial",
+    "text": "Étape 0 — Mesurer l’état initial\nlibrary(rsonar)\nres &lt;- sonar_analyse(\".\")\nprint(res)\n-- rsonar -- Quality Report --\n  Fichiers    : 1 R\n  Lint        : 8 issues (0 err / 3 warn / 5 style)\n  Style       : 1 fichier non conforme\n  Coverage    : 0%\n  Goodpractice: 3 échecs\n\n-- Dette Technique --\n  SQALE: E | Score: 38% | Durée: 4.2h"
+  },
+  {
+    "objectID": "index.html#étape-0-score-note-et-hotspots",
+    "href": "index.html#étape-0-score-note-et-hotspots",
+    "title": "rsonar en pratique",
+    "section": "Étape 0 — Score, note et hotspots",
+    "text": "Étape 0 — Score, note et hotspots\nquality_score(\".\")   # Score : 38% | Rating : E\ndebt_index(res)      # Note : E (dette critique)\nsonar_hotspots(res)  # → R/analysis.R en priorité\n\ndebt_index() : note de dette technique (A à E)\nsonar_hotspots() : fichiers à corriger en priorité\nsonar_report(res) : rapport HTML interactif"
+  },
+  {
+    "objectID": "index.html#étape-1-corriger-le-style-automatiquement",
+    "href": "index.html#étape-1-corriger-le-style-automatiquement",
+    "title": "rsonar en pratique",
+    "section": "Étape 1 — Corriger le style automatiquement",
+    "text": "Étape 1 — Corriger le style automatiquement\nsonar_fix() s’appuie sur air, le formateur R rapide de Posit.\n# Aperçu sans rien modifier\nsonar_fix(\".\", dry_run = TRUE)\n\n# Application des corrections de style\nsonar_fix(\".\")\nCorrige : espaces, = → &lt;-, accolades, indentation."
+  },
+  {
+    "objectID": "index.html#étape-1-résultat-version-1",
+    "href": "index.html#étape-1-résultat-version-1",
+    "title": "rsonar en pratique",
+    "section": "Étape 1 — Résultat (version 1)",
+    "text": "Étape 1 — Résultat (version 1)\naddcols &lt;- function(d, a, b) {\n  if (nrow(d) == 0) {\n    stop(\"empty\")\n  }\n  total &lt;- d[[a]] + d[[b]]\n  positive &lt;- ifelse(total &gt; 0, T, F)\n  result &lt;- list(total = total, positive = positive)\n  return(result)\n}\nLe style est réglé, mais le nommage, la complexité et la doc restent.\nRe-mesure : Score 62% · Note D."
+  },
+  {
+    "objectID": "index.html#étape-2-refactoriser-et-documenter",
+    "href": "index.html#étape-2-refactoriser-et-documenter",
+    "title": "rsonar en pratique",
+    "section": "Étape 2 — Refactoriser et documenter",
+    "text": "Étape 2 — Refactoriser et documenter\nAméliorations manuelles :\n\naddcols → add_columns, d/a/b → data/col1/col2\nifelse(x &gt; 0, T, F) → x &gt; 0\ndocumentation roxygen ajoutée\n\n#' Somme deux colonnes et signale les lignes positives\n#'\n#' @param data Un data frame.\n#' @param col1,col2 Noms des colonnes à sommer.\n#' @return Une liste avec `total` et `positive`.\nadd_columns &lt;- function(data, col1, col2) {\n  if (nrow(data) == 0) {\n    stop(\"`data` doit contenir au moins une ligne.\")\n  }\n  total &lt;- data[[col1]] + data[[col2]]\n  list(total = total, positive = total &gt; 0)\n}\nRe-mesure : Score 78% · Note C."
+  },
+  {
+    "objectID": "index.html#étape-3-ajouter-des-tests",
+    "href": "index.html#étape-3-ajouter-des-tests",
+    "title": "rsonar en pratique",
+    "section": "Étape 3 — Ajouter des tests",
+    "text": "Étape 3 — Ajouter des tests\ntests/testthat/test-analysis.R :\ntest_that(\"add_columns somme et signale\", {\n  data &lt;- data.frame(a = c(1, -2, 3), b = c(0, 5, -5))\n  res &lt;- add_columns(data, \"a\", \"b\")\n\n  expect_equal(res$total, c(1, 3, -2))\n  expect_equal(res$positive, c(TRUE, TRUE, FALSE))\n})\nLa couverture passe de 0% à 85%.\nRe-mesure : Score 94% · Note A."
+  },
+  {
+    "objectID": "index.html#la-progression-en-un-coup-dœil",
+    "href": "index.html#la-progression-en-un-coup-dœil",
+    "title": "rsonar en pratique",
+    "section": "La progression en un coup d’œil",
+    "text": "La progression en un coup d’œil\n\n\n\nÉtape\nAction\nScore\nNote\nCouverture\n\n\n\n\n0\nCode initial\n38 %\nE\n0 %\n\n\n1\nStyle auto (sonar_fix)\n62 %\nD\n0 %\n\n\n2\nRefactorisation + doc\n78 %\nC\n0 %\n\n\n3\nTests ajoutés\n94 %\nA\n85 %\n\n\n\nChaque amélioration ciblée fait monter le score et baisser la dette."
+  },
+  {
+    "objectID": "index.html#étape-4-bloquer-les-régressions-quality-gate",
+    "href": "index.html#étape-4-bloquer-les-régressions-quality-gate",
+    "title": "rsonar en pratique",
+    "section": "Étape 4 — Bloquer les régressions (Quality Gate)",
+    "text": "Étape 4 — Bloquer les régressions (Quality Gate)\nquality_gate(res,\n  coverage_min    = 80,\n  lint_errors_max = 0,\n  rating_min      = \"B\",\n  fail_on_error   = TRUE)\nSi un seuil est franchi, la pipeline CI bloque automatiquement.\nC’est le garde-fou qui empêche la note de redescendre."
+  },
+  {
+    "objectID": "index.html#suivre-lévolution-dans-le-temps",
+    "href": "index.html#suivre-lévolution-dans-le-temps",
+    "title": "rsonar en pratique",
+    "section": "Suivre l’évolution dans le temps",
+    "text": "Suivre l’évolution dans le temps\n# Comparer deux analyses (avant / après)\nsonar_diff(res_v3, res_v0)\n\n# Historiser les scores pour tracer la tendance\nsonar_trend(res, file = \"rsonar-history.json\")\n\nsonar_diff() : nouveaux problèmes, problèmes corrigés\nsonar_trend() : courbe d’évolution de la note"
+  },
+  {
+    "objectID": "index.html#exporter-les-résultats-ci",
+    "href": "index.html#exporter-les-résultats-ci",
+    "title": "rsonar en pratique",
+    "section": "Exporter les résultats (CI)",
+    "text": "Exporter les résultats (CI)\nexport_junit(res, \"junit-results.xml\")      # GitLab/Jenkins\nexport_sarif(res, \"results.sarif\")          # GitHub Code Scanning\nexport_sonar_json(res, \"sonar-issues.json\") # SonarQube\nFormats standards : JUnit XML, SARIF 2.1.0, SonarQube Generic Issue Import."
+  },
+  {
+    "objectID": "index.html#aller-plus-loin-automatiser-les-corrections",
+    "href": "index.html#aller-plus-loin-automatiser-les-corrections",
+    "title": "rsonar en pratique",
+    "section": "Aller plus loin : automatiser les corrections",
+    "text": "Aller plus loin : automatiser les corrections\nsonar_fix(\".\", create_mr = TRUE) ouvre directement une Merge Request / Pull Request.\nJob CI rsonar-fix (tâche manuelle optionnelle) :\n\nInstalle air (install_air())\nFormate tous les fichiers R (sonar_fix())\nOuvre une MR/PR avec les corrections\n\n→ Plus de reformatage à la main : on déclenche, on relit, on fusionne."
+  },
+  {
+    "objectID": "index.html#pipeline-ci-gitlab",
+    "href": "index.html#pipeline-ci-gitlab",
+    "title": "rsonar en pratique",
+    "section": "Pipeline CI (GitLab)",
+    "text": "Pipeline CI (GitLab)\nstages: [quality, autofix]\n\nrsonar-check:\n  stage: quality\n  script: R -e \"sonar_analyse('.'); export_junit()\"\n\nrsonar-fix:\n  stage: autofix\n  when: manual\n  script: R -e \"sonar_fix('.', create_mr = TRUE)\""
+  },
+  {
+    "objectID": "index.html#ce-quil-faut-retenir",
+    "href": "index.html#ce-quil-faut-retenir",
+    "title": "rsonar en pratique",
+    "section": "Ce qu’il faut retenir",
+    "text": "Ce qu’il faut retenir\nrsonar = mesurer, corriger, sécuriser :\n\nLocalement : quality_score() et debt_index() pour un feedback immédiat\nEn profondeur : sonar_analyse() + sonar_report() + sonar_hotspots()\nDans la durée : sonar_diff() / sonar_trend() pour voir la note progresser\nEn CI : quality_gate() + exports + sonar_fix(create_mr = TRUE)"
+  },
+  {
+    "objectID": "index.html#conclusion",
+    "href": "index.html#conclusion",
+    "title": "rsonar en pratique",
+    "section": "Conclusion",
+    "text": "Conclusion\nLa boucle pédagogique :\n\nPartir d’un code problématique\nMesurer la qualité (score, note, dette)\nAméliorer pas à pas (style → refactor → tests)\nVoir la note monter : 38% → 62% → 78% → 94%"
+  }
+]

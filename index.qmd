@@ -40,28 +40,46 @@ Une démarche en boucle, sur un exemple fil rouge :
 3. **Améliorer** le code pas à pas
 4. **Re-mesurer** et voir la note augmenter
 
+
 ## Le code de départ (version 0)
 
-Fichier `R/analysis.R` :
+Structure du projet :  
+
+├── 01_assignment_and_formatting.R
+├── 02_boolean_and_naming.R
+├── 03_cyclomatic_complexity.R
+├── 04_unused_vars_and_syntax.R
+├── 05_non_standard_evaluation.R
+├── 06_function_length.R
+├── 07_string_quote_and_infix.R
+├── 08_unnecessary_concatenation.R
+├── 09_implicit_returns_and_braces.R
+└── 10_duplicate_code_and_magic_numbers.R
+
+## Le code de départ (version 0)
+Exemple  `R/analysis.R` :
 
 ```{.r}
-addcols <- function(d,a,b){
-  if(nrow(d)==0){stop("empty")}
-  total=d[[a]]+d[[b]]
-  positive <- ifelse(total>0,T,F)
-  result=list(total=total, positive=positive)
+# File 1: Assignment operator & formatting issues
+calculate_tax <- function(income, rate = 0.2) {
+  # Violation: '=' used instead of '<-' for assignment
+  total_tax = income * rate
+  
+  # Violation: line over 80 characters limit with bad spacing around Operators and comma
+  result=data.frame(income=income,tax=total_tax,net=income-total_tax,note="Calculated automatically by custom financial routine")
+  
   return(result)
 }
 ```
 
-Problèmes : nommage, espaces, `=` vs `<-`, `T`/`F`, pas de doc, **aucun test**.
+Problèmes : nommage, espaces, `=` vs `<-`, `T`/`F`, pas de doc, ligne trop longue, **aucun test**.
 
 ## Étape 0 — Mesurer l'état initial
 
 ```{.r}
 library(rsonar)
 res <- sonar_analyse(".")
-print(res)
+sonar_report(res)
 ```
 
 ```
