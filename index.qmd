@@ -31,6 +31,74 @@ format:
 
 Vocabulaire SonarQube : *issues*, *Coverage*, **Quality Gate**.
 
+## SQALE : quantifier la dette technique
+
+**SQALE** = *Software Quality Assessment based on Lifecycle Expectations*.
+
+C'est la méthode popularisée par **SonarQube** — et reprise par `rsonar` — pour transformer les défauts du code en **coût estimé**, exprimé en minutes.
+
+Quatre notions clés :
+
+1. La **pénalité par issue** (minutes)
+2. Le **ratio de dette** (%)
+3. Le **SQALE rating** (note de A à E)
+4. La **méthode de calcul du coût estimé**
+
+## La pénalité par issue
+
+Chaque issue a un **coût de remédiation** : le temps estimé pour la corriger, en minutes.
+
+| Issue | Pénalité par défaut |
+|---|---|
+| Erreur `lintr` | 30 min |
+| Avertissement `lintr` | 10 min |
+| Violation de style | 2 min |
+| Fichier mal formaté (`styler`) | 5 min |
+| Échec `goodpractice` | 20 min |
+| Point de couverture manquant | 5 min / point |
+
+La dette totale = **somme** de ces pénalités.
+
+## Le ratio de dette
+
+On rapporte la dette totale à un **effort de référence** :
+
+```text
+ratio = D_total / (fichiers × 30 min)
+```
+
+- `D_total` : somme des pénalités de toutes les issues
+- `fichiers × 30 min` : effort estimé pour développer les fichiers
+
+Le **score qualité** s'en déduit :
+
+```text
+score = 100 × (1 - min(1, ratio))
+```
+
+## Le SQALE rating (A → E)
+
+Le ratio est converti en **note de maintenabilité** :
+
+| Ratio | Note | Signification |
+|---|---|---|
+| < 5 % | A | Excellente |
+| 5 – 10 % | B | Bonne |
+| 10 – 20 % | C | Acceptable |
+| 20 – 50 % | D | Médiocre |
+| > 50 % | E | Critique |
+
+## Le coût estimé : la méthode
+
+1. **Dénombrer** les issues (erreurs, warnings, style, couverture, goodpractice)
+2. **Sommer** leurs pénalités → dette totale en minutes
+3. **Diviser** par l'effort de référence → ratio de dette
+4. **Convertir** le ratio en note SQALE (A → E)
+
+Effort de référence : SonarQube → `lignes de code × 30 min` ; `rsonar` → `fichiers × 30 min`.
+
+Exemple : 2 erreurs + 2 warnings + 5 styles = 90 min, rapportées à 300 min (10 fichiers) → ratio 30 % → **note D**.
+
 ## Le plan : mesurer, améliorer, mesurer
 
 Une démarche en boucle, sur un exemple fil rouge :

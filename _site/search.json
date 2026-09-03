@@ -7,6 +7,41 @@
     "text": "What is rsonar?\n\n\nrsonar is the R equivalent of SonarQube: it centralizes R code quality measurement into one interactive report.\n\n\n\nTool\nRole\n\n\n\n\nlintr\nStatic analysis — bugs, style, complexity\n\n\nstyler\nCode formatting\n\n\ncovr\nTest coverage\n\n\ngoodpractice\nPackage best practices\n\n\n\n\n\n\nSonarQube vocabulary: issues, Coverage, Quality Gate."
   },
   {
+    "objectID": "index_en.html#sqale-quantifying-technical-debt",
+    "href": "index_en.html#sqale-quantifying-technical-debt",
+    "title": "rsonar in practice",
+    "section": "SQALE: quantifying technical debt",
+    "text": "SQALE: quantifying technical debt\nSQALE = Software Quality Assessment based on Lifecycle Expectations.\nThe method popularized by SonarQube — and reused by rsonar — to turn code defects into an estimated cost, expressed in minutes.\nFour key concepts:\n\nPenalty per issue (minutes)\nDebt ratio (%)\nSQALE rating (A to E)\nHow the estimated cost is calculated"
+  },
+  {
+    "objectID": "index_en.html#the-penalty-per-issue",
+    "href": "index_en.html#the-penalty-per-issue",
+    "title": "rsonar in practice",
+    "section": "The penalty per issue",
+    "text": "The penalty per issue\nEach issue has a remediation cost: the estimated time to fix it, in minutes.\n\n\n\nIssue\nDefault penalty\n\n\n\n\nlintr error\n30 min\n\n\nlintr warning\n10 min\n\n\nStyle violation\n2 min\n\n\nBadly formatted file (styler)\n5 min\n\n\ngoodpractice failure\n20 min\n\n\nMissing coverage point\n5 min / point\n\n\n\nTotal debt = the sum of these penalties."
+  },
+  {
+    "objectID": "index_en.html#the-debt-ratio",
+    "href": "index_en.html#the-debt-ratio",
+    "title": "rsonar in practice",
+    "section": "The debt ratio",
+    "text": "The debt ratio\nTotal debt is compared to a baseline effort:\nratio = D_total / (files × 30 min)\n\nD_total: sum of penalties across all issues\nfiles × 30 min: estimated effort to develop the files\n\nThe quality score is derived from it:\nscore = 100 × (1 - min(1, ratio))"
+  },
+  {
+    "objectID": "index_en.html#the-sqale-rating-a-e",
+    "href": "index_en.html#the-sqale-rating-a-e",
+    "title": "rsonar in practice",
+    "section": "The SQALE rating (A → E)",
+    "text": "The SQALE rating (A → E)\nThe ratio is converted into a maintainability rating:\n\n\n\nRatio\nRating\nMeaning\n\n\n\n\n&lt; 5 %\nA\nExcellent\n\n\n5 – 10 %\nB\nGood\n\n\n10 – 20 %\nC\nAcceptable\n\n\n20 – 50 %\nD\nPoor\n\n\n&gt; 50 %\nE\nCritical"
+  },
+  {
+    "objectID": "index_en.html#the-estimated-cost-the-method",
+    "href": "index_en.html#the-estimated-cost-the-method",
+    "title": "rsonar in practice",
+    "section": "The estimated cost: the method",
+    "text": "The estimated cost: the method\n\nCount the issues (errors, warnings, style, coverage, goodpractice)\nSum their penalties → total debt in minutes\nDivide by the baseline effort → debt ratio\nConvert the ratio into a SQALE rating (A → E)\n\nBaseline effort: SonarQube → lines of code × 30 min; rsonar → files × 30 min.\nExample: 2 errors + 2 warnings + 5 style = 90 min, against 300 min (10 files) → ratio 30 % → rating D."
+  },
+  {
     "objectID": "index_en.html#the-plan-measure-improve-measure",
     "href": "index_en.html#the-plan-measure-improve-measure",
     "title": "rsonar in practice",
@@ -154,6 +189,41 @@
     "text": "rsonar, c’est quoi ?\n\n\nrsonar est l’équivalent R de SonarQube : il centralise la mesure de la qualité du code R dans un rapport unique et interactif.\n\n\n\nOutil\nRôle\n\n\n\n\nlintr\nAnalyse statique — bugs, style, complexité\n\n\nstyler\nFormatage du code\n\n\ncovr\nCouverture de tests\n\n\ngoodpractice\nBonnes pratiques de packaging\n\n\n\n\n\n\nVocabulaire SonarQube : issues, Coverage, Quality Gate."
   },
   {
+    "objectID": "index.html#sqale-quantifier-la-dette-technique",
+    "href": "index.html#sqale-quantifier-la-dette-technique",
+    "title": "rsonar en pratique",
+    "section": "SQALE : quantifier la dette technique",
+    "text": "SQALE : quantifier la dette technique\nSQALE = Software Quality Assessment based on Lifecycle Expectations.\nC’est la méthode popularisée par SonarQube — et reprise par rsonar — pour transformer les défauts du code en coût estimé, exprimé en minutes.\nQuatre notions clés :\n\nLa pénalité par issue (minutes)\nLe ratio de dette (%)\nLe SQALE rating (note de A à E)\nLa méthode de calcul du coût estimé"
+  },
+  {
+    "objectID": "index.html#la-pénalité-par-issue",
+    "href": "index.html#la-pénalité-par-issue",
+    "title": "rsonar en pratique",
+    "section": "La pénalité par issue",
+    "text": "La pénalité par issue\nChaque issue a un coût de remédiation : le temps estimé pour la corriger, en minutes.\n\n\n\nIssue\nPénalité par défaut\n\n\n\n\nErreur lintr\n30 min\n\n\nAvertissement lintr\n10 min\n\n\nViolation de style\n2 min\n\n\nFichier mal formaté (styler)\n5 min\n\n\nÉchec goodpractice\n20 min\n\n\nPoint de couverture manquant\n5 min / point\n\n\n\nLa dette totale = somme de ces pénalités."
+  },
+  {
+    "objectID": "index.html#le-ratio-de-dette",
+    "href": "index.html#le-ratio-de-dette",
+    "title": "rsonar en pratique",
+    "section": "Le ratio de dette",
+    "text": "Le ratio de dette\nOn rapporte la dette totale à un effort de référence :\nratio = D_total / (fichiers × 30 min)\n\nD_total : somme des pénalités de toutes les issues\nfichiers × 30 min : effort estimé pour développer les fichiers\n\nLe score qualité s’en déduit :\nscore = 100 × (1 - min(1, ratio))"
+  },
+  {
+    "objectID": "index.html#le-sqale-rating-a-e",
+    "href": "index.html#le-sqale-rating-a-e",
+    "title": "rsonar en pratique",
+    "section": "Le SQALE rating (A → E)",
+    "text": "Le SQALE rating (A → E)\nLe ratio est converti en note de maintenabilité :\n\n\n\nRatio\nNote\nSignification\n\n\n\n\n&lt; 5 %\nA\nExcellente\n\n\n5 – 10 %\nB\nBonne\n\n\n10 – 20 %\nC\nAcceptable\n\n\n20 – 50 %\nD\nMédiocre\n\n\n&gt; 50 %\nE\nCritique"
+  },
+  {
+    "objectID": "index.html#le-coût-estimé-la-méthode",
+    "href": "index.html#le-coût-estimé-la-méthode",
+    "title": "rsonar en pratique",
+    "section": "Le coût estimé : la méthode",
+    "text": "Le coût estimé : la méthode\n\nDénombrer les issues (erreurs, warnings, style, couverture, goodpractice)\nSommer leurs pénalités → dette totale en minutes\nDiviser par l’effort de référence → ratio de dette\nConvertir le ratio en note SQALE (A → E)\n\nEffort de référence : SonarQube → lignes de code × 30 min ; rsonar → fichiers × 30 min.\nExemple : 2 erreurs + 2 warnings + 5 styles = 90 min, rapportées à 300 min (10 fichiers) → ratio 30 % → note D."
+  },
+  {
     "objectID": "index.html#le-plan-mesurer-améliorer-mesurer",
     "href": "index.html#le-plan-mesurer-améliorer-mesurer",
     "title": "rsonar en pratique",
@@ -165,14 +235,21 @@
     "href": "index.html#le-code-de-départ-version-0",
     "title": "rsonar en pratique",
     "section": "Le code de départ (version 0)",
-    "text": "Le code de départ (version 0)\nFichier R/analysis.R :\naddcols &lt;- function(d,a,b){\n  if(nrow(d)==0){stop(\"empty\")}\n  total=d[[a]]+d[[b]]\n  positive &lt;- ifelse(total&gt;0,T,F)\n  result=list(total=total, positive=positive)\n  return(result)\n}\nProblèmes : nommage, espaces, = vs &lt;-, T/F, pas de doc, aucun test."
+    "text": "Le code de départ (version 0)\nStructure du projet :\n├── 01_assignment_and_formatting.R ├── 02_boolean_and_naming.R ├── 03_cyclomatic_complexity.R ├── 04_unused_vars_and_syntax.R ├── 05_non_standard_evaluation.R ├── 06_function_length.R ├── 07_string_quote_and_infix.R ├── 08_unnecessary_concatenation.R ├── 09_implicit_returns_and_braces.R └── 10_duplicate_code_and_magic_numbers.R"
+  },
+  {
+    "objectID": "index.html#le-code-de-départ-version-0-1",
+    "href": "index.html#le-code-de-départ-version-0-1",
+    "title": "rsonar en pratique",
+    "section": "Le code de départ (version 0)",
+    "text": "Le code de départ (version 0)\nExemple R/analysis.R :\n# File 1: Assignment operator & formatting issues\ncalculate_tax &lt;- function(income, rate = 0.2) {\n  # Violation: '=' used instead of '&lt;-' for assignment\n  total_tax = income * rate\n  \n  # Violation: line over 80 characters limit with bad spacing around Operators and comma\n  result=data.frame(income=income,tax=total_tax,net=income-total_tax,note=\"Calculated automatically by custom financial routine\")\n  \n  return(result)\n}\nProblèmes : nommage, espaces, = vs &lt;-, T/F, pas de doc, ligne trop longue, aucun test."
   },
   {
     "objectID": "index.html#étape-0-mesurer-létat-initial",
     "href": "index.html#étape-0-mesurer-létat-initial",
     "title": "rsonar en pratique",
     "section": "Étape 0 — Mesurer l’état initial",
-    "text": "Étape 0 — Mesurer l’état initial\nlibrary(rsonar)\nres &lt;- sonar_analyse(\".\")\nprint(res)\n-- rsonar -- Quality Report --\n  Fichiers    : 1 R\n  Lint        : 8 issues (0 err / 3 warn / 5 style)\n  Style       : 1 fichier non conforme\n  Coverage    : 0%\n  Goodpractice: 3 échecs\n\n-- Dette Technique --\n  SQALE: E | Score: 38% | Durée: 4.2h"
+    "text": "Étape 0 — Mesurer l’état initial\nlibrary(rsonar)\nres &lt;- sonar_analyse(\".\")\nsonar_report(res)\n-- rsonar -- Quality Report --\n  Fichiers    : 1 R\n  Lint        : 8 issues (0 err / 3 warn / 5 style)\n  Style       : 1 fichier non conforme\n  Coverage    : 0%\n  Goodpractice: 3 échecs\n\n-- Dette Technique --\n  SQALE: E | Score: 38% | Durée: 4.2h"
   },
   {
     "objectID": "index.html#étape-0-score-note-et-hotspots",

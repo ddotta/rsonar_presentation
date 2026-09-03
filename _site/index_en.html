@@ -240,6 +240,119 @@ Damien Dotta
 </div></div>
 <p>SonarQube vocabulary: <em>issues</em>, <em>Coverage</em>, <strong>Quality Gate</strong>.</p>
 </section>
+<section id="sqale-quantifying-technical-debt" class="slide level2">
+<h2>SQALE: quantifying technical debt</h2>
+<p><strong>SQALE</strong> = <em>Software Quality Assessment based on Lifecycle Expectations</em>.</p>
+<p>The method popularized by <strong>SonarQube</strong> — and reused by <code>rsonar</code> — to turn code defects into an <strong>estimated cost</strong>, expressed in minutes.</p>
+<p>Four key concepts:</p>
+<ol type="1">
+<li><strong>Penalty per issue</strong> (minutes)</li>
+<li><strong>Debt ratio</strong> (%)</li>
+<li><strong>SQALE rating</strong> (A to E)</li>
+<li><strong>How the estimated cost is calculated</strong></li>
+</ol>
+</section>
+<section id="the-penalty-per-issue" class="slide level2">
+<h2>The penalty per issue</h2>
+<p>Each issue has a <strong>remediation cost</strong>: the estimated time to fix it, in minutes.</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Issue</th>
+<th>Default penalty</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>lintr</code> error</td>
+<td>30 min</td>
+</tr>
+<tr class="even">
+<td><code>lintr</code> warning</td>
+<td>10 min</td>
+</tr>
+<tr class="odd">
+<td>Style violation</td>
+<td>2 min</td>
+</tr>
+<tr class="even">
+<td>Badly formatted file (<code>styler</code>)</td>
+<td>5 min</td>
+</tr>
+<tr class="odd">
+<td><code>goodpractice</code> failure</td>
+<td>20 min</td>
+</tr>
+<tr class="even">
+<td>Missing coverage point</td>
+<td>5 min / point</td>
+</tr>
+</tbody>
+</table>
+<p>Total debt = the <strong>sum</strong> of these penalties.</p>
+</section>
+<section id="the-debt-ratio" class="slide level2">
+<h2>The debt ratio</h2>
+<p>Total debt is compared to a <strong>baseline effort</strong>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb1-1"><a></a>ratio = D_total / (files × 30 min)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><code>D_total</code>: sum of penalties across all issues</li>
+<li><code>files × 30 min</code>: estimated effort to develop the files</li>
+</ul>
+<p>The <strong>quality score</strong> is derived from it:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb2-1"><a></a>score = 100 × (1 - min(1, ratio))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="the-sqale-rating-a-e" class="slide level2">
+<h2>The SQALE rating (A → E)</h2>
+<p>The ratio is converted into a <strong>maintainability rating</strong>:</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Ratio</th>
+<th>Rating</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>&lt; 5 %</td>
+<td>A</td>
+<td>Excellent</td>
+</tr>
+<tr class="even">
+<td>5 – 10 %</td>
+<td>B</td>
+<td>Good</td>
+</tr>
+<tr class="odd">
+<td>10 – 20 %</td>
+<td>C</td>
+<td>Acceptable</td>
+</tr>
+<tr class="even">
+<td>20 – 50 %</td>
+<td>D</td>
+<td>Poor</td>
+</tr>
+<tr class="odd">
+<td>&gt; 50 %</td>
+<td>E</td>
+<td>Critical</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="the-estimated-cost-the-method" class="slide level2">
+<h2>The estimated cost: the method</h2>
+<ol type="1">
+<li><strong>Count</strong> the issues (errors, warnings, style, coverage, goodpractice)</li>
+<li><strong>Sum</strong> their penalties → total debt in minutes</li>
+<li><strong>Divide</strong> by the baseline effort → debt ratio</li>
+<li><strong>Convert</strong> the ratio into a SQALE rating (A → E)</li>
+</ol>
+<p>Baseline effort: SonarQube → <code>lines of code × 30 min</code>; <code>rsonar</code> → <code>files × 30 min</code>.</p>
+<p>Example: 2 errors + 2 warnings + 5 style = 90 min, against 300 min (10 files) → ratio 30 % → <strong>rating D</strong>.</p>
+</section>
 <section id="the-plan-measure-improve-measure" class="slide level2">
 <h2>The plan: measure, improve, measure</h2>
 <p>A loop, on a single running example:</p>
@@ -253,20 +366,20 @@ Damien Dotta
 <section id="the-starting-code-version-0" class="slide level2">
 <h2>The starting code (version 0)</h2>
 <p>File <code>R/analysis.R</code>:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a></a>addcols <span class="ot">&lt;-</span> <span class="cf">function</span>(d,a,b){</span>
-<span id="cb1-2"><a></a>  <span class="cf">if</span>(<span class="fu">nrow</span>(d)<span class="sc">==</span><span class="dv">0</span>){<span class="fu">stop</span>(<span class="st">"empty"</span>)}</span>
-<span id="cb1-3"><a></a>  total<span class="ot">=</span>d[[a]]<span class="sc">+</span>d[[b]]</span>
-<span id="cb1-4"><a></a>  positive <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(total<span class="sc">&gt;</span><span class="dv">0</span>,T,F)</span>
-<span id="cb1-5"><a></a>  result<span class="ot">=</span><span class="fu">list</span>(<span class="at">total=</span>total, <span class="at">positive=</span>positive)</span>
-<span id="cb1-6"><a></a>  <span class="fu">return</span>(result)</span>
-<span id="cb1-7"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a>addcols <span class="ot">&lt;-</span> <span class="cf">function</span>(d,a,b){</span>
+<span id="cb3-2"><a></a>  <span class="cf">if</span>(<span class="fu">nrow</span>(d)<span class="sc">==</span><span class="dv">0</span>){<span class="fu">stop</span>(<span class="st">"empty"</span>)}</span>
+<span id="cb3-3"><a></a>  total<span class="ot">=</span>d[[a]]<span class="sc">+</span>d[[b]]</span>
+<span id="cb3-4"><a></a>  positive <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(total<span class="sc">&gt;</span><span class="dv">0</span>,T,F)</span>
+<span id="cb3-5"><a></a>  result<span class="ot">=</span><span class="fu">list</span>(<span class="at">total=</span>total, <span class="at">positive=</span>positive)</span>
+<span id="cb3-6"><a></a>  <span class="fu">return</span>(result)</span>
+<span id="cb3-7"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Problems: naming, spacing, <code>=</code> vs <code>&lt;-</code>, <code>T</code>/<code>F</code>, no docs, <strong>no tests</strong>.</p>
 </section>
 <section id="step-0-measure-the-initial-state" class="slide level2">
 <h2>Step 0 — Measure the initial state</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a></a><span class="fu">library</span>(rsonar)</span>
-<span id="cb2-2"><a></a>res <span class="ot">&lt;-</span> <span class="fu">sonar_analyse</span>(<span class="st">"."</span>)</span>
-<span id="cb2-3"><a></a><span class="fu">print</span>(res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a></a><span class="fu">library</span>(rsonar)</span>
+<span id="cb4-2"><a></a>res <span class="ot">&lt;-</span> <span class="fu">sonar_analyse</span>(<span class="st">"."</span>)</span>
+<span id="cb4-3"><a></a><span class="fu">print</span>(res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <pre><code>-- rsonar -- Quality Report --
   Files       : 1 R
   Lint        : 8 issues (0 err / 3 warn / 5 style)
@@ -279,9 +392,9 @@ Damien Dotta
 </section>
 <section id="step-0-score-rating-and-hotspots" class="slide level2">
 <h2>Step 0 — Score, rating and hotspots</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a></a><span class="fu">quality_score</span>(<span class="st">"."</span>)   <span class="co"># Score: 38% | Rating: E</span></span>
-<span id="cb4-2"><a></a><span class="fu">debt_index</span>(res)      <span class="co"># Rating: E (critical debt)</span></span>
-<span id="cb4-3"><a></a><span class="fu">sonar_hotspots</span>(res)  <span class="co"># → R/analysis.R first</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a><span class="fu">quality_score</span>(<span class="st">"."</span>)   <span class="co"># Score: 38% | Rating: E</span></span>
+<span id="cb6-2"><a></a><span class="fu">debt_index</span>(res)      <span class="co"># Rating: E (critical debt)</span></span>
+<span id="cb6-3"><a></a><span class="fu">sonar_hotspots</span>(res)  <span class="co"># → R/analysis.R first</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
 <li><code>debt_index()</code>: technical debt rating (A to E)</li>
 <li><code>sonar_hotspots()</code>: files to fix first</li>
@@ -291,24 +404,24 @@ Damien Dotta
 <section id="step-1-fix-style-automatically" class="slide level2">
 <h2>Step 1 — Fix style automatically</h2>
 <p><code>sonar_fix()</code> is powered by <a href="https://github.com/posit-dev/air"><code>air</code></a>, Posit’s fast R formatter.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a></a><span class="co"># Preview without changing anything</span></span>
-<span id="cb5-2"><a></a><span class="fu">sonar_fix</span>(<span class="st">"."</span>, <span class="at">dry_run =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-3"><a></a></span>
-<span id="cb5-4"><a></a><span class="co"># Apply the style fixes</span></span>
-<span id="cb5-5"><a></a><span class="fu">sonar_fix</span>(<span class="st">"."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a><span class="co"># Preview without changing anything</span></span>
+<span id="cb7-2"><a></a><span class="fu">sonar_fix</span>(<span class="st">"."</span>, <span class="at">dry_run =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb7-3"><a></a></span>
+<span id="cb7-4"><a></a><span class="co"># Apply the style fixes</span></span>
+<span id="cb7-5"><a></a><span class="fu">sonar_fix</span>(<span class="st">"."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Fixes: spacing, <code>=</code> → <code>&lt;-</code>, braces, indentation.</p>
 </section>
 <section id="step-1-result-version-1" class="slide level2">
 <h2>Step 1 — Result (version 1)</h2>
-<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a>addcols <span class="ot">&lt;-</span> <span class="cf">function</span>(d, a, b) {</span>
-<span id="cb6-2"><a></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(d) <span class="sc">==</span> <span class="dv">0</span>) {</span>
-<span id="cb6-3"><a></a>    <span class="fu">stop</span>(<span class="st">"empty"</span>)</span>
-<span id="cb6-4"><a></a>  }</span>
-<span id="cb6-5"><a></a>  total <span class="ot">&lt;-</span> d[[a]] <span class="sc">+</span> d[[b]]</span>
-<span id="cb6-6"><a></a>  positive <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(total <span class="sc">&gt;</span> <span class="dv">0</span>, T, F)</span>
-<span id="cb6-7"><a></a>  result <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">total =</span> total, <span class="at">positive =</span> positive)</span>
-<span id="cb6-8"><a></a>  <span class="fu">return</span>(result)</span>
-<span id="cb6-9"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a>addcols <span class="ot">&lt;-</span> <span class="cf">function</span>(d, a, b) {</span>
+<span id="cb8-2"><a></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(d) <span class="sc">==</span> <span class="dv">0</span>) {</span>
+<span id="cb8-3"><a></a>    <span class="fu">stop</span>(<span class="st">"empty"</span>)</span>
+<span id="cb8-4"><a></a>  }</span>
+<span id="cb8-5"><a></a>  total <span class="ot">&lt;-</span> d[[a]] <span class="sc">+</span> d[[b]]</span>
+<span id="cb8-6"><a></a>  positive <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(total <span class="sc">&gt;</span> <span class="dv">0</span>, T, F)</span>
+<span id="cb8-7"><a></a>  result <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">total =</span> total, <span class="at">positive =</span> positive)</span>
+<span id="cb8-8"><a></a>  <span class="fu">return</span>(result)</span>
+<span id="cb8-9"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Style is fixed, but naming, complexity and docs remain.</p>
 <p>Re-measure: <strong>Score 62% · Rating D</strong>.</p>
 </section>
@@ -320,30 +433,30 @@ Damien Dotta
 <li><code>ifelse(x &gt; 0, T, F)</code> → <code>x &gt; 0</code></li>
 <li>roxygen documentation added</li>
 </ul>
-<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a><span class="co">#' Sum two columns and flag positive rows</span></span>
-<span id="cb7-2"><a></a><span class="co">#'</span></span>
-<span id="cb7-3"><a></a><span class="co">#' @param data A data frame.</span></span>
-<span id="cb7-4"><a></a><span class="co">#' @param col1,col2 Column names to sum.</span></span>
-<span id="cb7-5"><a></a><span class="co">#' @return A list with `total` and `positive`.</span></span>
-<span id="cb7-6"><a></a>add_columns <span class="ot">&lt;-</span> <span class="cf">function</span>(data, col1, col2) {</span>
-<span id="cb7-7"><a></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(data) <span class="sc">==</span> <span class="dv">0</span>) {</span>
-<span id="cb7-8"><a></a>    <span class="fu">stop</span>(<span class="st">"`data` must contain at least one row."</span>)</span>
-<span id="cb7-9"><a></a>  }</span>
-<span id="cb7-10"><a></a>  total <span class="ot">&lt;-</span> data[[col1]] <span class="sc">+</span> data[[col2]]</span>
-<span id="cb7-11"><a></a>  <span class="fu">list</span>(<span class="at">total =</span> total, <span class="at">positive =</span> total <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
-<span id="cb7-12"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="co">#' Sum two columns and flag positive rows</span></span>
+<span id="cb9-2"><a></a><span class="co">#'</span></span>
+<span id="cb9-3"><a></a><span class="co">#' @param data A data frame.</span></span>
+<span id="cb9-4"><a></a><span class="co">#' @param col1,col2 Column names to sum.</span></span>
+<span id="cb9-5"><a></a><span class="co">#' @return A list with `total` and `positive`.</span></span>
+<span id="cb9-6"><a></a>add_columns <span class="ot">&lt;-</span> <span class="cf">function</span>(data, col1, col2) {</span>
+<span id="cb9-7"><a></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(data) <span class="sc">==</span> <span class="dv">0</span>) {</span>
+<span id="cb9-8"><a></a>    <span class="fu">stop</span>(<span class="st">"`data` must contain at least one row."</span>)</span>
+<span id="cb9-9"><a></a>  }</span>
+<span id="cb9-10"><a></a>  total <span class="ot">&lt;-</span> data[[col1]] <span class="sc">+</span> data[[col2]]</span>
+<span id="cb9-11"><a></a>  <span class="fu">list</span>(<span class="at">total =</span> total, <span class="at">positive =</span> total <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb9-12"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Re-measure: <strong>Score 78% · Rating C</strong>.</p>
 </section>
 <section id="step-3-add-tests" class="slide level2">
 <h2>Step 3 — Add tests</h2>
 <p><code>tests/testthat/test-analysis.R</code>:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a><span class="fu">test_that</span>(<span class="st">"add_columns sums and flags"</span>, {</span>
-<span id="cb8-2"><a></a>  data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">a =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="dv">2</span>, <span class="dv">3</span>), <span class="at">b =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="sc">-</span><span class="dv">5</span>))</span>
-<span id="cb8-3"><a></a>  res <span class="ot">&lt;-</span> <span class="fu">add_columns</span>(data, <span class="st">"a"</span>, <span class="st">"b"</span>)</span>
-<span id="cb8-4"><a></a></span>
-<span id="cb8-5"><a></a>  <span class="fu">expect_equal</span>(res<span class="sc">$</span>total, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="sc">-</span><span class="dv">2</span>))</span>
-<span id="cb8-6"><a></a>  <span class="fu">expect_equal</span>(res<span class="sc">$</span>positive, <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>))</span>
-<span id="cb8-7"><a></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a><span class="fu">test_that</span>(<span class="st">"add_columns sums and flags"</span>, {</span>
+<span id="cb10-2"><a></a>  data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">a =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="dv">2</span>, <span class="dv">3</span>), <span class="at">b =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="sc">-</span><span class="dv">5</span>))</span>
+<span id="cb10-3"><a></a>  res <span class="ot">&lt;-</span> <span class="fu">add_columns</span>(data, <span class="st">"a"</span>, <span class="st">"b"</span>)</span>
+<span id="cb10-4"><a></a></span>
+<span id="cb10-5"><a></a>  <span class="fu">expect_equal</span>(res<span class="sc">$</span>total, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="sc">-</span><span class="dv">2</span>))</span>
+<span id="cb10-6"><a></a>  <span class="fu">expect_equal</span>(res<span class="sc">$</span>positive, <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>))</span>
+<span id="cb10-7"><a></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Coverage goes from 0% to 85%.</p>
 <p>Re-measure: <strong>Score 94% · Rating A</strong>.</p>
 </section>
@@ -394,21 +507,21 @@ Damien Dotta
 </section>
 <section id="step-4-block-regressions-quality-gate" class="slide level2">
 <h2>Step 4 — Block regressions (Quality Gate)</h2>
-<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="fu">quality_gate</span>(res,</span>
-<span id="cb9-2"><a></a>  <span class="at">coverage_min    =</span> <span class="dv">80</span>,</span>
-<span id="cb9-3"><a></a>  <span class="at">lint_errors_max =</span> <span class="dv">0</span>,</span>
-<span id="cb9-4"><a></a>  <span class="at">rating_min      =</span> <span class="st">"B"</span>,</span>
-<span id="cb9-5"><a></a>  <span class="at">fail_on_error   =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a><span class="fu">quality_gate</span>(res,</span>
+<span id="cb11-2"><a></a>  <span class="at">coverage_min    =</span> <span class="dv">80</span>,</span>
+<span id="cb11-3"><a></a>  <span class="at">lint_errors_max =</span> <span class="dv">0</span>,</span>
+<span id="cb11-4"><a></a>  <span class="at">rating_min      =</span> <span class="st">"B"</span>,</span>
+<span id="cb11-5"><a></a>  <span class="at">fail_on_error   =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>If a threshold is crossed, the CI pipeline blocks automatically.</p>
 <p>This is the guard that <strong>prevents the rating from dropping back</strong>.</p>
 </section>
 <section id="track-the-evolution-over-time" class="slide level2">
 <h2>Track the evolution over time</h2>
-<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a><span class="co"># Compare two analyses (before / after)</span></span>
-<span id="cb10-2"><a></a><span class="fu">sonar_diff</span>(res_v3, res_v0)</span>
-<span id="cb10-3"><a></a></span>
-<span id="cb10-4"><a></a><span class="co"># Save scores to plot the trend</span></span>
-<span id="cb10-5"><a></a><span class="fu">sonar_trend</span>(res, <span class="at">file =</span> <span class="st">"rsonar-history.json"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a></a><span class="co"># Compare two analyses (before / after)</span></span>
+<span id="cb12-2"><a></a><span class="fu">sonar_diff</span>(res_v3, res_v0)</span>
+<span id="cb12-3"><a></a></span>
+<span id="cb12-4"><a></a><span class="co"># Save scores to plot the trend</span></span>
+<span id="cb12-5"><a></a><span class="fu">sonar_trend</span>(res, <span class="at">file =</span> <span class="st">"rsonar-history.json"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
 <li><code>sonar_diff()</code>: new issues, fixed issues</li>
 <li><code>sonar_trend()</code>: rating evolution curve</li>
@@ -416,9 +529,9 @@ Damien Dotta
 </section>
 <section id="export-results-ci" class="slide level2">
 <h2>Export results (CI)</h2>
-<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a><span class="fu">export_junit</span>(res, <span class="st">"junit-results.xml"</span>)      <span class="co"># GitLab/Jenkins</span></span>
-<span id="cb11-2"><a></a><span class="fu">export_sarif</span>(res, <span class="st">"results.sarif"</span>)          <span class="co"># GitHub Code Scanning</span></span>
-<span id="cb11-3"><a></a><span class="fu">export_sonar_json</span>(res, <span class="st">"sonar-issues.json"</span>) <span class="co"># SonarQube</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a></a><span class="fu">export_junit</span>(res, <span class="st">"junit-results.xml"</span>)      <span class="co"># GitLab/Jenkins</span></span>
+<span id="cb13-2"><a></a><span class="fu">export_sarif</span>(res, <span class="st">"results.sarif"</span>)          <span class="co"># GitHub Code Scanning</span></span>
+<span id="cb13-3"><a></a><span class="fu">export_sonar_json</span>(res, <span class="st">"sonar-issues.json"</span>) <span class="co"># SonarQube</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Standard formats: JUnit XML, SARIF 2.1.0, SonarQube Generic Issue Import.</p>
 </section>
 <section id="going-further-automate-the-fixes" class="slide level2">
@@ -434,16 +547,16 @@ Damien Dotta
 </section>
 <section id="ci-pipeline-gitlab" class="slide level2">
 <h2>CI Pipeline (GitLab)</h2>
-<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb12-1"><a></a><span class="fu">stages</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">quality</span><span class="kw">,</span><span class="at"> autofix</span><span class="kw">]</span></span>
-<span id="cb12-2"><a></a></span>
-<span id="cb12-3"><a></a><span class="fu">rsonar-check</span><span class="kw">:</span></span>
-<span id="cb12-4"><a></a><span class="at">  </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> quality</span></span>
-<span id="cb12-5"><a></a><span class="at">  </span><span class="fu">script</span><span class="kw">:</span><span class="at"> R -e "sonar_analyse('.'); export_junit()"</span></span>
-<span id="cb12-6"><a></a></span>
-<span id="cb12-7"><a></a><span class="fu">rsonar-fix</span><span class="kw">:</span></span>
-<span id="cb12-8"><a></a><span class="at">  </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> autofix</span></span>
-<span id="cb12-9"><a></a><span class="at">  </span><span class="fu">when</span><span class="kw">:</span><span class="at"> manual</span></span>
-<span id="cb12-10"><a></a><span class="at">  </span><span class="fu">script</span><span class="kw">:</span><span class="at"> R -e "sonar_fix('.', create_mr = TRUE)"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb14-1"><a></a><span class="fu">stages</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">quality</span><span class="kw">,</span><span class="at"> autofix</span><span class="kw">]</span></span>
+<span id="cb14-2"><a></a></span>
+<span id="cb14-3"><a></a><span class="fu">rsonar-check</span><span class="kw">:</span></span>
+<span id="cb14-4"><a></a><span class="at">  </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> quality</span></span>
+<span id="cb14-5"><a></a><span class="at">  </span><span class="fu">script</span><span class="kw">:</span><span class="at"> R -e "sonar_analyse('.'); export_junit()"</span></span>
+<span id="cb14-6"><a></a></span>
+<span id="cb14-7"><a></a><span class="fu">rsonar-fix</span><span class="kw">:</span></span>
+<span id="cb14-8"><a></a><span class="at">  </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> autofix</span></span>
+<span id="cb14-9"><a></a><span class="at">  </span><span class="fu">when</span><span class="kw">:</span><span class="at"> manual</span></span>
+<span id="cb14-10"><a></a><span class="at">  </span><span class="fu">script</span><span class="kw">:</span><span class="at"> R -e "sonar_fix('.', create_mr = TRUE)"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="key-takeaways" class="slide level2">
 <h2>Key takeaways</h2>
@@ -773,7 +886,7 @@ Damien Dotta
       }
         var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
         var mailtoRegex = new RegExp(/^mailto:/);
-          var filterRegex = new RegExp("https:\/\/ddotta\.github\.io\/rsonar_presentation\/");
+          var filterRegex = new RegExp('/' + window.location.host + '/');
         var isInternal = (href) => {
             return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
         }

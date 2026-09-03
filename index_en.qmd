@@ -31,6 +31,74 @@ format:
 
 SonarQube vocabulary: *issues*, *Coverage*, **Quality Gate**.
 
+## SQALE: quantifying technical debt
+
+**SQALE** = *Software Quality Assessment based on Lifecycle Expectations*.
+
+The method popularized by **SonarQube** — and reused by `rsonar` — to turn code defects into an **estimated cost**, expressed in minutes.
+
+Four key concepts:
+
+1. **Penalty per issue** (minutes)
+2. **Debt ratio** (%)
+3. **SQALE rating** (A to E)
+4. **How the estimated cost is calculated**
+
+## The penalty per issue
+
+Each issue has a **remediation cost**: the estimated time to fix it, in minutes.
+
+| Issue | Default penalty |
+|---|---|
+| `lintr` error | 30 min |
+| `lintr` warning | 10 min |
+| Style violation | 2 min |
+| Badly formatted file (`styler`) | 5 min |
+| `goodpractice` failure | 20 min |
+| Missing coverage point | 5 min / point |
+
+Total debt = the **sum** of these penalties.
+
+## The debt ratio
+
+Total debt is compared to a **baseline effort**:
+
+```text
+ratio = D_total / (files × 30 min)
+```
+
+- `D_total`: sum of penalties across all issues
+- `files × 30 min`: estimated effort to develop the files
+
+The **quality score** is derived from it:
+
+```text
+score = 100 × (1 - min(1, ratio))
+```
+
+## The SQALE rating (A → E)
+
+The ratio is converted into a **maintainability rating**:
+
+| Ratio | Rating | Meaning |
+|---|---|---|
+| < 5 % | A | Excellent |
+| 5 – 10 % | B | Good |
+| 10 – 20 % | C | Acceptable |
+| 20 – 50 % | D | Poor |
+| > 50 % | E | Critical |
+
+## The estimated cost: the method
+
+1. **Count** the issues (errors, warnings, style, coverage, goodpractice)
+2. **Sum** their penalties → total debt in minutes
+3. **Divide** by the baseline effort → debt ratio
+4. **Convert** the ratio into a SQALE rating (A → E)
+
+Baseline effort: SonarQube → `lines of code × 30 min`; `rsonar` → `files × 30 min`.
+
+Example: 2 errors + 2 warnings + 5 style = 90 min, against 300 min (10 files) → ratio 30 % → **rating D**.
+
 ## The plan: measure, improve, measure
 
 A loop, on a single running example:
