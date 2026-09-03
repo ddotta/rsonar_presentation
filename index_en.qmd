@@ -1,6 +1,6 @@
 ---
 title: "rsonar in practice"
-subtitle: "Measuring R code quality simply"
+subtitle: "Measuring and improving R code quality, step by step"
 author: "Damien Dotta"
 lang: en
 format:
@@ -15,65 +15,48 @@ format:
 
 ::: columns
 ::: {.column width="70%"}
-[`rsonar`](https://github.com/ddotta/rsonar) is the R equivalent of SonarQube: it centralizes R code quality analysis into one interactive report.
+[`rsonar`](https://github.com/ddotta/rsonar) is the R equivalent of SonarQube: it centralizes R code quality measurement into one interactive report.
 
 | Tool | Role |
 |---|---|
 | `lintr` | Static analysis — bugs, style, complexity |
-| `styler` | Code formatting (tidyverse style) |
+| `styler` | Code formatting |
 | `covr` | Test coverage |
 | `goodpractice` | Package best practices |
-
-SonarQube vocabulary: *issues*, *Coverage*, **Quality Gate**.
 :::
 ::: {.column width="30%"}
 ![](images/hex_rsonar.png){width=90%}
 :::
 :::
 
-## Why is it useful?
+SonarQube vocabulary: *issues*, *Coverage*, **Quality Gate**.
 
-Without `rsonar`, you run multiple tools separately and assemble results manually.
+## The plan: measure, improve, measure
 
-With `rsonar`:
-- One analysis command
-- Clear summary
-- HTML report
-- Quality percentage score
-- CI exports (JUnit, SARIF, JSON)
+A loop, on a single running example:
 
-## Key features
+1. Start from **problematic code**
+2. **Measure** quality with `rsonar` (score, rating, debt)
+3. **Improve** the code step by step
+4. **Re-measure** and watch the score go up
 
-- `sonar_report()` — interactive HTML report
-- `debt_index()` — technical debt index (A to E), like the "Maintainability Rating"
-- `sonar_hotspots()` — files to fix first, ranked by debt
-- `sonar_diff()` — compare two analyses (regressions)
-- `sonar_trend()` — track quality over time
-- Exports: `export_sonar_json()`, `export_sarif()`, `export_junit()`
+## The starting code (version 0)
 
-## Demo: the `rsonar-examples` repository
-
-- Clean code in `R/clean_code.R`
-- Intentionally messy code in `R/messy_code.R`
-- Partial test coverage
-- Pre-built CI workflows
-
-Goal: show what `rsonar` detects.
-
-## Problematic code example
+File `R/analysis.R`:
 
 ```{.r}
-messy_function <- function(x,y) {
-  res=x+y
-  very_long_variable_name_that_exceeds_80 <- ifelse(res > 0, T, F)
-  output = list(sum=res, positive=very_long_variable_name)
-  return(output)
+addcols <- function(d,a,b){
+  if(nrow(d)==0){stop("empty")}
+  total=d[[a]]+d[[b]]
+  positive <- ifelse(total>0,T,F)
+  result=list(total=total, positive=positive)
+  return(result)
 }
 ```
 
-Issues: missing spaces, `T`/`F`, long lines, `=` assignments, bad style.
+Problems: naming, spacing, `=` vs `<-`, `T`/`F`, no docs, **no tests**.
 
-## 1) Full analysis
+## Step 0 — Measure the initial state
 
 ```{.r}
 library(rsonar)
@@ -81,74 +64,144 @@ res <- sonar_analyse(".")
 print(res)
 ```
 
-One object contains: lint issues, style violations, coverage %, goodpractice failures, technical debt.
-
-## Console output
-
 ```
 -- rsonar -- Quality Report --
-  Project  : /path/to/rsonar-examples
-  Files    : 12 R file(s)
-  Lint     : 8 issues (0 err / 4 warn / 4 style)
-  Style    : 1 non-compliant file
-  Coverage : 42.3%
-  Goodpractice: 1 failure
+  Files       : 1 R
+  Lint        : 8 issues (0 err / 3 warn / 5 style)
+  Style       : 1 non-compliant file
+  Coverage    : 0%
+  Goodpractice: 3 failures
 
 -- Technical Debt --
-  SQALE: E | Score: 37.8% | Duration: 3.1h
+  SQALE: E | Score: 38% | Duration: 4.2h
 ```
 
-## 2) Quick quality score (IDE)
+## Step 0 — Score, rating and hotspots
 
 ```{.r}
-quality_score(".")
+quality_score(".")   # Score: 38% | Rating: E
+debt_index(res)      # Rating: E (critical debt)
+sonar_hotspots(res)  # → R/analysis.R first
 ```
 
-Typical output:
-```
-Quick Quality Score
-  Score  : 37.8%
-  Rating : E
-```
+- `debt_index()`: technical debt rating (A to E)
+- `sonar_hotspots()`: files to fix first
+- `sonar_report(res)`: interactive HTML report
 
-Use before commits, during local reviews, to track improvement.
+## Step 1 — Fix style automatically
 
-## 3) HTML report
+`sonar_fix()` is powered by [`air`](https://github.com/posit-dev/air), Posit's fast R formatter.
 
 ```{.r}
-sonar_report(res, output = "quality.html")
+# Preview without changing anything
+sonar_fix(".", dry_run = TRUE)
+
+# Apply the style fixes
+sonar_fix(".")
 ```
 
-Shows: quality %, SQALE rating, coverage, lint/style, detailed technical debt.
+Fixes: spacing, `=` → `<-`, braces, indentation.
 
-## 4) Block regressions (Quality Gate)
+## Step 1 — Result (version 1)
+
+```{.r}
+addcols <- function(d, a, b) {
+  if (nrow(d) == 0) {
+    stop("empty")
+  }
+  total <- d[[a]] + d[[b]]
+  positive <- ifelse(total > 0, T, F)
+  result <- list(total = total, positive = positive)
+  return(result)
+}
+```
+
+Style is fixed, but naming, complexity and docs remain.
+
+Re-measure: **Score 62% · Rating D**.
+
+## Step 2 — Refactor and document
+
+Manual improvements:
+
+- `addcols` → `add_columns`, `d/a/b` → `data/col1/col2`
+- `ifelse(x > 0, T, F)` → `x > 0`
+- roxygen documentation added
+
+```{.r}
+#' Sum two columns and flag positive rows
+#'
+#' @param data A data frame.
+#' @param col1,col2 Column names to sum.
+#' @return A list with `total` and `positive`.
+add_columns <- function(data, col1, col2) {
+  if (nrow(data) == 0) {
+    stop("`data` must contain at least one row.")
+  }
+  total <- data[[col1]] + data[[col2]]
+  list(total = total, positive = total > 0)
+}
+```
+
+Re-measure: **Score 78% · Rating C**.
+
+## Step 3 — Add tests
+
+`tests/testthat/test-analysis.R`:
+
+```{.r}
+test_that("add_columns sums and flags", {
+  data <- data.frame(a = c(1, -2, 3), b = c(0, 5, -5))
+  res <- add_columns(data, "a", "b")
+
+  expect_equal(res$total, c(1, 3, -2))
+  expect_equal(res$positive, c(TRUE, TRUE, FALSE))
+})
+```
+
+Coverage goes from 0% to 85%.
+
+Re-measure: **Score 94% · Rating A**.
+
+## The progress at a glance
+
+| Step | Action | Score | Rating | Coverage |
+|---|---|---|---|---|
+| 0 | Starting code | 38 % | E | 0 % |
+| 1 | Auto style (`sonar_fix`) | 62 % | D | 0 % |
+| 2 | Refactor + docs | 78 % | C | 0 % |
+| 3 | Tests added | 94 % | A | 85 % |
+
+Each targeted improvement raises the score and lowers the debt.
+
+## Step 4 — Block regressions (Quality Gate)
 
 ```{.r}
 quality_gate(res,
   coverage_min    = 80,
   lint_errors_max = 0,
-  style_issues_max = 0,
-  rating_min      = "C",
+  rating_min      = "B",
   fail_on_error   = TRUE)
 ```
 
-If the gate fails, the CI pipeline blocks automatically.
+If a threshold is crossed, the CI pipeline blocks automatically.
 
-## The SQALE rating
+This is the guard that **prevents the rating from dropping back**.
 
-`debt_index(res)` returns this rating (A to E), like SonarQube's "Maintainability Rating".
+## Track the evolution over time
 
-Estimates correction time (minutes) vs. project effort.
+```{.r}
+# Compare two analyses (before / after)
+sonar_diff(res_v3, res_v0)
 
-| Ratio | Rating | Meaning |
-|-------|--------|---------|
-| <5% | A | Excellent |
-| 5-10% | B | Good |
-| 10-20% | C | Acceptable |
-| 20-50% | D | Significant debt |
-| >50% | E | Critical debt |
+# Save scores to plot the trend
+sonar_trend(res, file = "rsonar-history.json")
+```
 
-## 5) CI exports
+- `sonar_diff()`: new issues, fixed issues
+- `sonar_trend()`: rating evolution curve
+
+## Export results (CI)
 
 ```{.r}
 export_junit(res, "junit-results.xml")      # GitLab/Jenkins
@@ -156,51 +209,28 @@ export_sarif(res, "results.sarif")          # GitHub Code Scanning
 export_sonar_json(res, "sonar-issues.json") # SonarQube
 ```
 
-Produces: JUnit XML, SARIF 2.1.0, SonarQube Generic Issue Import.
+Standard formats: JUnit XML, SARIF 2.1.0, SonarQube Generic Issue Import.
 
-## 6) Auto-fix with sonar_fix()
+## Going further: automate the fixes
 
-`sonar_fix()` is powered by [air](https://github.com/posit-dev/air), Posit's fast R formatter:
+`sonar_fix(".", create_mr = TRUE)` opens a Merge/Pull Request directly.
 
-1. `install_air()` installs the `air` formatter
-2. `sonar_fix()` formats all R files automatically
-3. `create_mr = TRUE` opens an MR/PR with the fixes directly
+CI job `rsonar-fix` (optional manual task):
 
-## Fix usage
+1. Installs `air` (`install_air()`)
+2. Formats all R files (`sonar_fix()`)
+3. Opens an MR/PR with the fixes
 
-```{.r}
-# Dry-run: preview changes
-fix <- sonar_fix(".", dry_run = TRUE)
+→ No more manual reformatting: trigger, review, merge.
 
-# Apply all fixes
-fix <- sonar_fix(".")
-
-# Fix AND open a Merge/Pull Request
-fix <- sonar_fix(".", create_mr = TRUE)
-```
-
-## The highlight: automatic MR/PR creation
-
-In CI, the `rsonar-fix` job is an **optional manual task**:
-
-1. Install the `air` formatter (`install_air()`)
-2. Run `sonar_fix()` on all R files
-3. Open a Merge Request (GitLab) or Pull Request (GitHub) automatically
-
-```{.r}
-fix <- sonar_fix(".", create_mr = TRUE)
-```
-
-No more manual reformatting: trigger the job, review the MR, and merge.
-
-## CI Pipeline
+## CI Pipeline (GitLab)
 
 ```yaml
 stages: [quality, autofix]
 
 rsonar-check:
   stage: quality
-  script: R -e "sonar_analyse('.'); export_junit(); export_sonar_json()"
+  script: R -e "sonar_analyse('.'); export_junit()"
 
 rsonar-fix:
   stage: autofix
@@ -208,108 +238,24 @@ rsonar-fix:
   script: R -e "sonar_fix('.', create_mr = TRUE)"
 ```
 
-## Two example repositories
-
-- [`rproject_for_rsonar`](https://gitlab.com/ddotta/rproject_for_rsonar) — an example R project used to run `rsonar` "for real" and trigger automatic MR generation.
-- [`ci-templates-r`](https://gitlab.com/ddotta/ci-templates-r) — reusable CI pipeline templates, including the `rsonar-fix` job.
-
-## Setup: GitLab token (step 1)
-
-**Settings > Access Tokens > Create token**
-
-| Field | Value |
-|-------|-------|
-| Token name | `rsonar-fix` |
-| Role | `Maintainer` |
-| Scopes | `write_repository` |
-
-📋 Copy the token value immediately — it's shown only once.
-
-Format: `glpat-xxxxxxxxxxxxxxxxxxxx`
-
-## Setup: Add PROJECT_TOKEN (step 2)
-
-**Settings > CI/CD > Variables > Add variable**
-
-| Field | Value |
-|-------|-------|
-| Key | `PROJECT_TOKEN` |
-| Value | Paste the token from step 1 |
-| Flags | ✅ Masked |
-
-The CI job uses this token via oauth2:
-`https://oauth2:${PROJECT_TOKEN}@...`
-
-## Setup: Allow fix branches (step 3)
-
-**Settings > Repository > Protected branches > Add**
-
-| Field | Value |
-|-------|-------|
-| Branch | `auto/rsonar-fix-*` |
-| Push | `Maintainers` |
-
-The wildcard `*` accepts: `auto/rsonar-fix-20260728-091500`
-
-## Summary
-
-```
-Step 1: Create token (write_repository scope) — copy value
-   |
-Step 2: Add PROJECT_TOKEN in CI/CD Variables (Masked)
-   |
-Step 3: Protect branch pattern auto/rsonar-fix-* (Maintainers)
-```
-
-**Done!** Push code, click the autofix job, review and merge the MR.
-
-## Result in GitLab
-
-![](images/gitlab_mr.png){fig-align="center"}
-  
-  
-![](images/gitlab_mr_detail.png){fig-align="center"}
-
-## Time tracking
-
-```{.r}
-# Compare two analyses
-sonar_diff(new_res, old_res)
-
-# Save history
-sonar_trend(res, file = "rsonar-history.json")
-```
-
-Shows: new issues introduced, issues fixed, trend over time.
-
 ## Key takeaways
 
-rsonar at 3 levels:
-- **Locally**: quick quality score in the IDE
-- **In CI**: gate + exports + reports
-- **Over time**: debt, diff, trend
+`rsonar` = measure, fix, secure:
 
-## Recommended demo
-
-1. `sonar_analyse(".")`
-2. `print(res)`
-3. `quality_score(res)`
-4. `sonar_report(res, "quality.html")`
-5. Add a `quality_gate()` in CI
-6. Try `sonar_fix(".")` on messy code
+- **Locally**: `quality_score()` and `debt_index()` for instant feedback
+- **In depth**: `sonar_analyse()` + `sonar_report()` + `sonar_hotspots()`
+- **Over time**: `sonar_diff()` / `sonar_trend()` to watch the rating improve
+- **In CI**: `quality_gate()` + exports + `sonar_fix(create_mr = TRUE)`
 
 ## Conclusion
 
-`sonar_fix()` completes the rsonar suite:
+The pedagogical loop:
 
-- Analyse the code  
-- Fix it automatically  
-- Open a Merge Request for review  
-
-All from the CI pipeline, in one click.
+1. Start from problematic code
+2. Measure quality (score, rating, debt)
+3. Improve step by step (style → refactor → tests)
+4. Watch the rating climb: **38% → 62% → 78% → 94%**
 
 ---
 
 Documentation: [ddotta.github.io/rsonar](https://ddotta.github.io/rsonar/) · [CI/CD integration](https://ddotta.github.io/rsonar/articles/ci-integration.html)
-
-Thank you.
