@@ -13,13 +13,16 @@ format:
 
 ## rsonar, c'est quoi ?
 
-`rsonar` mesure la qualite de code R, inspire de SonarQube :
+[`rsonar`](https://github.com/ddotta/rsonar) est l'equivalent R de SonarQube : il centralise l'analyse de qualite du code R dans un rapport unique et interactif.
 
-- Analyse statique (lintr)
-- Style de code (styler)
-- Couverture de tests (covr)
-- Bonnes pratiques package (goodpractice)
-- Dette technique + Quality Gate
+| Outil | Role |
+|---|---|
+| `lintr` | Analyse statique — bugs, style, complexite |
+| `styler` | Formatage du code (style tidyverse) |
+| `covr` | Couverture de tests |
+| `goodpractice` | Bonnes pratiques de packaging R |
+
+Vocabulaire SonarQube : *issues*, *Coverage*, **Quality Gate**.
 
 ## Pourquoi c'est utile ?
 
@@ -29,6 +32,15 @@ Une seule commande, tout est centralise :
 - Rapport HTML
 - Score qualite en %
 - Exports pour la CI (JUnit, SARIF, JSON)
+
+## Fonctionnalites cles
+
+- `sonar_report()` : rapport HTML interactif
+- `debt_index()` : indice de dette technique (A a E), comme le "Maintainability Rating"
+- `sonar_hotspots()` : fichiers a corriger en priorite
+- `sonar_diff()` : comparer deux analyses (regressions)
+- `sonar_trend()` : evolution de la qualite dans le temps
+- Exports : `export_sonar_json()`, `export_sarif()`, `export_junit()`
 
 ## Demo : depot `rsonar-examples`
 
@@ -103,6 +115,8 @@ Si le gate echoue, le pipeline CI bloque automatiquement.
 
 ## La note SQALE
 
+`debt_index(res)` retourne cette note (A a E), comme le "Maintainability Rating" de SonarQube.
+
 Estime un temps de correction (minutes) vs effort du projet.
 
 | Ratio | Note | Signification |
@@ -123,18 +137,11 @@ export_sonar_json(res, "sonar-issues.json") # SonarQube
 
 ## 6) Auto-fix avec sonar_fix()
 
-**16 familles de corrections — 12 appliquees, 4 en rapport :**
+`sonar_fix()` s'appuie sur [air](https://github.com/posit-dev/air), le formateur R rapide developpe par Posit :
 
-| Categorie | Exemple |
-|-----------|---------|
-| `styler` / `air` | Formatage complet |
-| `spacing` | `x<-1` → `x <- 1` |
-| `true_false` | `if(T)` → `if(TRUE)` |
-| `commas` | `c(1,2,3)` → `c(1, 2, 3)` |
-| `simplify` | `if(x==TRUE)` → `if(x)` |
-| `pipes` | `%>%` → `|>` |
-| `assignment` | `=` → `<-` |
-| `cleanup` | Espaces fin de ligne |
+1. `install_air()` installe le formateur `air`
+2. `sonar_fix()` formate automatiquement tous les fichiers R
+3. Option `create_mr = TRUE` : ouvre directement une MR/PR avec les corrections
 
 ## Utilisation
 
@@ -143,22 +150,25 @@ export_sonar_json(res, "sonar-issues.json") # SonarQube
 fix <- sonar_fix(".", dry_run = TRUE)
 
 # Appliquer toutes les corrections
-fix <- sonar_fix(".", dry_run = FALSE)
+fix <- sonar_fix(".")
 
-# Avec air (plus rapide)
-install_air()
-fix <- sonar_fix(".", formatter = "air")
+# Corriger ET ouvrir une Merge Request / Pull Request
+fix <- sonar_fix(".", create_mr = TRUE)
 ```
 
-## 7) Workflow complet : sonar_autofix()
+## Le point fort : creation automatique de MR/PR
 
-Une fonction pour tout le processus :
+Dans une pipeline CI, le job `rsonar-fix` est une **tache manuelle optionnelle** :
+
+1. Installation du formateur `air` (`install_air()`)
+2. Execution de `sonar_fix()` sur tous les fichiers R
+3. Ouverture automatique d'une MR (GitLab) ou PR (GitHub)
 
 ```{.r}
-sonar_autofix(provider = "gitlab")   # Analyse + commit + push + MR
-sonar_autofix(provider = "github")   # Analyse + commit + push + PR
-sonar_autofix()                      # Auto-detection de la plateforme
+fix <- sonar_fix(".", create_mr = TRUE)
 ```
+
+Plus de reformatage a la main : declencher le job, relire la MR et la fusionner.
 
 ## Pipeline CI
 
@@ -169,11 +179,16 @@ rsonar-check:
   stage: quality
   script: R -e "sonar_analyse('.'); export_junit()"
 
-rsonar-autofix:
+rsonar-fix:
   stage: autofix
   when: manual
-  script: R -e "sonar_autofix(provider='gitlab', verbose=TRUE)"
+  script: R -e "sonar_fix('.', create_mr = TRUE)"
 ```
+
+## Deux depots d'exemple
+
+- [`rproject_for_rsonar`](https://gitlab.com/ddotta/rproject_for_rsonar) : projet R d'exemple, terrain de test pour executer `rsonar` et generer des MR automatiques.
+- [`ci-templates-r`](https://gitlab.com/ddotta/ci-templates-r) : templates de pipelines CI reutilisables, dont le job `rsonar-fix`.
 
 ## Installation : token GitLab (etape 1)
 
@@ -251,10 +266,14 @@ Affiche : nouveaux problemes, problemes corriges, tendance.
 
 ## Conclusion
 
-`sonar_fix()` + `sonar_autofix()` completent la suite rsonar :
+`sonar_fix()` complete la suite rsonar :
 
 - Analyser le code  
 - Corriger automatiquement  
 - Ouvrir une Merge Request pour review  
 
 Le tout depuis le pipeline CI, en un clic.
+
+---
+
+Documentation : [ddotta.github.io/rsonar](https://ddotta.github.io/rsonar/) · [integration CI/CD](https://ddotta.github.io/rsonar/articles/ci-integration.html)
