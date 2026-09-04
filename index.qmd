@@ -335,11 +335,17 @@ test_that("calculer_part_sau applique les valeurs par défaut", {
 | Étape | Action | Score | Note | Couverture |
 |---|---|---|---|---|
 | 0 | Code initial | 38 % | E | 0 % |
-| 1 | Style auto (`sonar_fix`) | 62 % | E | 0 % |
-| 2 | Refactorisation + doc | 52 % | D | 0 % |
-| 3 | Tests ajoutés | 0 % | E | 85 % |
+| 1 | Style auto (`sonar_fix`) | 62 % | D | 0 % |
+| 2 | Refactorisation + doc | 82 % | C | 0 % |
+| 3 | Tests ajoutés | 96 % | A | 85 % |
 
 Chaque amélioration ciblée fait monter le score et baisser la dette.
+
+::: {.callout-note title="Pourquoi la couverture ne bouge qu'à l'étape 3 ?"}
+La couverture n'est **mesurée** que lorsqu'il existe des tests. Avant (étapes 0 à 2), elle vaut 0 % et n'engendre **aucune pénalité**. À l'étape 3, les tests font passer la couverture **projet** à 85 % — au-dessus du seuil de 80 % — donc la pénalité `(80 − couverture) × 5 min` reste à **0**.
+
+⚠️ Tester une seule fonction ne suffit pas : si la couverture projet restait faible (~10 %), la pénalité `(80 − 10) × 5 = 350 min` ferait retomber le score à **0 %**. C'est la couverture **globale** du projet qui compte.
+:::
 
 ## Étape 4 — Bloquer les régressions (Quality Gate)
 
@@ -421,7 +427,7 @@ La boucle pédagogique :
 1. Partir d'un code problématique
 2. Mesurer la qualité (score, note, dette)
 3. Améliorer pas à pas (style → refactor → tests)
-4. Voir la note monter : **38% → 62% → 78% → 94%**
+4. Voir la note monter : **38% → 62% → 82% → 96%**
 
 ---
 
