@@ -236,7 +236,11 @@ Damien Dotta
 </tbody>
 </table>
 </div><div class="column" style="width:30%;">
-<p><img data-src="images/hex_rsonar.png" style="width:90.0%"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/hex_rsonar.png" class="quarto-figure quarto-figure-center"></p>
+</figure>
+</div>
 </div></div>
 <p>Vocabulaire SonarQube : <em>issues</em>, <em>Coverage</em>, <strong>Quality Gate</strong>.</p>
 </section>
@@ -370,7 +374,7 @@ Damien Dotta
 </section>
 <section id="le-code-de-départ-version-0-1" class="slide level2">
 <h2>Le code de départ (version 0)</h2>
-<p>Exemple <code>R/analysis.R</code> :</p>
+<p>Exemple <code>01_assignment_and_formatting.R</code> :</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a><span class="co"># File 1: Assignment operator &amp; formatting issues</span></span>
 <span id="cb3-2"><a></a>calculate_tax <span class="ot">&lt;-</span> <span class="cf">function</span>(income, <span class="at">rate =</span> <span class="fl">0.2</span>) {</span>
 <span id="cb3-3"><a></a>  <span class="co"># Violation: '=' used instead of '&lt;-' for assignment</span></span>
@@ -388,83 +392,116 @@ Damien Dotta
 <div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a></a><span class="fu">library</span>(rsonar)</span>
 <span id="cb4-2"><a></a>res <span class="ot">&lt;-</span> <span class="fu">sonar_analyse</span>(<span class="st">"."</span>)</span>
 <span id="cb4-3"><a></a><span class="fu">sonar_report</span>(res)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<pre><code>-- rsonar -- Quality Report --
-  Fichiers    : 1 R
-  Lint        : 8 issues (0 err / 3 warn / 5 style)
-  Style       : 1 fichier non conforme
-  Coverage    : 0%
-  Goodpractice: 3 échecs
+<p>Affiche un rapport interactif global.</p>
 
--- Dette Technique --
-  SQALE: E | Score: 38% | Durée: 4.2h</code></pre>
-</section>
+<img data-src="images/report_version0.png" class="quarto-figure quarto-figure-center r-stretch"></section>
 <section id="étape-0-score-note-et-hotspots" class="slide level2">
 <h2>Étape 0 — Score, note et hotspots</h2>
-<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a><span class="fu">quality_score</span>(<span class="st">"."</span>)   <span class="co"># Score : 38% | Rating : E</span></span>
-<span id="cb6-2"><a></a><span class="fu">debt_index</span>(res)      <span class="co"># Note : E (dette critique)</span></span>
-<span id="cb6-3"><a></a><span class="fu">sonar_hotspots</span>(res)  <span class="co"># → R/analysis.R en priorité</span></span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<ul>
-<li><code>debt_index()</code> : note de dette technique (A à E)</li>
-<li><code>sonar_hotspots()</code> : fichiers à corriger en priorité</li>
-<li><code>sonar_report(res)</code> : rapport HTML interactif</li>
-</ul>
-</section>
+
+<img data-src="images/technical_debt.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="étape-0-score-note-et-hotspots-1" class="slide level2">
+<h2>Étape 0 — Score, note et hotspots</h2>
+
+<img data-src="images/lint_issues.png" class="quarto-figure quarto-figure-center r-stretch"></section>
 <section id="étape-1-corriger-le-style-automatiquement" class="slide level2">
 <h2>Étape 1 — Corriger le style automatiquement</h2>
 <p><code>sonar_fix()</code> s’appuie sur <a href="https://github.com/posit-dev/air"><code>air</code></a>, le formateur R rapide de Posit.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a><span class="co"># Aperçu sans rien modifier</span></span>
-<span id="cb7-2"><a></a><span class="fu">sonar_fix</span>(<span class="st">"."</span>, <span class="at">dry_run =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb7-3"><a></a></span>
-<span id="cb7-4"><a></a><span class="co"># Application des corrections de style</span></span>
-<span id="cb7-5"><a></a><span class="fu">sonar_fix</span>(<span class="st">"."</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Corrige : espaces, <code>=</code> → <code>&lt;-</code>, accolades, indentation.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a></a><span class="co"># Aperçu sans rien modifier</span></span>
+<span id="cb5-2"><a></a><span class="fu">sonar_fix</span>(<span class="st">"."</span>, <span class="at">dry_run =</span> <span class="cn">TRUE</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a>── rsonar <span class="fu">Fix</span> (dry<span class="sc">-</span>run) ────────────────────────────────────────────────────────────────────</span>
+<span id="cb6-2"><a></a>ℹ Path<span class="sc">:</span> <span class="er">/</span>var<span class="sc">/</span>data<span class="sc">/</span>nfs<span class="sc">/</span>CERISE<span class="sc">/</span><span class="dv">00</span><span class="sc">-</span>Espace<span class="sc">-</span>Personnel<span class="sc">/</span>damien.dotta<span class="sc">/</span>rsonar_tests</span>
+<span id="cb6-3"><a></a>ℹ <span class="dv">10</span> R <span class="fu">file</span>(s) found</span>
+<span id="cb6-4"><a></a>✔ Report saved<span class="sc">:</span> sonar<span class="sc">-</span>fixes.json</span>
+<span id="cb6-5"><a></a>                               </span>
+<span id="cb6-6"><a></a>── rsonar Fix <span class="fu">Report</span> (dry<span class="sc">-</span>run <span class="sc">-</span> no files modified) ─────────────────────────────────────────</span>
+<span id="cb6-7"><a></a>ℹ Path <span class="sc">:</span> <span class="er">/</span>var<span class="sc">/</span>data<span class="sc">/</span>nfs<span class="sc">/</span>CERISE<span class="sc">/</span><span class="dv">00</span><span class="sc">-</span>Espace<span class="sc">-</span>Personnel<span class="sc">/</span>damien.dotta<span class="sc">/</span>rsonar_tests</span>
+<span id="cb6-8"><a></a>ℹ Files <span class="sc">:</span> <span class="dv">10</span> scanned, <span class="dv">10</span> modified</span>
+<span id="cb6-9"><a></a>ℹ Time <span class="sc">:</span> <span class="dv">2</span>s</span>
+<span id="cb6-10"><a></a>                               </span>
+<span id="cb6-11"><a></a>── Fixes applied               </span>
+<span id="cb6-12"><a></a>  styler<span class="sc">:</span> <span class="dv">9</span>fixes to <span class="dv">10</span> <span class="fu">file</span>(s)</span>
+<span id="cb6-13"><a></a>  spacing<span class="sc">:</span> <span class="dv">4</span></span>
+<span id="cb6-14"><a></a>  true_false<span class="sc">:</span> <span class="dv">3</span></span>
+<span id="cb6-15"><a></a>  commas<span class="sc">:</span> <span class="dv">2</span></span>
+<span id="cb6-16"><a></a>  cleanup<span class="sc">:</span> <span class="dv">29</span></span>
+<span id="cb6-17"><a></a>  assignment<span class="sc">:</span> <span class="dv">2</span></span>
+<span id="cb6-18"><a></a>  unused_vars<span class="sc">:</span> <span class="dv">1</span></span>
+<span id="cb6-19"><a></a>ℹ Run <span class="st">`</span><span class="at">sonar_fix()</span><span class="st">`</span> with <span class="st">`</span><span class="at">dry_run = FALSE</span><span class="st">`</span> to apply fixes.</span>
+<span id="cb6-20"><a></a>✔ Applying fixes to <span class="dv">10</span> <span class="fu">file</span>(s) [<span class="fl">2.2</span>s]</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="étape-1-corriger-le-style-automatiquement-1" class="slide level2">
+<h2>Étape 1 — Corriger le style automatiquement</h2>
+<p>Avec dry_run à FALSE, les scripts sont modifiés :</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a><span class="co"># Application des corrections de style</span></span>
+<span id="cb7-2"><a></a><span class="fu">sonar_fix</span>(<span class="st">"."</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="étape-1-résultat-version-1" class="slide level2">
 <h2>Étape 1 — Résultat (version 1)</h2>
-<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a>addcols <span class="ot">&lt;-</span> <span class="cf">function</span>(d, a, b) {</span>
-<span id="cb8-2"><a></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(d) <span class="sc">==</span> <span class="dv">0</span>) {</span>
-<span id="cb8-3"><a></a>    <span class="fu">stop</span>(<span class="st">"empty"</span>)</span>
-<span id="cb8-4"><a></a>  }</span>
-<span id="cb8-5"><a></a>  total <span class="ot">&lt;-</span> d[[a]] <span class="sc">+</span> d[[b]]</span>
-<span id="cb8-6"><a></a>  positive <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(total <span class="sc">&gt;</span> <span class="dv">0</span>, T, F)</span>
-<span id="cb8-7"><a></a>  result <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">total =</span> total, <span class="at">positive =</span> positive)</span>
-<span id="cb8-8"><a></a>  <span class="fu">return</span>(result)</span>
-<span id="cb8-9"><a></a>}</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Le style est réglé, mais le nommage, la complexité et la doc restent.</p>
-<p>Re-mesure : <strong>Score 62% · Note D</strong>.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a><span class="co"># File 1: Assignment operator &amp; formatting issues</span></span>
+<span id="cb8-2"><a></a>calculate_tax <span class="ot">&lt;-</span> <span class="cf">function</span>(income, <span class="at">rate =</span> <span class="fl">0.2</span>) {</span>
+<span id="cb8-3"><a></a>  <span class="co"># Violation: '=' used instead of '&lt;-' for assignment</span></span>
+<span id="cb8-4"><a></a>  total_tax <span class="ot">&lt;-</span> income <span class="sc">*</span> rate</span>
+<span id="cb8-5"><a></a></span>
+<span id="cb8-6"><a></a>  <span class="co"># Violation: line over 80 characters limit with bad spacing around Operators and comma</span></span>
+<span id="cb8-7"><a></a>  result <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">income =</span> income, <span class="at">tax =</span> total_tax, <span class="at">net =</span> income <span class="sc">-</span> total_tax, <span class="at">note =</span> <span class="st">"Calculated automatically by custom financial routine"</span>)</span>
+<span id="cb8-8"><a></a></span>
+<span id="cb8-9"><a></a>  <span class="fu">return</span>(result)</span>
+<span id="cb8-10"><a></a>}</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Le style est réglé, mais tout n’est pas réglé.</p>
 </section>
+<section id="étape-1-résultat-version-1-1" class="slide level2">
+<h2>Étape 1 — Résultat (version 1)</h2>
+
+<img data-src="images/report_version1.png" class="quarto-figure quarto-figure-center r-stretch"></section>
 <section id="étape-2-refactoriser-et-documenter" class="slide level2">
 <h2>Étape 2 — Refactoriser et documenter</h2>
 <p>Améliorations manuelles :</p>
 <ul>
-<li><code>addcols</code> → <code>add_columns</code>, <code>d/a/b</code> → <code>data/col1/col2</code></li>
-<li><code>ifelse(x &gt; 0, T, F)</code> → <code>x &gt; 0</code></li>
-<li>documentation roxygen ajoutée</li>
+<li>renommer <code>total_tax</code> → <code>tax</code> et extraire <code>net</code></li>
+<li>fractionner le <code>data.frame</code> (ligne trop longue)</li>
+<li>supprimer le <code>return()</code> explicite (retour implicite)</li>
+<li>ajouter la documentation <strong>roxygen2</strong></li>
 </ul>
-<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="co">#' Somme deux colonnes et signale les lignes positives</span></span>
+<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="co">#' Calcule l'impôt et le revenu net</span></span>
 <span id="cb9-2"><a></a><span class="co">#'</span></span>
-<span id="cb9-3"><a></a><span class="co">#' @param data Un data frame.</span></span>
-<span id="cb9-4"><a></a><span class="co">#' @param col1,col2 Noms des colonnes à sommer.</span></span>
-<span id="cb9-5"><a></a><span class="co">#' @return Une liste avec `total` et `positive`.</span></span>
-<span id="cb9-6"><a></a>add_columns <span class="ot">&lt;-</span> <span class="cf">function</span>(data, col1, col2) {</span>
-<span id="cb9-7"><a></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(data) <span class="sc">==</span> <span class="dv">0</span>) {</span>
-<span id="cb9-8"><a></a>    <span class="fu">stop</span>(<span class="st">"`data` doit contenir au moins une ligne."</span>)</span>
-<span id="cb9-9"><a></a>  }</span>
-<span id="cb9-10"><a></a>  total <span class="ot">&lt;-</span> data[[col1]] <span class="sc">+</span> data[[col2]]</span>
-<span id="cb9-11"><a></a>  <span class="fu">list</span>(<span class="at">total =</span> total, <span class="at">positive =</span> total <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
-<span id="cb9-12"><a></a>}</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-3"><a></a><span class="co">#' @param income Revenu brut (numérique ou vecteur).</span></span>
+<span id="cb9-4"><a></a><span class="co">#' @param rate Taux d'imposition, par défaut `0.2` (20 %).</span></span>
+<span id="cb9-5"><a></a><span class="co">#'</span></span>
+<span id="cb9-6"><a></a><span class="co">#' @return Un `data.frame` avec `income`, `tax`, `net` et `note`.</span></span>
+<span id="cb9-7"><a></a><span class="co">#' @export</span></span>
+<span id="cb9-8"><a></a><span class="co">#'</span></span>
+<span id="cb9-9"><a></a><span class="co">#' @examples</span></span>
+<span id="cb9-10"><a></a><span class="co">#' calculate_tax(c(1000, 2500))</span></span>
+<span id="cb9-11"><a></a>calculate_tax <span class="ot">&lt;-</span> <span class="cf">function</span>(income, <span class="at">rate =</span> <span class="fl">0.2</span>) {</span>
+<span id="cb9-12"><a></a>  tax <span class="ot">&lt;-</span> income <span class="sc">*</span> rate</span>
+<span id="cb9-13"><a></a>  net <span class="ot">&lt;-</span> income <span class="sc">-</span> tax</span>
+<span id="cb9-14"><a></a></span>
+<span id="cb9-15"><a></a>  <span class="fu">data.frame</span>(</span>
+<span id="cb9-16"><a></a>    <span class="at">income =</span> income,</span>
+<span id="cb9-17"><a></a>    <span class="at">tax    =</span> tax,</span>
+<span id="cb9-18"><a></a>    <span class="at">net    =</span> net,</span>
+<span id="cb9-19"><a></a>    <span class="at">note   =</span> <span class="st">"Calculated automatically by custom financial routine"</span></span>
+<span id="cb9-20"><a></a>  )</span>
+<span id="cb9-21"><a></a>}</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Re-mesure : <strong>Score 78% · Note C</strong>.</p>
 </section>
 <section id="étape-3-ajouter-des-tests" class="slide level2">
 <h2>Étape 3 — Ajouter des tests</h2>
-<p><code>tests/testthat/test-analysis.R</code> :</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a><span class="fu">test_that</span>(<span class="st">"add_columns somme et signale"</span>, {</span>
-<span id="cb10-2"><a></a>  data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">a =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="dv">2</span>, <span class="dv">3</span>), <span class="at">b =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="sc">-</span><span class="dv">5</span>))</span>
-<span id="cb10-3"><a></a>  res <span class="ot">&lt;-</span> <span class="fu">add_columns</span>(data, <span class="st">"a"</span>, <span class="st">"b"</span>)</span>
-<span id="cb10-4"><a></a></span>
-<span id="cb10-5"><a></a>  <span class="fu">expect_equal</span>(res<span class="sc">$</span>total, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="sc">-</span><span class="dv">2</span>))</span>
-<span id="cb10-6"><a></a>  <span class="fu">expect_equal</span>(res<span class="sc">$</span>positive, <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>))</span>
-<span id="cb10-7"><a></a>})</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><code>tests/testthat/test-calculate-tax.R</code> :</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a><span class="fu">test_that</span>(<span class="st">"calculate_tax calcule l'impôt et le net"</span>, {</span>
+<span id="cb10-2"><a></a>  res <span class="ot">&lt;-</span> <span class="fu">calculate_tax</span>(<span class="fu">c</span>(<span class="dv">1000</span>, <span class="dv">2500</span>), <span class="at">rate =</span> <span class="fl">0.2</span>)</span>
+<span id="cb10-3"><a></a></span>
+<span id="cb10-4"><a></a>  <span class="fu">expect_equal</span>(res<span class="sc">$</span>tax, <span class="fu">c</span>(<span class="dv">200</span>, <span class="dv">500</span>))</span>
+<span id="cb10-5"><a></a>  <span class="fu">expect_equal</span>(res<span class="sc">$</span>net, <span class="fu">c</span>(<span class="dv">800</span>, <span class="dv">2000</span>))</span>
+<span id="cb10-6"><a></a>  <span class="fu">expect_equal</span>(res<span class="sc">$</span>income, <span class="fu">c</span>(<span class="dv">1000</span>, <span class="dv">2500</span>))</span>
+<span id="cb10-7"><a></a>})</span>
+<span id="cb10-8"><a></a></span>
+<span id="cb10-9"><a></a><span class="fu">test_that</span>(<span class="st">"calculate_tax applique le taux par défaut"</span>, {</span>
+<span id="cb10-10"><a></a>  res <span class="ot">&lt;-</span> <span class="fu">calculate_tax</span>(<span class="dv">1000</span>)</span>
+<span id="cb10-11"><a></a></span>
+<span id="cb10-12"><a></a>  <span class="fu">expect_equal</span>(res<span class="sc">$</span>tax, <span class="dv">200</span>)</span>
+<span id="cb10-13"><a></a>  <span class="fu">expect_equal</span>(res<span class="sc">$</span>net, <span class="dv">800</span>)</span>
+<span id="cb10-14"><a></a>})</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>La couverture passe de 0% à 85%.</p>
 <p>Re-mesure : <strong>Score 94% · Note A</strong>.</p>
 </section>

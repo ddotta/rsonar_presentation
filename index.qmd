@@ -25,7 +25,7 @@ format:
 | `goodpractice` | Bonnes pratiques de packaging |
 :::
 ::: {.column width="30%"}
-![](images/hex_rsonar.png){width=90%}
+![](images/hex_rsonar.png){fig-align="center"}
 :::
 :::
 
@@ -125,24 +125,36 @@ Structure du projet :
 └── 10_duplicate_code_and_magic_numbers.R
 
 ## Le code de départ (version 0)
-Exemple  `R/analysis.R` :
+Exemple  `01_assignment_and_formatting.R` :
 
 ```{.r}
 # File 1: Assignment operator & formatting issues
-calculate_tax <- function(income, rate = 0.2) {
-  # Violation: '=' used instead of '<-' for assignment
-  total_tax = income * rate
+Part_SAU = function( SAU_HA = 80 , surface_totale = 100 , unused_arg = 10 ){
+  var_inutile1 = 10
+  var_inutile2 = 20
   
-  # Violation: line over 80 characters limit with bad spacing around Operators and comma
-  result=data.frame(income=income,tax=total_tax,net=income-total_tax,note="Calculated automatically by custom financial routine")
+    if( SAU_HA == NA || surface_totale == NA || SAU_HA == NULL ){ return( NULL ) }
   
-  return(result)
+  for( i in 1:length( SAU_HA ) ){ print( i ) }
+  
+    msg = paste( "Part SAU: " , SAU_HA , sep = "" )
+  
+   if( class( SAU_HA ) == "numeric" ){ warning( msg ) }
+
+  
+  if( SAU_HA > 0 && surface_totale > 0 ){
+    res = ( SAU_HA / surface_totale ) * 100
+  }
+  
+  return( round( res , 1 ) )
+    
+    print("Fini"
 }
 ```
 
-Problèmes : nommage, espaces, `=` vs `<-`, `T`/`F`, pas de doc, ligne trop longue, **aucun test**.
+Problèmes : nommage, espaces, `=` vs `<-`, pas de doc, ligne trop longue, aucun test...
 
-## Étape 0 — Mesurer l'état initial
+## Version 0 — Scores
 
 ```{.r}
 library(rsonar)
@@ -150,29 +162,23 @@ res <- sonar_analyse(".")
 sonar_report(res)
 ```
 
-```
--- rsonar -- Quality Report --
-  Fichiers    : 1 R
-  Lint        : 8 issues (0 err / 3 warn / 5 style)
-  Style       : 1 fichier non conforme
-  Coverage    : 0%
-  Goodpractice: 3 échecs
+Affiche un rapport interactif global.  
 
--- Dette Technique --
-  SQALE: E | Score: 38% | Durée: 4.2h
-```
 
-## Étape 0 — Score, note et hotspots
+![](images/report_version0.png){fig-align="center"}
 
-```{.r}
-quality_score(".")   # Score : 38% | Rating : E
-debt_index(res)      # Note : E (dette critique)
-sonar_hotspots(res)  # → R/analysis.R en priorité
-```
 
-- `debt_index()` : note de dette technique (A à E)
-- `sonar_hotspots()` : fichiers à corriger en priorité
-- `sonar_report(res)` : rapport HTML interactif
+## Version 0 — Dette technique
+
+![](images/technical_debt.png){fig-align="center"}
+
+## Version 0 — Hotspots
+
+![](images/hotspots_version0.png){fig-align="center"}
+
+## Version 0 — Lint issues
+
+![](images/lint_issues.png){fig-align="center"}
 
 ## Étape 1 — Corriger le style automatiquement
 
@@ -181,51 +187,106 @@ sonar_hotspots(res)  # → R/analysis.R en priorité
 ```{.r}
 # Aperçu sans rien modifier
 sonar_fix(".", dry_run = TRUE)
+```
 
+```{.r}
+── rsonar Fix (dry-run) ──────────────────────────────────────────────────────────────────────────────────────────────────
+ℹ Path: /var/data/nfs/CERISE/00-Espace-Personnel/damien.dotta/rsonar_tests
+ℹ 10 R file(s) found
+✔ Report saved: sonar-fixes.json
+                               
+── rsonar Fix Report (dry-run - no files modified) ───────────────────────────────────────────────────────────────────────
+ℹ Path : /var/data/nfs/CERISE/00-Espace-Personnel/damien.dotta/rsonar_tests
+ℹ Files : 10 scanned, 10 modified
+ℹ Time : 1.8s
+                               
+── Fixes applied               
+  styler: 8fixes to 10 file(s)
+  spacing: 3
+  true_false: 3
+  commas: 1
+  cleanup: 35
+  assignment: 4
+  unused_vars: 3
+ℹ Run `sonar_fix()` with `dry_run = FALSE` to apply fixes.
+✔ Applying fixes to 10 file(s) [2s]
+```
+
+## Étape 1 — Corriger le style automatiquement
+
+Avec dry_run à FALSE, les scripts sont modifiés :  
+  
+```{.r}
 # Application des corrections de style
 sonar_fix(".")
 ```
 
-Corrige : espaces, `=` → `<-`, accolades, indentation.
 
-## Étape 1 — Résultat (version 1)
+## Version 1 — Résultat
 
 ```{.r}
-addcols <- function(d, a, b) {
-  if (nrow(d) == 0) {
-    stop("empty")
+# File 1: Assignment operator & formatting issues
+Part_SAU = function( SAU_HA = 80 , surface_totale = 100 , unused_arg = 10 ){
+
+    if( SAU_HA == NA || surface_totale == NA || SAU_HA == NULL ){ return( NULL ) }
+
+  for( i in 1:length( SAU_HA ) ){ print( i ) }
+
+    msg = paste( "Part SAU: " , SAU_HA , sep = "" )
+
+   if( class( SAU_HA ) == "numeric" ){ warning( msg ) }
+
+  if( SAU_HA > 0 && surface_totale > 0 ){
+    res <- ( SAU_HA / surface_totale ) * 100
   }
-  total <- d[[a]] + d[[b]]
-  positive <- ifelse(total > 0, T, F)
-  result <- list(total = total, positive = positive)
-  return(result)
+
+  return( round( res , 1 ) )
+
+    print("Fini"
 }
 ```
 
-Le style est réglé, mais le nommage, la complexité et la doc restent.
+C'est mieux mais tout n'est pas réglé.
 
-Re-mesure : **Score 62% · Note D**.
+## Version 1 — Résultats
+
+![](images/report_version1.png){fig-align="center"}
+
+Sur notre script exemple :  
+  
+
+![](images/lint_issues_version1.png){fig-align="center"}
 
 ## Étape 2 — Refactoriser et documenter
 
 Améliorations manuelles :
 
-- `addcols` → `add_columns`, `d/a/b` → `data/col1/col2`
-- `ifelse(x > 0, T, F)` → `x > 0`
-- documentation roxygen ajoutée
+- renommer `total_tax` → `tax` et extraire `net`
+- fractionner le `data.frame` (ligne trop longue)
+- supprimer le `return()` explicite (retour implicite)
+- ajouter la documentation **roxygen2**
 
 ```{.r}
-#' Somme deux colonnes et signale les lignes positives
+#' Calcule l'impôt et le revenu net
 #'
-#' @param data Un data frame.
-#' @param col1,col2 Noms des colonnes à sommer.
-#' @return Une liste avec `total` et `positive`.
-add_columns <- function(data, col1, col2) {
-  if (nrow(data) == 0) {
-    stop("`data` doit contenir au moins une ligne.")
-  }
-  total <- data[[col1]] + data[[col2]]
-  list(total = total, positive = total > 0)
+#' @param income Revenu brut (numérique ou vecteur).
+#' @param rate Taux d'imposition, par défaut `0.2` (20 %).
+#'
+#' @return Un `data.frame` avec `income`, `tax`, `net` et `note`.
+#' @export
+#'
+#' @examples
+#' calculate_tax(c(1000, 2500))
+calculate_tax <- function(income, rate = 0.2) {
+  tax <- income * rate
+  net <- income - tax
+
+  data.frame(
+    income = income,
+    tax    = tax,
+    net    = net,
+    note   = "Calculated automatically by custom financial routine"
+  )
 }
 ```
 
@@ -233,15 +294,22 @@ Re-mesure : **Score 78% · Note C**.
 
 ## Étape 3 — Ajouter des tests
 
-`tests/testthat/test-analysis.R` :
+`tests/testthat/test-calculate-tax.R` :
 
 ```{.r}
-test_that("add_columns somme et signale", {
-  data <- data.frame(a = c(1, -2, 3), b = c(0, 5, -5))
-  res <- add_columns(data, "a", "b")
+test_that("calculate_tax calcule l'impôt et le net", {
+  res <- calculate_tax(c(1000, 2500), rate = 0.2)
 
-  expect_equal(res$total, c(1, 3, -2))
-  expect_equal(res$positive, c(TRUE, TRUE, FALSE))
+  expect_equal(res$tax, c(200, 500))
+  expect_equal(res$net, c(800, 2000))
+  expect_equal(res$income, c(1000, 2500))
+})
+
+test_that("calculate_tax applique le taux par défaut", {
+  res <- calculate_tax(1000)
+
+  expect_equal(res$tax, 200)
+  expect_equal(res$net, 800)
 })
 ```
 

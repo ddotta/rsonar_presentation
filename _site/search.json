@@ -186,7 +186,7 @@
     "href": "index.html#rsonar-cest-quoi",
     "title": "rsonar en pratique",
     "section": "rsonar, c’est quoi ?",
-    "text": "rsonar, c’est quoi ?\n\n\nrsonar est l’équivalent R de SonarQube : il centralise la mesure de la qualité du code R dans un rapport unique et interactif.\n\n\n\nOutil\nRôle\n\n\n\n\nlintr\nAnalyse statique — bugs, style, complexité\n\n\nstyler\nFormatage du code\n\n\ncovr\nCouverture de tests\n\n\ngoodpractice\nBonnes pratiques de packaging\n\n\n\n\n\n\nVocabulaire SonarQube : issues, Coverage, Quality Gate."
+    "text": "rsonar, c’est quoi ?\n\n\nrsonar est l’équivalent R de SonarQube : il centralise la mesure de la qualité du code R dans un rapport unique et interactif.\n\n\n\nOutil\nRôle\n\n\n\n\nlintr\nAnalyse statique — bugs, style, complexité\n\n\nstyler\nFormatage du code\n\n\ncovr\nCouverture de tests\n\n\ngoodpractice\nBonnes pratiques de packaging\n\n\n\n\n\n\n\n\n\n\nVocabulaire SonarQube : issues, Coverage, Quality Gate."
   },
   {
     "objectID": "index.html#sqale-quantifier-la-dette-technique",
@@ -242,49 +242,49 @@
     "href": "index.html#le-code-de-départ-version-0-1",
     "title": "rsonar en pratique",
     "section": "Le code de départ (version 0)",
-    "text": "Le code de départ (version 0)\nExemple R/analysis.R :\n# File 1: Assignment operator & formatting issues\ncalculate_tax &lt;- function(income, rate = 0.2) {\n  # Violation: '=' used instead of '&lt;-' for assignment\n  total_tax = income * rate\n  \n  # Violation: line over 80 characters limit with bad spacing around Operators and comma\n  result=data.frame(income=income,tax=total_tax,net=income-total_tax,note=\"Calculated automatically by custom financial routine\")\n  \n  return(result)\n}\nProblèmes : nommage, espaces, = vs &lt;-, T/F, pas de doc, ligne trop longue, aucun test."
+    "text": "Le code de départ (version 0)\nExemple 01_assignment_and_formatting.R :\n# File 1: Assignment operator & formatting issues\ncalculate_tax &lt;- function(income, rate = 0.2) {\n  # Violation: '=' used instead of '&lt;-' for assignment\n  total_tax = income * rate\n  \n  # Violation: line over 80 characters limit with bad spacing around Operators and comma\n  result=data.frame(income=income,tax=total_tax,net=income-total_tax,note=\"Calculated automatically by custom financial routine\")\n  \n  return(result)\n}\nProblèmes : nommage, espaces, = vs &lt;-, T/F, pas de doc, ligne trop longue, aucun test."
   },
   {
     "objectID": "index.html#étape-0-mesurer-létat-initial",
     "href": "index.html#étape-0-mesurer-létat-initial",
     "title": "rsonar en pratique",
     "section": "Étape 0 — Mesurer l’état initial",
-    "text": "Étape 0 — Mesurer l’état initial\nlibrary(rsonar)\nres &lt;- sonar_analyse(\".\")\nsonar_report(res)\n-- rsonar -- Quality Report --\n  Fichiers    : 1 R\n  Lint        : 8 issues (0 err / 3 warn / 5 style)\n  Style       : 1 fichier non conforme\n  Coverage    : 0%\n  Goodpractice: 3 échecs\n\n-- Dette Technique --\n  SQALE: E | Score: 38% | Durée: 4.2h"
+    "text": "Étape 0 — Mesurer l’état initial\nlibrary(rsonar)\nres &lt;- sonar_analyse(\".\")\nsonar_report(res)\nAffiche un rapport interactif global."
   },
   {
     "objectID": "index.html#étape-0-score-note-et-hotspots",
     "href": "index.html#étape-0-score-note-et-hotspots",
     "title": "rsonar en pratique",
     "section": "Étape 0 — Score, note et hotspots",
-    "text": "Étape 0 — Score, note et hotspots\nquality_score(\".\")   # Score : 38% | Rating : E\ndebt_index(res)      # Note : E (dette critique)\nsonar_hotspots(res)  # → R/analysis.R en priorité\n\ndebt_index() : note de dette technique (A à E)\nsonar_hotspots() : fichiers à corriger en priorité\nsonar_report(res) : rapport HTML interactif"
+    "text": "Étape 0 — Score, note et hotspots"
   },
   {
     "objectID": "index.html#étape-1-corriger-le-style-automatiquement",
     "href": "index.html#étape-1-corriger-le-style-automatiquement",
     "title": "rsonar en pratique",
     "section": "Étape 1 — Corriger le style automatiquement",
-    "text": "Étape 1 — Corriger le style automatiquement\nsonar_fix() s’appuie sur air, le formateur R rapide de Posit.\n# Aperçu sans rien modifier\nsonar_fix(\".\", dry_run = TRUE)\n\n# Application des corrections de style\nsonar_fix(\".\")\nCorrige : espaces, = → &lt;-, accolades, indentation."
+    "text": "Étape 1 — Corriger le style automatiquement\nsonar_fix() s’appuie sur air, le formateur R rapide de Posit.\n# Aperçu sans rien modifier\nsonar_fix(\".\", dry_run = TRUE)\n── rsonar Fix (dry-run) ────────────────────────────────────────────────────────────────────\nℹ Path: /var/data/nfs/CERISE/00-Espace-Personnel/damien.dotta/rsonar_tests\nℹ 10 R file(s) found\n✔ Report saved: sonar-fixes.json\n                               \n── rsonar Fix Report (dry-run - no files modified) ─────────────────────────────────────────\nℹ Path : /var/data/nfs/CERISE/00-Espace-Personnel/damien.dotta/rsonar_tests\nℹ Files : 10 scanned, 10 modified\nℹ Time : 2s\n                               \n── Fixes applied               \n  styler: 9fixes to 10 file(s)\n  spacing: 4\n  true_false: 3\n  commas: 2\n  cleanup: 29\n  assignment: 2\n  unused_vars: 1\nℹ Run `sonar_fix()` with `dry_run = FALSE` to apply fixes.\n✔ Applying fixes to 10 file(s) [2.2s]"
   },
   {
     "objectID": "index.html#étape-1-résultat-version-1",
     "href": "index.html#étape-1-résultat-version-1",
     "title": "rsonar en pratique",
     "section": "Étape 1 — Résultat (version 1)",
-    "text": "Étape 1 — Résultat (version 1)\naddcols &lt;- function(d, a, b) {\n  if (nrow(d) == 0) {\n    stop(\"empty\")\n  }\n  total &lt;- d[[a]] + d[[b]]\n  positive &lt;- ifelse(total &gt; 0, T, F)\n  result &lt;- list(total = total, positive = positive)\n  return(result)\n}\nLe style est réglé, mais le nommage, la complexité et la doc restent.\nRe-mesure : Score 62% · Note D."
+    "text": "Étape 1 — Résultat (version 1)\n# File 1: Assignment operator & formatting issues\ncalculate_tax &lt;- function(income, rate = 0.2) {\n  # Violation: '=' used instead of '&lt;-' for assignment\n  total_tax &lt;- income * rate\n\n  # Violation: line over 80 characters limit with bad spacing around Operators and comma\n  result &lt;- data.frame(income = income, tax = total_tax, net = income - total_tax, note = \"Calculated automatically by custom financial routine\")\n\n  return(result)\n}\nLe style est réglé, mais tout n’est pas réglé."
   },
   {
     "objectID": "index.html#étape-2-refactoriser-et-documenter",
     "href": "index.html#étape-2-refactoriser-et-documenter",
     "title": "rsonar en pratique",
     "section": "Étape 2 — Refactoriser et documenter",
-    "text": "Étape 2 — Refactoriser et documenter\nAméliorations manuelles :\n\naddcols → add_columns, d/a/b → data/col1/col2\nifelse(x &gt; 0, T, F) → x &gt; 0\ndocumentation roxygen ajoutée\n\n#' Somme deux colonnes et signale les lignes positives\n#'\n#' @param data Un data frame.\n#' @param col1,col2 Noms des colonnes à sommer.\n#' @return Une liste avec `total` et `positive`.\nadd_columns &lt;- function(data, col1, col2) {\n  if (nrow(data) == 0) {\n    stop(\"`data` doit contenir au moins une ligne.\")\n  }\n  total &lt;- data[[col1]] + data[[col2]]\n  list(total = total, positive = total &gt; 0)\n}\nRe-mesure : Score 78% · Note C."
+    "text": "Étape 2 — Refactoriser et documenter\nAméliorations manuelles :\n\nrenommer total_tax → tax et extraire net\nfractionner le data.frame (ligne trop longue)\nsupprimer le return() explicite (retour implicite)\najouter la documentation roxygen2\n\n#' Calcule l'impôt et le revenu net\n#'\n#' @param income Revenu brut (numérique ou vecteur).\n#' @param rate Taux d'imposition, par défaut `0.2` (20 %).\n#'\n#' @return Un `data.frame` avec `income`, `tax`, `net` et `note`.\n#' @export\n#'\n#' @examples\n#' calculate_tax(c(1000, 2500))\ncalculate_tax &lt;- function(income, rate = 0.2) {\n  tax &lt;- income * rate\n  net &lt;- income - tax\n\n  data.frame(\n    income = income,\n    tax    = tax,\n    net    = net,\n    note   = \"Calculated automatically by custom financial routine\"\n  )\n}\nRe-mesure : Score 78% · Note C."
   },
   {
     "objectID": "index.html#étape-3-ajouter-des-tests",
     "href": "index.html#étape-3-ajouter-des-tests",
     "title": "rsonar en pratique",
     "section": "Étape 3 — Ajouter des tests",
-    "text": "Étape 3 — Ajouter des tests\ntests/testthat/test-analysis.R :\ntest_that(\"add_columns somme et signale\", {\n  data &lt;- data.frame(a = c(1, -2, 3), b = c(0, 5, -5))\n  res &lt;- add_columns(data, \"a\", \"b\")\n\n  expect_equal(res$total, c(1, 3, -2))\n  expect_equal(res$positive, c(TRUE, TRUE, FALSE))\n})\nLa couverture passe de 0% à 85%.\nRe-mesure : Score 94% · Note A."
+    "text": "Étape 3 — Ajouter des tests\ntests/testthat/test-calculate-tax.R :\ntest_that(\"calculate_tax calcule l'impôt et le net\", {\n  res &lt;- calculate_tax(c(1000, 2500), rate = 0.2)\n\n  expect_equal(res$tax, c(200, 500))\n  expect_equal(res$net, c(800, 2000))\n  expect_equal(res$income, c(1000, 2500))\n})\n\ntest_that(\"calculate_tax applique le taux par défaut\", {\n  res &lt;- calculate_tax(1000)\n\n  expect_equal(res$tax, 200)\n  expect_equal(res$net, 800)\n})\nLa couverture passe de 0% à 85%.\nRe-mesure : Score 94% · Note A."
   },
   {
     "objectID": "index.html#la-progression-en-un-coup-dœil",
@@ -341,5 +341,26 @@
     "title": "rsonar en pratique",
     "section": "Conclusion",
     "text": "Conclusion\nLa boucle pédagogique :\n\nPartir d’un code problématique\nMesurer la qualité (score, note, dette)\nAméliorer pas à pas (style → refactor → tests)\nVoir la note monter : 38% → 62% → 78% → 94%"
+  },
+  {
+    "objectID": "index.html#étape-0-score-note-et-hotspots-1",
+    "href": "index.html#étape-0-score-note-et-hotspots-1",
+    "title": "rsonar en pratique",
+    "section": "Étape 0 — Score, note et hotspots",
+    "text": "Étape 0 — Score, note et hotspots"
+  },
+  {
+    "objectID": "index.html#étape-1-corriger-le-style-automatiquement-1",
+    "href": "index.html#étape-1-corriger-le-style-automatiquement-1",
+    "title": "rsonar en pratique",
+    "section": "Étape 1 — Corriger le style automatiquement",
+    "text": "Étape 1 — Corriger le style automatiquement\nAvec dry_run à FALSE, les scripts sont modifiés :\n# Application des corrections de style\nsonar_fix(\".\")"
+  },
+  {
+    "objectID": "index.html#étape-1-résultat-version-1-1",
+    "href": "index.html#étape-1-résultat-version-1-1",
+    "title": "rsonar en pratique",
+    "section": "Étape 1 — Résultat (version 1)",
+    "text": "Étape 1 — Résultat (version 1)"
   }
 ]
