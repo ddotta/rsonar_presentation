@@ -208,7 +208,7 @@ Damien Dotta
 <h2>What is rsonar?</h2>
 <div class="columns">
 <div class="column" style="width:70%;">
-<p><a href="https://github.com/ddotta/rsonar"><code>rsonar</code></a> is the R equivalent of SonarQube: it centralizes R code quality measurement into one interactive report.</p>
+<p><a href="https://github.com/ddotta/rsonar"><code>rsonar</code></a> is the R equivalent of SonarQube: it centralizes R code quality measurement into a single, interactive report.</p>
 <table class="caption-top">
 <thead>
 <tr class="header">
@@ -231,25 +231,29 @@ Damien Dotta
 </tr>
 <tr class="even">
 <td><code>goodpractice</code></td>
-<td>Package best practices</td>
+<td>Packaging best practices</td>
 </tr>
 </tbody>
 </table>
 </div><div class="column" style="width:30%;">
-<p><img data-src="images/hex_rsonar.png" style="width:90.0%"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/hex_rsonar.png" class="quarto-figure quarto-figure-center"></p>
+</figure>
+</div>
 </div></div>
 <p>SonarQube vocabulary: <em>issues</em>, <em>Coverage</em>, <strong>Quality Gate</strong>.</p>
 </section>
 <section id="sqale-quantifying-technical-debt" class="slide level2">
 <h2>SQALE: quantifying technical debt</h2>
 <p><strong>SQALE</strong> = <em>Software Quality Assessment based on Lifecycle Expectations</em>.</p>
-<p>The method popularized by <strong>SonarQube</strong> — and reused by <code>rsonar</code> — to turn code defects into an <strong>estimated cost</strong>, expressed in minutes.</p>
+<p>It is the method popularized by <strong>SonarQube</strong> — and adopted by <code>rsonar</code> — to turn code defects into an <strong>estimated cost</strong>, expressed in minutes.</p>
 <p>Four key concepts:</p>
 <ol type="1">
-<li><strong>Penalty per issue</strong> (minutes)</li>
-<li><strong>Debt ratio</strong> (%)</li>
-<li><strong>SQALE rating</strong> (A to E)</li>
-<li><strong>How the estimated cost is calculated</strong></li>
+<li>The <strong>penalty per issue</strong> (minutes)</li>
+<li>The <strong>debt ratio</strong> (%)</li>
+<li>The <strong>SQALE rating</strong> (grade from A to E)</li>
+<li>The <strong>method for calculating the estimated cost</strong></li>
 </ol>
 </section>
 <section id="the-penalty-per-issue" class="slide level2">
@@ -293,10 +297,10 @@ Damien Dotta
 </section>
 <section id="the-debt-ratio" class="slide level2">
 <h2>The debt ratio</h2>
-<p>Total debt is compared to a <strong>baseline effort</strong>:</p>
+<p>Total debt is compared to a <strong>reference effort</strong>:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb1-1"><a></a>ratio = D_total / (files × 30 min)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
-<li><code>D_total</code>: sum of penalties across all issues</li>
+<li><code>D_total</code>: sum of the penalties for all issues</li>
 <li><code>files × 30 min</code>: estimated effort to develop the files</li>
 </ul>
 <p>The <strong>quality score</strong> is derived from it:</p>
@@ -304,12 +308,12 @@ Damien Dotta
 </section>
 <section id="the-sqale-rating-a-e" class="slide level2">
 <h2>The SQALE rating (A → E)</h2>
-<p>The ratio is converted into a <strong>maintainability rating</strong>:</p>
+<p>The ratio is converted into a <strong>maintainability grade</strong>:</p>
 <table class="caption-top">
 <thead>
 <tr class="header">
 <th>Ratio</th>
-<th>Rating</th>
+<th>Grade</th>
 <th>Meaning</th>
 </tr>
 </thead>
@@ -347,236 +351,375 @@ Damien Dotta
 <ol type="1">
 <li><strong>Count</strong> the issues (errors, warnings, style, coverage, goodpractice)</li>
 <li><strong>Sum</strong> their penalties → total debt in minutes</li>
-<li><strong>Divide</strong> by the baseline effort → debt ratio</li>
-<li><strong>Convert</strong> the ratio into a SQALE rating (A → E)</li>
+<li><strong>Divide</strong> by the reference effort → debt ratio</li>
+<li><strong>Convert</strong> the ratio into a SQALE grade (A → E)</li>
 </ol>
-<p>Baseline effort: SonarQube → <code>lines of code × 30 min</code>; <code>rsonar</code> → <code>files × 30 min</code>.</p>
-<p>Example: 2 errors + 2 warnings + 5 style = 90 min, against 300 min (10 files) → ratio 30 % → <strong>rating D</strong>.</p>
+<p>Reference effort: SonarQube → <code>lines of code × 30 min</code>; <code>rsonar</code> → <code>files × 30 min</code>.</p>
+<p>Example: 2 errors + 2 warnings + 5 style = 90 min, compared to 300 min (10 files) → 30 % ratio → <strong>grade D</strong>.</p>
 </section>
 <section id="the-plan-measure-improve-measure" class="slide level2">
 <h2>The plan: measure, improve, measure</h2>
-<p>A loop, on a single running example:</p>
+<p>A loop approach, using a running example:</p>
 <ol type="1">
 <li>Start from <strong>problematic code</strong></li>
-<li><strong>Measure</strong> quality with <code>rsonar</code> (score, rating, debt)</li>
+<li><strong>Measure</strong> quality with <code>rsonar</code> (score, grade, debt)</li>
 <li><strong>Improve</strong> the code step by step</li>
-<li><strong>Re-measure</strong> and watch the score go up</li>
+<li><strong>Re-measure</strong> and watch the grade go up</li>
 </ol>
 </section>
 <section id="the-starting-code-version-0" class="slide level2">
 <h2>The starting code (version 0)</h2>
-<p>File <code>R/analysis.R</code>:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a>addcols <span class="ot">&lt;-</span> <span class="cf">function</span>(d,a,b){</span>
-<span id="cb3-2"><a></a>  <span class="cf">if</span>(<span class="fu">nrow</span>(d)<span class="sc">==</span><span class="dv">0</span>){<span class="fu">stop</span>(<span class="st">"empty"</span>)}</span>
-<span id="cb3-3"><a></a>  total<span class="ot">=</span>d[[a]]<span class="sc">+</span>d[[b]]</span>
-<span id="cb3-4"><a></a>  positive <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(total<span class="sc">&gt;</span><span class="dv">0</span>,T,F)</span>
-<span id="cb3-5"><a></a>  result<span class="ot">=</span><span class="fu">list</span>(<span class="at">total=</span>total, <span class="at">positive=</span>positive)</span>
-<span id="cb3-6"><a></a>  <span class="fu">return</span>(result)</span>
-<span id="cb3-7"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Problems: naming, spacing, <code>=</code> vs <code>&lt;-</code>, <code>T</code>/<code>F</code>, no docs, <strong>no tests</strong>.</p>
+<p>Project structure:</p>
+<p>├── 01_assignment_and_formatting.R ├── 02_boolean_and_naming.R ├── 03_cyclomatic_complexity.R ├── 04_unused_vars_and_syntax.R ├── 05_non_standard_evaluation.R ├── 06_function_length.R ├── 07_string_quote_and_infix.R ├── 08_unnecessary_concatenation.R ├── 09_implicit_returns_and_braces.R └── 10_duplicate_code_and_magic_numbers.R</p>
 </section>
-<section id="step-0-measure-the-initial-state" class="slide level2">
-<h2>Step 0 — Measure the initial state</h2>
+<section id="the-starting-code-version-0-1" class="slide level2">
+<h2>The starting code (version 0)</h2>
+<p>Example <code>01_assignment_and_formatting.R</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a><span class="co"># File 1: Assignment operator &amp; formatting issues</span></span>
+<span id="cb3-2"><a></a>Part_SAU <span class="ot">=</span> <span class="cf">function</span>( <span class="at">SAU_HA =</span> <span class="dv">80</span> , <span class="at">surface_totale =</span> <span class="dv">100</span> , <span class="at">unused_arg =</span> <span class="dv">10</span> ){</span>
+<span id="cb3-3"><a></a>  var_inutile1 <span class="ot">=</span> <span class="dv">10</span></span>
+<span id="cb3-4"><a></a>  var_inutile2 <span class="ot">=</span> <span class="dv">20</span></span>
+<span id="cb3-5"><a></a>  </span>
+<span id="cb3-6"><a></a>    <span class="cf">if</span>( SAU_HA <span class="sc">==</span> <span class="cn">NA</span> <span class="sc">||</span> surface_totale <span class="sc">==</span> <span class="cn">NA</span> <span class="sc">||</span> SAU_HA <span class="sc">==</span> <span class="cn">NULL</span> ){ <span class="fu">return</span>( <span class="cn">NULL</span> ) }</span>
+<span id="cb3-7"><a></a>  </span>
+<span id="cb3-8"><a></a>  <span class="cf">for</span>( i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>( SAU_HA ) ){ <span class="fu">print</span>( i ) }</span>
+<span id="cb3-9"><a></a>  </span>
+<span id="cb3-10"><a></a>    msg <span class="ot">=</span> <span class="fu">paste</span>( <span class="st">"SAU share: "</span> , SAU_HA , <span class="at">sep =</span> <span class="st">""</span> )</span>
+<span id="cb3-11"><a></a>  </span>
+<span id="cb3-12"><a></a>   <span class="cf">if</span>( <span class="fu">class</span>( SAU_HA ) <span class="sc">==</span> <span class="st">"numeric"</span> ){ <span class="fu">warning</span>( msg ) }</span>
+<span id="cb3-13"><a></a></span>
+<span id="cb3-14"><a></a>  </span>
+<span id="cb3-15"><a></a>  <span class="cf">if</span>( SAU_HA <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;&amp;</span> surface_totale <span class="sc">&gt;</span> <span class="dv">0</span> ){</span>
+<span id="cb3-16"><a></a>    res <span class="ot">=</span> ( SAU_HA <span class="sc">/</span> surface_totale ) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb3-17"><a></a>  }</span>
+<span id="cb3-18"><a></a>  </span>
+<span id="cb3-19"><a></a>  <span class="fu">return</span>( <span class="fu">round</span>( res , <span class="dv">1</span> ) )</span>
+<span id="cb3-20"><a></a>    </span>
+<span id="cb3-21"><a></a>    <span class="fu">print</span>(<span class="st">"Done"</span></span>
+<span id="cb3-22"><a></a><span class="er">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Problems: naming, spacing, <code>=</code> vs <code>&lt;-</code>, no docs, line too long, no tests…</p>
+</section>
+<section id="version-0-scores" class="slide level2">
+<h2>Version 0 — Scores</h2>
 <div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a></a><span class="fu">library</span>(rsonar)</span>
 <span id="cb4-2"><a></a>res <span class="ot">&lt;-</span> <span class="fu">sonar_analyse</span>(<span class="st">"."</span>)</span>
-<span id="cb4-3"><a></a><span class="fu">print</span>(res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<pre><code>-- rsonar -- Quality Report --
-  Files       : 1 R
-  Lint        : 8 issues (0 err / 3 warn / 5 style)
-  Style       : 1 non-compliant file
-  Coverage    : 0%
-  Goodpractice: 3 failures
+<span id="cb4-3"><a></a><span class="fu">sonar_report</span>(res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Displays a global interactive report.</p>
 
--- Technical Debt --
-  SQALE: E | Score: 38% | Duration: 4.2h</code></pre>
+<img data-src="images/report_version0.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="version-0-technical-debt" class="slide level2">
+<h2>Version 0 — Technical debt</h2>
+
+<img data-src="images/technical_debt.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="version-0-hotspots" class="slide level2">
+<h2>Version 0 — Hotspots</h2>
+
+<img data-src="images/hotspots_version0.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="version-0-lint-issues" class="slide level2">
+<h2>Version 0 — Lint issues</h2>
+
+<img data-src="images/lint_issues.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="step-1-fix-the-style-automatically" class="slide level2">
+<h2>Step 1 — Fix the style automatically</h2>
+<p><code>sonar_fix()</code> relies on <a href="https://github.com/posit-dev/air"><code>air</code></a>, Posit’s fast R formatter.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a></a><span class="co"># Preview without modifying anything</span></span>
+<span id="cb5-2"><a></a><span class="fu">sonar_fix</span>(<span class="st">"."</span>, <span class="at">dry_run =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a>── rsonar <span class="fu">Fix</span> (dry<span class="sc">-</span>run) ──────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span id="cb6-2"><a></a>ℹ Path<span class="sc">:</span> <span class="er">/</span>var<span class="sc">/</span>data<span class="sc">/</span>nfs<span class="sc">/</span>CERISE<span class="sc">/</span><span class="dv">00</span><span class="sc">-</span>Espace<span class="sc">-</span>Personnel<span class="sc">/</span>damien.dotta<span class="sc">/</span>rsonar_tests</span>
+<span id="cb6-3"><a></a>ℹ <span class="dv">10</span> R <span class="fu">file</span>(s) found</span>
+<span id="cb6-4"><a></a>✔ Report saved<span class="sc">:</span> sonar<span class="sc">-</span>fixes.json</span>
+<span id="cb6-5"><a></a>                              </span>
+<span id="cb6-6"><a></a>── rsonar Fix <span class="fu">Report</span> (dry<span class="sc">-</span>run <span class="sc">-</span> no files modified) ───────────────────────────────────────────────────────────────────────</span>
+<span id="cb6-7"><a></a>ℹ Path <span class="sc">:</span> <span class="er">/</span>var<span class="sc">/</span>data<span class="sc">/</span>nfs<span class="sc">/</span>CERISE<span class="sc">/</span><span class="dv">00</span><span class="sc">-</span>Espace<span class="sc">-</span>Personnel<span class="sc">/</span>damien.dotta<span class="sc">/</span>rsonar_tests</span>
+<span id="cb6-8"><a></a>ℹ Files <span class="sc">:</span> <span class="dv">10</span> scanned, <span class="dv">10</span> modified</span>
+<span id="cb6-9"><a></a>ℹ Time <span class="sc">:</span> <span class="fl">1.8</span>s</span>
+<span id="cb6-10"><a></a>                              </span>
+<span id="cb6-11"><a></a>── Fixes applied               </span>
+<span id="cb6-12"><a></a>  styler<span class="sc">:</span> <span class="dv">8</span>fixes to <span class="dv">10</span> <span class="fu">file</span>(s)</span>
+<span id="cb6-13"><a></a>  spacing<span class="sc">:</span> <span class="dv">3</span></span>
+<span id="cb6-14"><a></a>  true_false<span class="sc">:</span> <span class="dv">3</span></span>
+<span id="cb6-15"><a></a>  commas<span class="sc">:</span> <span class="dv">1</span></span>
+<span id="cb6-16"><a></a>  cleanup<span class="sc">:</span> <span class="dv">35</span></span>
+<span id="cb6-17"><a></a>  assignment<span class="sc">:</span> <span class="dv">4</span></span>
+<span id="cb6-18"><a></a>  unused_vars<span class="sc">:</span> <span class="dv">3</span></span>
+<span id="cb6-19"><a></a>ℹ Run <span class="st">`</span><span class="at">sonar_fix()</span><span class="st">`</span> with <span class="st">`</span><span class="at">dry_run = FALSE</span><span class="st">`</span> to apply fixes.</span>
+<span id="cb6-20"><a></a>✔ Applying fixes to <span class="dv">10</span> <span class="fu">file</span>(s) [<span class="dv">2</span>s]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="step-0-score-rating-and-hotspots" class="slide level2">
-<h2>Step 0 — Score, rating and hotspots</h2>
-<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a><span class="fu">quality_score</span>(<span class="st">"."</span>)   <span class="co"># Score: 38% | Rating: E</span></span>
-<span id="cb6-2"><a></a><span class="fu">debt_index</span>(res)      <span class="co"># Rating: E (critical debt)</span></span>
-<span id="cb6-3"><a></a><span class="fu">sonar_hotspots</span>(res)  <span class="co"># → R/analysis.R first</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<ul>
-<li><code>debt_index()</code>: technical debt rating (A to E)</li>
-<li><code>sonar_hotspots()</code>: files to fix first</li>
-<li><code>sonar_report(res)</code>: interactive HTML report</li>
-</ul>
+<section id="step-1-fix-the-style-automatically-1" class="slide level2">
+<h2>Step 1 — Fix the style automatically</h2>
+<p>With dry_run set to FALSE, the scripts are modified:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a><span class="co"># Apply style fixes</span></span>
+<span id="cb7-2"><a></a><span class="fu">sonar_fix</span>(<span class="st">"."</span>, <span class="at">dry_run =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="step-1-fix-style-automatically" class="slide level2">
-<h2>Step 1 — Fix style automatically</h2>
-<p><code>sonar_fix()</code> is powered by <a href="https://github.com/posit-dev/air"><code>air</code></a>, Posit’s fast R formatter.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a><span class="co"># Preview without changing anything</span></span>
-<span id="cb7-2"><a></a><span class="fu">sonar_fix</span>(<span class="st">"."</span>, <span class="at">dry_run =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb7-3"><a></a></span>
-<span id="cb7-4"><a></a><span class="co"># Apply the style fixes</span></span>
-<span id="cb7-5"><a></a><span class="fu">sonar_fix</span>(<span class="st">"."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Fixes: spacing, <code>=</code> → <code>&lt;-</code>, braces, indentation.</p>
+<section id="version-1-result" class="slide level2">
+<h2>Version 1 — Result</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a><span class="co"># File 1: Assignment operator &amp; formatting issues</span></span>
+<span id="cb8-2"><a></a>Part_SAU <span class="ot">=</span> <span class="cf">function</span>( <span class="at">SAU_HA =</span> <span class="dv">80</span> , <span class="at">surface_totale =</span> <span class="dv">100</span> , <span class="at">unused_arg =</span> <span class="dv">10</span> ){</span>
+<span id="cb8-3"><a></a></span>
+<span id="cb8-4"><a></a>  <span class="cf">if</span>( SAU_HA <span class="sc">==</span> <span class="cn">NA</span> <span class="sc">||</span> surface_totale <span class="sc">==</span> <span class="cn">NA</span> <span class="sc">||</span> SAU_HA <span class="sc">==</span> <span class="cn">NULL</span> ){ <span class="fu">return</span>( <span class="cn">NULL</span> ) }</span>
+<span id="cb8-5"><a></a></span>
+<span id="cb8-6"><a></a>  <span class="cf">for</span>( i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>( SAU_HA ) ){ <span class="fu">print</span>( i ) }</span>
+<span id="cb8-7"><a></a></span>
+<span id="cb8-8"><a></a>  msg <span class="ot">=</span> <span class="fu">paste</span>( <span class="st">"SAU share: "</span> , SAU_HA , <span class="at">sep =</span> <span class="st">""</span> )</span>
+<span id="cb8-9"><a></a></span>
+<span id="cb8-10"><a></a>  <span class="cf">if</span>( <span class="fu">class</span>( SAU_HA ) <span class="sc">==</span> <span class="st">"numeric"</span> ){ <span class="fu">warning</span>( msg ) }</span>
+<span id="cb8-11"><a></a></span>
+<span id="cb8-12"><a></a>  <span class="cf">if</span>( SAU_HA <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;&amp;</span> surface_totale <span class="sc">&gt;</span> <span class="dv">0</span> ){</span>
+<span id="cb8-13"><a></a>    res <span class="ot">&lt;-</span> ( SAU_HA <span class="sc">/</span> surface_totale ) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb8-14"><a></a>  }</span>
+<span id="cb8-15"><a></a></span>
+<span id="cb8-16"><a></a>  <span class="fu">return</span>( <span class="fu">round</span>( res , <span class="dv">1</span> ) )</span>
+<span id="cb8-17"><a></a></span>
+<span id="cb8-18"><a></a>  <span class="fu">print</span>(<span class="st">"Done"</span></span>
+<span id="cb8-19"><a></a>        <span class="er">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>It’s better, but not everything is fixed.</p>
 </section>
-<section id="step-1-result-version-1" class="slide level2">
-<h2>Step 1 — Result (version 1)</h2>
-<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a>addcols <span class="ot">&lt;-</span> <span class="cf">function</span>(d, a, b) {</span>
-<span id="cb8-2"><a></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(d) <span class="sc">==</span> <span class="dv">0</span>) {</span>
-<span id="cb8-3"><a></a>    <span class="fu">stop</span>(<span class="st">"empty"</span>)</span>
-<span id="cb8-4"><a></a>  }</span>
-<span id="cb8-5"><a></a>  total <span class="ot">&lt;-</span> d[[a]] <span class="sc">+</span> d[[b]]</span>
-<span id="cb8-6"><a></a>  positive <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(total <span class="sc">&gt;</span> <span class="dv">0</span>, T, F)</span>
-<span id="cb8-7"><a></a>  result <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">total =</span> total, <span class="at">positive =</span> positive)</span>
-<span id="cb8-8"><a></a>  <span class="fu">return</span>(result)</span>
-<span id="cb8-9"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Style is fixed, but naming, complexity and docs remain.</p>
-<p>Re-measure: <strong>Score 62% · Rating D</strong>.</p>
+<section id="version-1-results" class="slide level2">
+<h2>Version 1 — Results</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/report_version1.png" class="quarto-figure quarto-figure-center"></p>
+</figure>
+</div>
+<p>On our example script:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/lint_issues_version1.png" class="quarto-figure quarto-figure-center"></p>
+</figure>
+</div>
 </section>
-<section id="step-2-refactor-and-document" class="slide level2">
-<h2>Step 2 — Refactor and document</h2>
+<section id="version-2-refactor-and-document" class="slide level2">
+<h2>Version 2 — Refactor and document</h2>
 <p>Manual improvements:</p>
 <ul>
-<li><code>addcols</code> → <code>add_columns</code>, <code>d/a/b</code> → <code>data/col1/col2</code></li>
-<li><code>ifelse(x &gt; 0, T, F)</code> → <code>x &gt; 0</code></li>
-<li>roxygen documentation added</li>
+<li>rename <code>Part_SAU</code> → <code>calculer_part_sau</code> and <code>SAU_HA</code> → <code>sau_ha</code> (snake_case)</li>
+<li>remove the unused variables (<code>unused_arg</code>, <code>var_inutile1</code>, <code>var_inutile2</code>)</li>
+<li>replace <code>SAU_HA == NA</code> → <code>is.na()</code> and <code>class() == "numeric"</code> → <code>is.numeric()</code></li>
+<li>remove the stray <code>for (i in 1:length(...)) print(i)</code> loop</li>
+<li>fix the syntax error <code>print("Done"</code> and return to the implicit return</li>
+<li>add <strong>roxygen2</strong> documentation</li>
 </ul>
-<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="co">#' Sum two columns and flag positive rows</span></span>
+<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="co">#' Calculate the Useful Agricultural Area (SAU) share</span></span>
 <span id="cb9-2"><a></a><span class="co">#'</span></span>
-<span id="cb9-3"><a></a><span class="co">#' @param data A data frame.</span></span>
-<span id="cb9-4"><a></a><span class="co">#' @param col1,col2 Column names to sum.</span></span>
-<span id="cb9-5"><a></a><span class="co">#' @return A list with `total` and `positive`.</span></span>
-<span id="cb9-6"><a></a>add_columns <span class="ot">&lt;-</span> <span class="cf">function</span>(data, col1, col2) {</span>
-<span id="cb9-7"><a></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(data) <span class="sc">==</span> <span class="dv">0</span>) {</span>
-<span id="cb9-8"><a></a>    <span class="fu">stop</span>(<span class="st">"`data` must contain at least one row."</span>)</span>
-<span id="cb9-9"><a></a>  }</span>
-<span id="cb9-10"><a></a>  total <span class="ot">&lt;-</span> data[[col1]] <span class="sc">+</span> data[[col2]]</span>
-<span id="cb9-11"><a></a>  <span class="fu">list</span>(<span class="at">total =</span> total, <span class="at">positive =</span> total <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
-<span id="cb9-12"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Re-measure: <strong>Score 78% · Rating C</strong>.</p>
+<span id="cb9-3"><a></a><span class="co">#' @param sau_ha Numeric or numeric vector. The SAU in hectares.</span></span>
+<span id="cb9-4"><a></a><span class="co">#' @param surface_totale Numeric or numeric vector. The total surface in ha.</span></span>
+<span id="cb9-5"><a></a><span class="co">#'</span></span>
+<span id="cb9-6"><a></a><span class="co">#' @return The SAU share as a percentage.</span></span>
+<span id="cb9-7"><a></a><span class="co">#' @export</span></span>
+<span id="cb9-8"><a></a>calculer_part_sau <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">sau_ha =</span> <span class="dv">80</span>, <span class="at">surface_totale =</span> <span class="dv">100</span>) {</span>
+<span id="cb9-9"><a></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(sau_ha) <span class="sc">||</span> <span class="fu">is.null</span>(surface_totale)) {</span>
+<span id="cb9-10"><a></a>    <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb9-11"><a></a>  }</span>
+<span id="cb9-12"><a></a></span>
+<span id="cb9-13"><a></a>  <span class="cf">if</span> (<span class="fu">any</span>(<span class="fu">is.na</span>(sau_ha)) <span class="sc">||</span> <span class="fu">any</span>(<span class="fu">is.na</span>(surface_totale))) {</span>
+<span id="cb9-14"><a></a>    <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb9-15"><a></a>  }</span>
+<span id="cb9-16"><a></a></span>
+<span id="cb9-17"><a></a>  <span class="cf">if</span> (<span class="fu">any</span>(sau_ha <span class="sc">&lt;</span> <span class="dv">0</span>) <span class="sc">||</span> <span class="fu">any</span>(surface_totale <span class="sc">&lt;=</span> <span class="dv">0</span>)) {</span>
+<span id="cb9-18"><a></a>    <span class="fu">stop</span>(<span class="st">"Surfaces must be positive and the total surface must be &gt; 0."</span>)</span>
+<span id="cb9-19"><a></a>  }</span>
+<span id="cb9-20"><a></a></span>
+<span id="cb9-21"><a></a>  res <span class="ot">&lt;-</span> (sau_ha <span class="sc">/</span> surface_totale) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb9-22"><a></a></span>
+<span id="cb9-23"><a></a>  <span class="cf">if</span> (<span class="fu">any</span>(res <span class="sc">&gt;</span> <span class="dv">100</span>)) {</span>
+<span id="cb9-24"><a></a>    <span class="fu">warning</span>(<span class="st">"At least one SAU value exceeds the total surface."</span>)</span>
+<span id="cb9-25"><a></a>  }</span>
+<span id="cb9-26"><a></a></span>
+<span id="cb9-27"><a></a>  <span class="fu">return</span>(res)</span>
+<span id="cb9-28"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="step-3-add-tests" class="slide level2">
-<h2>Step 3 — Add tests</h2>
-<p><code>tests/testthat/test-analysis.R</code>:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a><span class="fu">test_that</span>(<span class="st">"add_columns sums and flags"</span>, {</span>
-<span id="cb10-2"><a></a>  data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">a =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="dv">2</span>, <span class="dv">3</span>), <span class="at">b =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="sc">-</span><span class="dv">5</span>))</span>
-<span id="cb10-3"><a></a>  res <span class="ot">&lt;-</span> <span class="fu">add_columns</span>(data, <span class="st">"a"</span>, <span class="st">"b"</span>)</span>
-<span id="cb10-4"><a></a></span>
-<span id="cb10-5"><a></a>  <span class="fu">expect_equal</span>(res<span class="sc">$</span>total, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="sc">-</span><span class="dv">2</span>))</span>
-<span id="cb10-6"><a></a>  <span class="fu">expect_equal</span>(res<span class="sc">$</span>positive, <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>))</span>
-<span id="cb10-7"><a></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Coverage goes from 0% to 85%.</p>
-<p>Re-measure: <strong>Score 94% · Rating A</strong>.</p>
+<section id="version-2-refactor-and-document-1" class="slide level2">
+<h2>Version 2 — Refactor and document</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/report_version2.png" class="quarto-figure quarto-figure-center"></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/lint_issues_version2.png" class="quarto-figure quarto-figure-center"></p>
+</figure>
+</div>
 </section>
-<section id="the-progress-at-a-glance" class="slide level2">
-<h2>The progress at a glance</h2>
+<section id="version-3-add-tests" class="slide level2">
+<h2>Version 3 — Add tests</h2>
+<p><code>tests/testthat/test-calculer-part-sau.R</code>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a><span class="fu">library</span>(testthat)</span>
+<span id="cb10-2"><a></a></span>
+<span id="cb10-3"><a></a><span class="fu">test_that</span>(<span class="st">"calculer_part_sau computes the SAU share on a vector"</span>, {</span>
+<span id="cb10-4"><a></a>  res <span class="ot">&lt;-</span> <span class="fu">calculer_part_sau</span>(<span class="at">sau_ha =</span> <span class="fu">c</span>(<span class="dv">80</span>, <span class="dv">120</span>), <span class="at">surface_totale =</span> <span class="dv">200</span>)</span>
+<span id="cb10-5"><a></a></span>
+<span id="cb10-6"><a></a>  <span class="fu">expect_equal</span>(res, <span class="fu">c</span>(<span class="dv">40</span>, <span class="dv">60</span>))</span>
+<span id="cb10-7"><a></a>})</span>
+<span id="cb10-8"><a></a></span>
+<span id="cb10-9"><a></a><span class="fu">test_that</span>(<span class="st">"calculer_part_sau applies the default values"</span>, {</span>
+<span id="cb10-10"><a></a>  res <span class="ot">&lt;-</span> <span class="fu">calculer_part_sau</span>()</span>
+<span id="cb10-11"><a></a></span>
+<span id="cb10-12"><a></a>  <span class="fu">expect_equal</span>(res, <span class="dv">80</span>)</span>
+<span id="cb10-13"><a></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="version-3-add-tests-12" class="slide level2">
+<h2>Version 3 — Add tests (1/2)</h2>
+<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a>res <span class="ot">&lt;-</span> <span class="fu">sonar_analyse</span>(<span class="st">"."</span>,<span class="at">include_coverage =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+<img data-src="images/report_version3_ss_coverage.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="version-3-add-tests-22" class="slide level2">
+<h2>Version 3 — Add tests (2/2)</h2>
+<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a></a>res <span class="ot">&lt;-</span> <span class="fu">sonar_analyse</span>(<span class="st">"."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+<img data-src="images/report_version3.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="why-does-the-score-drop-to-0" class="slide level2">
+<h2>Why does the score drop to 0 %?</h2>
+<p><code>sonar_analyse(".")</code> <strong>without</strong> <code>include_coverage = FALSE</code> measures coverage as soon as a <code>tests/</code> folder exists. Here it is only <strong>7 %</strong>: <code>calculer_part_sau</code> is the only function tested among the 10 scripts.</p>
+<p>The coverage penalty then applies:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb13-1"><a></a>(80 − 7) × 5 = 365 min</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This penalty alone exceeds the reference effort (11 files × 30 = 330 min):</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb14-1"><a></a>ratio = debt / 330 ≥ 1</span>
+<span id="cb14-2"><a></a>score = 100 × (1 − 1) = 0 %</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>→ <strong>Score 0 % · Grade E</strong>. It is the <strong>global</strong> project coverage that matters, not that of a single file.</p>
+</section>
+<section id="version-4---complete-repository-with-tests-and-high-coverage" class="slide level2">
+<h2>Version 4 - Complete repository with tests and high coverage</h2>
+<ul>
+<li>See <a href="https://gitlab.com/ddotta/rproject_for_rsonar_with_tests">this repository</a> to get a complete R project with tests and very high coverage.</li>
+</ul>
+
+<img data-src="images/report_version_finale.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="the-progression-at-a-glance" class="slide level2">
+<h2>The progression at a glance</h2>
 <table class="caption-top">
 <thead>
 <tr class="header">
 <th>Step</th>
 <th>Action</th>
 <th>Score</th>
-<th>Rating</th>
+<th>Grade</th>
 <th>Coverage</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>0</td>
-<td>Starting code</td>
-<td>38 %</td>
+<td>Initial code</td>
+<td>0 %</td>
 <td>E</td>
 <td>0 %</td>
 </tr>
 <tr class="even">
 <td>1</td>
 <td>Auto style (<code>sonar_fix</code>)</td>
-<td>62 %</td>
-<td>D</td>
+<td>0 %</td>
+<td>E</td>
 <td>0 %</td>
 </tr>
 <tr class="odd">
 <td>2</td>
-<td>Refactor + docs</td>
-<td>78 %</td>
-<td>C</td>
+<td>Refactoring + docs</td>
+<td>49 %</td>
+<td>E</td>
 <td>0 %</td>
 </tr>
 <tr class="even">
 <td>3</td>
-<td>Tests added</td>
-<td>94 %</td>
+<td>Tests added without penalty</td>
+<td>50 %</td>
+<td>D</td>
+<td>0 %</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Tests added with penalty</td>
+<td>0 %</td>
+<td>E</td>
+<td>7 %</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Complete repository</td>
+<td>98 %</td>
 <td>A</td>
-<td>85 %</td>
+<td>100 %</td>
 </tr>
 </tbody>
 </table>
 <p>Each targeted improvement raises the score and lowers the debt.</p>
-</section>
-<section id="step-4-block-regressions-quality-gate" class="slide level2">
-<h2>Step 4 — Block regressions (Quality Gate)</h2>
-<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a><span class="fu">quality_gate</span>(res,</span>
-<span id="cb11-2"><a></a>  <span class="at">coverage_min    =</span> <span class="dv">80</span>,</span>
-<span id="cb11-3"><a></a>  <span class="at">lint_errors_max =</span> <span class="dv">0</span>,</span>
-<span id="cb11-4"><a></a>  <span class="at">rating_min      =</span> <span class="st">"B"</span>,</span>
-<span id="cb11-5"><a></a>  <span class="at">fail_on_error   =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>If a threshold is crossed, the CI pipeline blocks automatically.</p>
-<p>This is the guard that <strong>prevents the rating from dropping back</strong>.</p>
-</section>
-<section id="track-the-evolution-over-time" class="slide level2">
-<h2>Track the evolution over time</h2>
-<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a></a><span class="co"># Compare two analyses (before / after)</span></span>
-<span id="cb12-2"><a></a><span class="fu">sonar_diff</span>(res_v3, res_v0)</span>
-<span id="cb12-3"><a></a></span>
-<span id="cb12-4"><a></a><span class="co"># Save scores to plot the trend</span></span>
-<span id="cb12-5"><a></a><span class="fu">sonar_trend</span>(res, <span class="at">file =</span> <span class="st">"rsonar-history.json"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<ul>
-<li><code>sonar_diff()</code>: new issues, fixed issues</li>
-<li><code>sonar_trend()</code>: rating evolution curve</li>
-</ul>
-</section>
-<section id="export-results-ci" class="slide level2">
-<h2>Export results (CI)</h2>
-<div class="sourceCode" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a></a><span class="fu">export_junit</span>(res, <span class="st">"junit-results.xml"</span>)      <span class="co"># GitLab/Jenkins</span></span>
-<span id="cb13-2"><a></a><span class="fu">export_sarif</span>(res, <span class="st">"results.sarif"</span>)          <span class="co"># GitHub Code Scanning</span></span>
-<span id="cb13-3"><a></a><span class="fu">export_sonar_json</span>(res, <span class="st">"sonar-issues.json"</span>) <span class="co"># SonarQube</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Standard formats: JUnit XML, SARIF 2.1.0, SonarQube Generic Issue Import.</p>
+<div title="Why does coverage only change at step 3?">
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Why does coverage only change at step 3?</strong></p>
+</div>
+<div class="callout-content">
+<p>Coverage is only <strong>measured</strong> when tests exist. Before (steps 0 to 2), it is 0 % and generates <strong>no penalty</strong>. At step 3, measuring coverage (<strong>7 %</strong>) triggers the penalty <code>(80 − 7) × 5 = 365 min</code>, which drops the score back to <strong>0 %</strong>.</p>
+<p>⚠️ To avoid this, you must cover the <strong>entire project</strong> (coverage ≥ 80 %), not a single function. Otherwise, it is the <strong>global</strong> coverage that drives the score down.</p>
+</div>
+</div>
+</div>
+</div>
 </section>
 <section id="going-further-automate-the-fixes" class="slide level2">
 <h2>Going further: automate the fixes</h2>
-<p><code>sonar_fix(".", create_mr = TRUE)</code> opens a Merge/Pull Request directly.</p>
-<p>CI job <code>rsonar-fix</code> (optional manual task):</p>
+<p>The <code>rsonar</code> package can be integrated into a CI/CD pipeline to automate quality measurement and code reformatting.</p>
+<ul>
+<li>See <a href="https://gitlab.com/ddotta/rproject_for_rsonar">this repository</a></li>
+</ul>
+<p><code>sonar_fix(".", create_mr = TRUE)</code> directly opens a Merge Request.</p>
+<p>CI job <code>rsonar-fix</code>:</p>
 <ol type="1">
 <li>Installs <code>air</code> (<code>install_air()</code>)</li>
 <li>Formats all R files (<code>sonar_fix()</code>)</li>
 <li>Opens an MR/PR with the fixes</li>
 </ol>
-<p>→ No more manual reformatting: trigger, review, merge.</p>
+<p>Result: no more need to reformat code by hand before committing, nor to go back and forth in code review over simple style questions. A developer triggers the job, and a ready-made MR arrives with the formatting diff — all that’s left is to review and merge it.</p>
 </section>
-<section id="ci-pipeline-gitlab" class="slide level2">
-<h2>CI Pipeline (GitLab)</h2>
-<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb14-1"><a></a><span class="fu">stages</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">quality</span><span class="kw">,</span><span class="at"> autofix</span><span class="kw">]</span></span>
-<span id="cb14-2"><a></a></span>
-<span id="cb14-3"><a></a><span class="fu">rsonar-check</span><span class="kw">:</span></span>
-<span id="cb14-4"><a></a><span class="at">  </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> quality</span></span>
-<span id="cb14-5"><a></a><span class="at">  </span><span class="fu">script</span><span class="kw">:</span><span class="at"> R -e "sonar_analyse('.'); export_junit()"</span></span>
-<span id="cb14-6"><a></a></span>
-<span id="cb14-7"><a></a><span class="fu">rsonar-fix</span><span class="kw">:</span></span>
-<span id="cb14-8"><a></a><span class="at">  </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> autofix</span></span>
-<span id="cb14-9"><a></a><span class="at">  </span><span class="fu">when</span><span class="kw">:</span><span class="at"> manual</span></span>
-<span id="cb14-10"><a></a><span class="at">  </span><span class="fu">script</span><span class="kw">:</span><span class="at"> R -e "sonar_fix('.', create_mr = TRUE)"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="ci-pipeline-example-gitlab" class="slide level2">
+<h2>CI pipeline example (GitLab)</h2>
+<ul>
+<li>See <a href="https://gitlab.com/ddotta/ci-templates-r">this repository</a></li>
+</ul>
+<p>Minimal excerpt from <code>.gitlab-ci.yml</code>:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb15-1"><a></a><span class="fu">stages</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">quality</span><span class="kw">,</span><span class="at"> autofix</span><span class="kw">]</span></span>
+<span id="cb15-2"><a></a></span>
+<span id="cb15-3"><a></a><span class="fu">rsonar-check</span><span class="kw">:</span></span>
+<span id="cb15-4"><a></a><span class="at">  </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> quality</span></span>
+<span id="cb15-5"><a></a><span class="at">  </span><span class="fu">script</span><span class="kw">:</span><span class="at"> R -e "sonar_analyse('.'); export_junit()"</span></span>
+<span id="cb15-6"><a></a></span>
+<span id="cb15-7"><a></a><span class="fu">rsonar-fix</span><span class="kw">:</span></span>
+<span id="cb15-8"><a></a><span class="at">  </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> autofix</span></span>
+<span id="cb15-9"><a></a><span class="at">  </span><span class="fu">when</span><span class="kw">:</span><span class="at"> manual</span></span>
+<span id="cb15-10"><a></a><span class="at">  </span><span class="fu">script</span><span class="kw">:</span><span class="at"> R -e "sonar_fix('.', create_mr = TRUE)"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="track-the-evolution-over-time" class="slide level2">
+<h2>Track the evolution over time</h2>
+<div class="sourceCode" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a></a><span class="co"># Compare two analyses (before / after)</span></span>
+<span id="cb16-2"><a></a><span class="fu">sonar_diff</span>(res_v3, res_v0)</span>
+<span id="cb16-3"><a></a></span>
+<span id="cb16-4"><a></a><span class="co"># Store scores over time to track the trend</span></span>
+<span id="cb16-5"><a></a><span class="fu">sonar_trend</span>(res, <span class="at">file =</span> <span class="st">"rsonar-history.json"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><code>sonar_diff()</code>: new issues, fixed issues</li>
+<li><code>sonar_trend()</code>: evolution curve of the grade</li>
+</ul>
+</section>
+<section id="export-the-results-ci" class="slide level2">
+<h2>Export the results (CI)</h2>
+<div class="sourceCode" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a></a><span class="fu">export_junit</span>(res, <span class="st">"junit-results.xml"</span>)      <span class="co"># GitLab/Jenkins</span></span>
+<span id="cb17-2"><a></a><span class="fu">export_sarif</span>(res, <span class="st">"results.sarif"</span>)          <span class="co"># GitHub Code Scanning</span></span>
+<span id="cb17-3"><a></a><span class="fu">export_sonar_json</span>(res, <span class="st">"sonar-issues.json"</span>) <span class="co"># SonarQube</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Standard formats: JUnit XML, SARIF 2.1.0, SonarQube Generic Issue Import.</p>
 </section>
 <section id="key-takeaways" class="slide level2">
 <h2>Key takeaways</h2>
 <p><code>rsonar</code> = measure, fix, secure:</p>
 <ul>
-<li><strong>Locally</strong>: <code>quality_score()</code> and <code>debt_index()</code> for instant feedback</li>
+<li><strong>Locally</strong>: <code>quality_score()</code> and <code>debt_index()</code> for immediate feedback</li>
 <li><strong>In depth</strong>: <code>sonar_analyse()</code> + <code>sonar_report()</code> + <code>sonar_hotspots()</code></li>
-<li><strong>Over time</strong>: <code>sonar_diff()</code> / <code>sonar_trend()</code> to watch the rating improve</li>
+<li><strong>Over time</strong>: <code>sonar_diff()</code> / <code>sonar_trend()</code> to see the grade improve</li>
 <li><strong>In CI</strong>: <code>quality_gate()</code> + exports + <code>sonar_fix(create_mr = TRUE)</code></li>
 </ul>
-</section>
-<section id="conclusion" class="slide level2">
-<h2>Conclusion</h2>
-<p>The pedagogical loop:</p>
-<ol type="1">
-<li>Start from problematic code</li>
-<li>Measure quality (score, rating, debt)</li>
-<li>Improve step by step (style → refactor → tests)</li>
-<li>Watch the rating climb: <strong>38% → 62% → 78% → 94%</strong></li>
-</ol>
 </section>
 <section class="slide level2">
 
@@ -886,7 +1029,7 @@ Damien Dotta
       }
         var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
         var mailtoRegex = new RegExp(/^mailto:/);
-          var filterRegex = new RegExp('/' + window.location.host + '/');
+          var filterRegex = new RegExp("https:\/\/ddotta\.github\.io\/rsonar_presentation\/");
         var isInternal = (href) => {
             return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
         }

@@ -5,7 +5,7 @@ author: "Damien Dotta"
 lang: en
 format:
   revealjs:
-    theme: darkly
+    theme: dark
     slide-number: true
     transition: fade
     progress: true
@@ -113,6 +113,7 @@ A loop approach, using a running example:
 
 Project structure:  
 
+```
 ├── 01_assignment_and_formatting.R
 ├── 02_boolean_and_naming.R
 ├── 03_cyclomatic_complexity.R
@@ -123,6 +124,7 @@ Project structure:
 ├── 08_unnecessary_concatenation.R
 ├── 09_implicit_returns_and_braces.R
 └── 10_duplicate_code_and_magic_numbers.R
+```
 
 ## The starting code (version 0)
 Example `01_assignment_and_formatting.R`:
@@ -257,16 +259,17 @@ On our example script:
 
 ![](images/lint_issues_version1.png){fig-align="center"}
 
-## Version 2 — Refactor and document
+## Version 2 — Refactor/document
 
 Manual improvements:
 
 - rename `Part_SAU` → `calculer_part_sau` and `SAU_HA` → `sau_ha` (snake_case)
-- remove the unused variables (`unused_arg`, `var_inutile1`, `var_inutile2`)
 - replace `SAU_HA == NA` → `is.na()` and `class() == "numeric"` → `is.numeric()`
 - remove the stray `for (i in 1:length(...)) print(i)` loop
 - fix the syntax error `print("Done"` and return to the implicit return
 - add **roxygen2** documentation
+
+## Version 2 — Refactor/document
 
 ```{.r}
 #' Calculate the Useful Agricultural Area (SAU) share
@@ -299,7 +302,7 @@ calculer_part_sau <- function(sau_ha = 80, surface_totale = 100) {
 }
 ```
 
-## Version 2 — Refactor and document
+## Version 2 — Refactor/document
 
 ![](images/report_version2.png){fig-align="center"}
 
@@ -344,7 +347,7 @@ res <- sonar_analyse(".")
 
 ## Why does the score drop to 0 %?
 
-`sonar_analyse(".")` **without** `include_coverage = FALSE` measures coverage as soon as a `tests/` folder exists. Here it is only **7 %**: `calculer_part_sau` is the only function tested among the 10 scripts.
+`sonar_analyse(".")` **without** `include_coverage = FALSE` measures coverage as soon as a `tests/` folder exists. Here it is only **7 %**: only one function is tested among the 10 scripts.
 
 The coverage penalty then applies:
 
@@ -378,7 +381,9 @@ score = 100 × (1 − 1) = 0 %
 | 3 | Tests added with penalty | 0 % | E | 7 % | 37 |
 | 4 | Complete repository | 98 % | A | 100 % | 4 |
 
-Each targeted improvement raises the score and lowers the debt.
+Each improvement raises the score and lowers the debt.
+
+## About coverage
 
 ::: {.callout-note title="Why does coverage only change at step 3?"}
 Coverage is only **measured** when tests exist. Before (steps 0 to 2), it is 0 % and generates **no penalty**. At step 3, measuring coverage (**7 %**) triggers the penalty `(80 − 7) × 5 = 365 min`, which drops the score back to **0 %**.
@@ -389,20 +394,9 @@ Coverage is only **measured** when tests exist. Before (steps 0 to 2), it is 0 %
 
 ## Going further: automate the fixes
 
-The `rsonar` package can be integrated into a CI/CD pipeline to automate quality measurement and code reformatting.
+The `rsonar` package can be integrated into a CI/CD pipeline to automate quality measurement and code reformatting. See [this repository](https://gitlab.com/ddotta/rproject_for_rsonar)
 
-- See [this repository](https://gitlab.com/ddotta/rproject_for_rsonar)
-
-`sonar_fix(".", create_mr = TRUE)` directly opens a Merge Request.
-
-CI job `rsonar-fix`:
-
-1. Installs `air` (`install_air()`)
-2. Formats all R files (`sonar_fix()`)
-3. Opens an MR/PR with the fixes
-
-
-Result: no more need to reformat code by hand before committing, nor to go back and forth in code review over simple style questions. A developer triggers the job, and a ready-made MR arrives with the formatting diff — all that's left is to review and merge it.
+**Result:** no more need to reformat code by hand before committing, nor to go back and forth in code review over simple style questions. A developer triggers the job, and a ready-made MR arrives with the formatting diff and all that's left is to review and merge it.
 
 ## CI pipeline example (GitLab)
 

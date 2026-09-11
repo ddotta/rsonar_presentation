@@ -4,14 +4,14 @@
     "href": "index_en.html#what-is-rsonar",
     "title": "rsonar in practice",
     "section": "What is rsonar?",
-    "text": "What is rsonar?\n\n\nrsonar is the R equivalent of SonarQube: it centralizes R code quality measurement into one interactive report.\n\n\n\nTool\nRole\n\n\n\n\nlintr\nStatic analysis — bugs, style, complexity\n\n\nstyler\nCode formatting\n\n\ncovr\nTest coverage\n\n\ngoodpractice\nPackage best practices\n\n\n\n\n\n\nSonarQube vocabulary: issues, Coverage, Quality Gate."
+    "text": "What is rsonar?\n\n\nrsonar is the R equivalent of SonarQube: it centralizes R code quality measurement into a single, interactive report.\n\n\n\nTool\nRole\n\n\n\n\nlintr\nStatic analysis — bugs, style, complexity\n\n\nstyler\nCode formatting\n\n\ncovr\nTest coverage\n\n\ngoodpractice\nPackaging best practices\n\n\n\n\n\n\n\n\n\n\nSonarQube vocabulary: issues, Coverage, Quality Gate."
   },
   {
     "objectID": "index_en.html#sqale-quantifying-technical-debt",
     "href": "index_en.html#sqale-quantifying-technical-debt",
     "title": "rsonar in practice",
     "section": "SQALE: quantifying technical debt",
-    "text": "SQALE: quantifying technical debt\nSQALE = Software Quality Assessment based on Lifecycle Expectations.\nThe method popularized by SonarQube — and reused by rsonar — to turn code defects into an estimated cost, expressed in minutes.\nFour key concepts:\n\nPenalty per issue (minutes)\nDebt ratio (%)\nSQALE rating (A to E)\nHow the estimated cost is calculated"
+    "text": "SQALE: quantifying technical debt\nSQALE = Software Quality Assessment based on Lifecycle Expectations.\nIt is the method popularized by SonarQube — and adopted by rsonar — to turn code defects into an estimated cost, expressed in minutes.\nFour key concepts:\n\nThe penalty per issue (minutes)\nThe debt ratio (%)\nThe SQALE rating (grade from A to E)\nThe method for calculating the estimated cost"
   },
   {
     "objectID": "index_en.html#the-penalty-per-issue",
@@ -25,133 +25,189 @@
     "href": "index_en.html#the-debt-ratio",
     "title": "rsonar in practice",
     "section": "The debt ratio",
-    "text": "The debt ratio\nTotal debt is compared to a baseline effort:\nratio = D_total / (files × 30 min)\n\nD_total: sum of penalties across all issues\nfiles × 30 min: estimated effort to develop the files\n\nThe quality score is derived from it:\nscore = 100 × (1 - min(1, ratio))"
+    "text": "The debt ratio\nTotal debt is compared to a reference effort:\nratio = D_total / (files × 30 min)\n\nD_total: sum of the penalties for all issues\nfiles × 30 min: estimated effort to develop the files\n\nThe quality score is derived from it:\nscore = 100 × (1 - min(1, ratio))"
   },
   {
     "objectID": "index_en.html#the-sqale-rating-a-e",
     "href": "index_en.html#the-sqale-rating-a-e",
     "title": "rsonar in practice",
     "section": "The SQALE rating (A → E)",
-    "text": "The SQALE rating (A → E)\nThe ratio is converted into a maintainability rating:\n\n\n\nRatio\nRating\nMeaning\n\n\n\n\n&lt; 5 %\nA\nExcellent\n\n\n5 – 10 %\nB\nGood\n\n\n10 – 20 %\nC\nAcceptable\n\n\n20 – 50 %\nD\nPoor\n\n\n&gt; 50 %\nE\nCritical"
+    "text": "The SQALE rating (A → E)\nThe ratio is converted into a maintainability grade:\n\n\n\nRatio\nGrade\nMeaning\n\n\n\n\n&lt; 5 %\nA\nExcellent\n\n\n5 – 10 %\nB\nGood\n\n\n10 – 20 %\nC\nAcceptable\n\n\n20 – 50 %\nD\nPoor\n\n\n&gt; 50 %\nE\nCritical"
   },
   {
     "objectID": "index_en.html#the-estimated-cost-the-method",
     "href": "index_en.html#the-estimated-cost-the-method",
     "title": "rsonar in practice",
     "section": "The estimated cost: the method",
-    "text": "The estimated cost: the method\n\nCount the issues (errors, warnings, style, coverage, goodpractice)\nSum their penalties → total debt in minutes\nDivide by the baseline effort → debt ratio\nConvert the ratio into a SQALE rating (A → E)\n\nBaseline effort: SonarQube → lines of code × 30 min; rsonar → files × 30 min.\nExample: 2 errors + 2 warnings + 5 style = 90 min, against 300 min (10 files) → ratio 30 % → rating D."
+    "text": "The estimated cost: the method\n\nCount the issues (errors, warnings, style, coverage, goodpractice)\nSum their penalties → total debt in minutes\nDivide by the reference effort → debt ratio\nConvert the ratio into a SQALE grade (A → E)\n\nReference effort: SonarQube → lines of code × 30 min; rsonar → files × 30 min.\nExample: 2 errors + 2 warnings + 5 style = 90 min, compared to 300 min (10 files) → 30 % ratio → grade D."
   },
   {
     "objectID": "index_en.html#the-plan-measure-improve-measure",
     "href": "index_en.html#the-plan-measure-improve-measure",
     "title": "rsonar in practice",
     "section": "The plan: measure, improve, measure",
-    "text": "The plan: measure, improve, measure\nA loop, on a single running example:\n\nStart from problematic code\nMeasure quality with rsonar (score, rating, debt)\nImprove the code step by step\nRe-measure and watch the score go up"
+    "text": "The plan: measure, improve, measure\nA loop approach, using a running example:\n\nStart from problematic code\nMeasure quality with rsonar (score, grade, debt)\nImprove the code step by step\nRe-measure and watch the grade go up"
   },
   {
     "objectID": "index_en.html#the-starting-code-version-0",
     "href": "index_en.html#the-starting-code-version-0",
     "title": "rsonar in practice",
     "section": "The starting code (version 0)",
-    "text": "The starting code (version 0)\nFile R/analysis.R:\naddcols &lt;- function(d,a,b){\n  if(nrow(d)==0){stop(\"empty\")}\n  total=d[[a]]+d[[b]]\n  positive &lt;- ifelse(total&gt;0,T,F)\n  result=list(total=total, positive=positive)\n  return(result)\n}\nProblems: naming, spacing, = vs &lt;-, T/F, no docs, no tests."
+    "text": "The starting code (version 0)\nProject structure:\n├── 01_assignment_and_formatting.R ├── 02_boolean_and_naming.R ├── 03_cyclomatic_complexity.R ├── 04_unused_vars_and_syntax.R ├── 05_non_standard_evaluation.R ├── 06_function_length.R ├── 07_string_quote_and_infix.R ├── 08_unnecessary_concatenation.R ├── 09_implicit_returns_and_braces.R └── 10_duplicate_code_and_magic_numbers.R"
   },
   {
-    "objectID": "index_en.html#step-0-measure-the-initial-state",
-    "href": "index_en.html#step-0-measure-the-initial-state",
+    "objectID": "index_en.html#the-starting-code-version-0-1",
+    "href": "index_en.html#the-starting-code-version-0-1",
     "title": "rsonar in practice",
-    "section": "Step 0 — Measure the initial state",
-    "text": "Step 0 — Measure the initial state\nlibrary(rsonar)\nres &lt;- sonar_analyse(\".\")\nprint(res)\n-- rsonar -- Quality Report --\n  Files       : 1 R\n  Lint        : 8 issues (0 err / 3 warn / 5 style)\n  Style       : 1 non-compliant file\n  Coverage    : 0%\n  Goodpractice: 3 failures\n\n-- Technical Debt --\n  SQALE: E | Score: 38% | Duration: 4.2h"
+    "section": "The starting code (version 0)",
+    "text": "The starting code (version 0)\nExample 01_assignment_and_formatting.R:\n# File 1: Assignment operator & formatting issues\nPart_SAU = function( SAU_HA = 80 , surface_totale = 100 , unused_arg = 10 ){\n  var_inutile1 = 10\n  var_inutile2 = 20\n  \n    if( SAU_HA == NA || surface_totale == NA || SAU_HA == NULL ){ return( NULL ) }\n  \n  for( i in 1:length( SAU_HA ) ){ print( i ) }\n  \n    msg = paste( \"SAU share: \" , SAU_HA , sep = \"\" )\n  \n   if( class( SAU_HA ) == \"numeric\" ){ warning( msg ) }\n\n  \n  if( SAU_HA &gt; 0 && surface_totale &gt; 0 ){\n    res = ( SAU_HA / surface_totale ) * 100\n  }\n  \n  return( round( res , 1 ) )\n    \n    print(\"Done\"\n}\nProblems: naming, spacing, = vs &lt;-, no docs, line too long, no tests…"
   },
   {
-    "objectID": "index_en.html#step-0-score-rating-and-hotspots",
-    "href": "index_en.html#step-0-score-rating-and-hotspots",
+    "objectID": "index_en.html#version-0-scores",
+    "href": "index_en.html#version-0-scores",
     "title": "rsonar in practice",
-    "section": "Step 0 — Score, rating and hotspots",
-    "text": "Step 0 — Score, rating and hotspots\nquality_score(\".\")   # Score: 38% | Rating: E\ndebt_index(res)      # Rating: E (critical debt)\nsonar_hotspots(res)  # → R/analysis.R first\n\ndebt_index(): technical debt rating (A to E)\nsonar_hotspots(): files to fix first\nsonar_report(res): interactive HTML report"
+    "section": "Version 0 — Scores",
+    "text": "Version 0 — Scores\nlibrary(rsonar)\nres &lt;- sonar_analyse(\".\")\nsonar_report(res)\nDisplays a global interactive report."
   },
   {
-    "objectID": "index_en.html#step-1-fix-style-automatically",
-    "href": "index_en.html#step-1-fix-style-automatically",
+    "objectID": "index_en.html#version-0-technical-debt",
+    "href": "index_en.html#version-0-technical-debt",
     "title": "rsonar in practice",
-    "section": "Step 1 — Fix style automatically",
-    "text": "Step 1 — Fix style automatically\nsonar_fix() is powered by air, Posit’s fast R formatter.\n# Preview without changing anything\nsonar_fix(\".\", dry_run = TRUE)\n\n# Apply the style fixes\nsonar_fix(\".\")\nFixes: spacing, = → &lt;-, braces, indentation."
+    "section": "Version 0 — Technical debt",
+    "text": "Version 0 — Technical debt"
   },
   {
-    "objectID": "index_en.html#step-1-result-version-1",
-    "href": "index_en.html#step-1-result-version-1",
+    "objectID": "index_en.html#version-0-hotspots",
+    "href": "index_en.html#version-0-hotspots",
     "title": "rsonar in practice",
-    "section": "Step 1 — Result (version 1)",
-    "text": "Step 1 — Result (version 1)\naddcols &lt;- function(d, a, b) {\n  if (nrow(d) == 0) {\n    stop(\"empty\")\n  }\n  total &lt;- d[[a]] + d[[b]]\n  positive &lt;- ifelse(total &gt; 0, T, F)\n  result &lt;- list(total = total, positive = positive)\n  return(result)\n}\nStyle is fixed, but naming, complexity and docs remain.\nRe-measure: Score 62% · Rating D."
+    "section": "Version 0 — Hotspots",
+    "text": "Version 0 — Hotspots"
   },
   {
-    "objectID": "index_en.html#step-2-refactor-and-document",
-    "href": "index_en.html#step-2-refactor-and-document",
+    "objectID": "index_en.html#version-0-lint-issues",
+    "href": "index_en.html#version-0-lint-issues",
     "title": "rsonar in practice",
-    "section": "Step 2 — Refactor and document",
-    "text": "Step 2 — Refactor and document\nManual improvements:\n\naddcols → add_columns, d/a/b → data/col1/col2\nifelse(x &gt; 0, T, F) → x &gt; 0\nroxygen documentation added\n\n#' Sum two columns and flag positive rows\n#'\n#' @param data A data frame.\n#' @param col1,col2 Column names to sum.\n#' @return A list with `total` and `positive`.\nadd_columns &lt;- function(data, col1, col2) {\n  if (nrow(data) == 0) {\n    stop(\"`data` must contain at least one row.\")\n  }\n  total &lt;- data[[col1]] + data[[col2]]\n  list(total = total, positive = total &gt; 0)\n}\nRe-measure: Score 78% · Rating C."
+    "section": "Version 0 — Lint issues",
+    "text": "Version 0 — Lint issues"
   },
   {
-    "objectID": "index_en.html#step-3-add-tests",
-    "href": "index_en.html#step-3-add-tests",
+    "objectID": "index_en.html#step-1-fix-the-style-automatically",
+    "href": "index_en.html#step-1-fix-the-style-automatically",
     "title": "rsonar in practice",
-    "section": "Step 3 — Add tests",
-    "text": "Step 3 — Add tests\ntests/testthat/test-analysis.R:\ntest_that(\"add_columns sums and flags\", {\n  data &lt;- data.frame(a = c(1, -2, 3), b = c(0, 5, -5))\n  res &lt;- add_columns(data, \"a\", \"b\")\n\n  expect_equal(res$total, c(1, 3, -2))\n  expect_equal(res$positive, c(TRUE, TRUE, FALSE))\n})\nCoverage goes from 0% to 85%.\nRe-measure: Score 94% · Rating A."
+    "section": "Step 1 — Fix the style automatically",
+    "text": "Step 1 — Fix the style automatically\nsonar_fix() relies on air, Posit’s fast R formatter.\n# Preview without modifying anything\nsonar_fix(\".\", dry_run = TRUE)\n── rsonar Fix (dry-run) ──────────────────────────────────────────────────────────────────────────────────────────────────\nℹ Path: /var/data/nfs/CERISE/00-Espace-Personnel/damien.dotta/rsonar_tests\nℹ 10 R file(s) found\n✔ Report saved: sonar-fixes.json\n                              \n── rsonar Fix Report (dry-run - no files modified) ───────────────────────────────────────────────────────────────────────\nℹ Path : /var/data/nfs/CERISE/00-Espace-Personnel/damien.dotta/rsonar_tests\nℹ Files : 10 scanned, 10 modified\nℹ Time : 1.8s\n                              \n── Fixes applied               \n  styler: 8fixes to 10 file(s)\n  spacing: 3\n  true_false: 3\n  commas: 1\n  cleanup: 35\n  assignment: 4\n  unused_vars: 3\nℹ Run `sonar_fix()` with `dry_run = FALSE` to apply fixes.\n✔ Applying fixes to 10 file(s) [2s]"
   },
   {
-    "objectID": "index_en.html#the-progress-at-a-glance",
-    "href": "index_en.html#the-progress-at-a-glance",
+    "objectID": "index_en.html#step-1-fix-the-style-automatically-1",
+    "href": "index_en.html#step-1-fix-the-style-automatically-1",
     "title": "rsonar in practice",
-    "section": "The progress at a glance",
-    "text": "The progress at a glance\n\n\n\nStep\nAction\nScore\nRating\nCoverage\n\n\n\n\n0\nStarting code\n38 %\nE\n0 %\n\n\n1\nAuto style (sonar_fix)\n62 %\nD\n0 %\n\n\n2\nRefactor + docs\n78 %\nC\n0 %\n\n\n3\nTests added\n94 %\nA\n85 %\n\n\n\nEach targeted improvement raises the score and lowers the debt."
+    "section": "Step 1 — Fix the style automatically",
+    "text": "Step 1 — Fix the style automatically\nWith dry_run set to FALSE, the scripts are modified:\n# Apply style fixes\nsonar_fix(\".\", dry_run = FALSE)"
   },
   {
-    "objectID": "index_en.html#step-4-block-regressions-quality-gate",
-    "href": "index_en.html#step-4-block-regressions-quality-gate",
+    "objectID": "index_en.html#version-1-result",
+    "href": "index_en.html#version-1-result",
     "title": "rsonar in practice",
-    "section": "Step 4 — Block regressions (Quality Gate)",
-    "text": "Step 4 — Block regressions (Quality Gate)\nquality_gate(res,\n  coverage_min    = 80,\n  lint_errors_max = 0,\n  rating_min      = \"B\",\n  fail_on_error   = TRUE)\nIf a threshold is crossed, the CI pipeline blocks automatically.\nThis is the guard that prevents the rating from dropping back."
+    "section": "Version 1 — Result",
+    "text": "Version 1 — Result\n# File 1: Assignment operator & formatting issues\nPart_SAU = function( SAU_HA = 80 , surface_totale = 100 , unused_arg = 10 ){\n\n  if( SAU_HA == NA || surface_totale == NA || SAU_HA == NULL ){ return( NULL ) }\n\n  for( i in 1:length( SAU_HA ) ){ print( i ) }\n\n  msg = paste( \"SAU share: \" , SAU_HA , sep = \"\" )\n\n  if( class( SAU_HA ) == \"numeric\" ){ warning( msg ) }\n\n  if( SAU_HA &gt; 0 && surface_totale &gt; 0 ){\n    res &lt;- ( SAU_HA / surface_totale ) * 100\n  }\n\n  return( round( res , 1 ) )\n\n  print(\"Done\"\n        }\nIt’s better, but not everything is fixed."
   },
   {
-    "objectID": "index_en.html#track-the-evolution-over-time",
-    "href": "index_en.html#track-the-evolution-over-time",
+    "objectID": "index_en.html#version-1-results",
+    "href": "index_en.html#version-1-results",
     "title": "rsonar in practice",
-    "section": "Track the evolution over time",
-    "text": "Track the evolution over time\n# Compare two analyses (before / after)\nsonar_diff(res_v3, res_v0)\n\n# Save scores to plot the trend\nsonar_trend(res, file = \"rsonar-history.json\")\n\nsonar_diff(): new issues, fixed issues\nsonar_trend(): rating evolution curve"
+    "section": "Version 1 — Results",
+    "text": "Version 1 — Results\n\n\n\n\n\nOn our example script:"
   },
   {
-    "objectID": "index_en.html#export-results-ci",
-    "href": "index_en.html#export-results-ci",
+    "objectID": "index_en.html#version-2-refactor-and-document",
+    "href": "index_en.html#version-2-refactor-and-document",
     "title": "rsonar in practice",
-    "section": "Export results (CI)",
-    "text": "Export results (CI)\nexport_junit(res, \"junit-results.xml\")      # GitLab/Jenkins\nexport_sarif(res, \"results.sarif\")          # GitHub Code Scanning\nexport_sonar_json(res, \"sonar-issues.json\") # SonarQube\nStandard formats: JUnit XML, SARIF 2.1.0, SonarQube Generic Issue Import."
+    "section": "Version 2 — Refactor and document",
+    "text": "Version 2 — Refactor and document\nManual improvements:\n\nrename Part_SAU → calculer_part_sau and SAU_HA → sau_ha (snake_case)\nremove the unused variables (unused_arg, var_inutile1, var_inutile2)\nreplace SAU_HA == NA → is.na() and class() == \"numeric\" → is.numeric()\nremove the stray for (i in 1:length(...)) print(i) loop\nfix the syntax error print(\"Done\" and return to the implicit return\nadd roxygen2 documentation\n\n#' Calculate the Useful Agricultural Area (SAU) share\n#'\n#' @param sau_ha Numeric or numeric vector. The SAU in hectares.\n#' @param surface_totale Numeric or numeric vector. The total surface in ha.\n#'\n#' @return The SAU share as a percentage.\n#' @export\ncalculer_part_sau &lt;- function(sau_ha = 80, surface_totale = 100) {\n  if (is.null(sau_ha) || is.null(surface_totale)) {\n    return(NULL)\n  }\n\n  if (any(is.na(sau_ha)) || any(is.na(surface_totale))) {\n    return(NULL)\n  }\n\n  if (any(sau_ha &lt; 0) || any(surface_totale &lt;= 0)) {\n    stop(\"Surfaces must be positive and the total surface must be &gt; 0.\")\n  }\n\n  res &lt;- (sau_ha / surface_totale) * 100\n\n  if (any(res &gt; 100)) {\n    warning(\"At least one SAU value exceeds the total surface.\")\n  }\n\n  return(res)\n}"
+  },
+  {
+    "objectID": "index_en.html#version-2-refactor-and-document-1",
+    "href": "index_en.html#version-2-refactor-and-document-1",
+    "title": "rsonar in practice",
+    "section": "Version 2 — Refactor and document",
+    "text": "Version 2 — Refactor and document"
+  },
+  {
+    "objectID": "index_en.html#version-3-add-tests",
+    "href": "index_en.html#version-3-add-tests",
+    "title": "rsonar in practice",
+    "section": "Version 3 — Add tests",
+    "text": "Version 3 — Add tests\ntests/testthat/test-calculer-part-sau.R:\nlibrary(testthat)\n\ntest_that(\"calculer_part_sau computes the SAU share on a vector\", {\n  res &lt;- calculer_part_sau(sau_ha = c(80, 120), surface_totale = 200)\n\n  expect_equal(res, c(40, 60))\n})\n\ntest_that(\"calculer_part_sau applies the default values\", {\n  res &lt;- calculer_part_sau()\n\n  expect_equal(res, 80)\n})"
+  },
+  {
+    "objectID": "index_en.html#version-3-add-tests-12",
+    "href": "index_en.html#version-3-add-tests-12",
+    "title": "rsonar in practice",
+    "section": "Version 3 — Add tests (1/2)",
+    "text": "Version 3 — Add tests (1/2)\nres &lt;- sonar_analyse(\".\",include_coverage = FALSE)"
+  },
+  {
+    "objectID": "index_en.html#version-3-add-tests-22",
+    "href": "index_en.html#version-3-add-tests-22",
+    "title": "rsonar in practice",
+    "section": "Version 3 — Add tests (2/2)",
+    "text": "Version 3 — Add tests (2/2)\nres &lt;- sonar_analyse(\".\")"
+  },
+  {
+    "objectID": "index_en.html#why-does-the-score-drop-to-0",
+    "href": "index_en.html#why-does-the-score-drop-to-0",
+    "title": "rsonar in practice",
+    "section": "Why does the score drop to 0 %?",
+    "text": "Why does the score drop to 0 %?\nsonar_analyse(\".\") without include_coverage = FALSE measures coverage as soon as a tests/ folder exists. Here it is only 7 %: calculer_part_sau is the only function tested among the 10 scripts.\nThe coverage penalty then applies:\n(80 − 7) × 5 = 365 min\nThis penalty alone exceeds the reference effort (11 files × 30 = 330 min):\nratio = debt / 330 ≥ 1\nscore = 100 × (1 − 1) = 0 %\n→ Score 0 % · Grade E. It is the global project coverage that matters, not that of a single file."
+  },
+  {
+    "objectID": "index_en.html#version-4---complete-repository-with-tests-and-high-coverage",
+    "href": "index_en.html#version-4---complete-repository-with-tests-and-high-coverage",
+    "title": "rsonar in practice",
+    "section": "Version 4 - Complete repository with tests and high coverage",
+    "text": "Version 4 - Complete repository with tests and high coverage\n\nSee this repository to get a complete R project with tests and very high coverage."
+  },
+  {
+    "objectID": "index_en.html#the-progression-at-a-glance",
+    "href": "index_en.html#the-progression-at-a-glance",
+    "title": "rsonar in practice",
+    "section": "The progression at a glance",
+    "text": "The progression at a glance\n\n\n\nStep\nAction\nScore\nGrade\nCoverage\n\n\n\n\n0\nInitial code\n0 %\nE\n0 %\n\n\n1\nAuto style (sonar_fix)\n0 %\nE\n0 %\n\n\n2\nRefactoring + docs\n49 %\nE\n0 %\n\n\n3\nTests added without penalty\n50 %\nD\n0 %\n\n\n3\nTests added with penalty\n0 %\nE\n7 %\n\n\n4\nComplete repository\n98 %\nA\n100 %\n\n\n\nEach targeted improvement raises the score and lowers the debt.\n\n\n\n\n\n\n\nWhy does coverage only change at step 3?\n\n\nCoverage is only measured when tests exist. Before (steps 0 to 2), it is 0 % and generates no penalty. At step 3, measuring coverage (7 %) triggers the penalty (80 − 7) × 5 = 365 min, which drops the score back to 0 %.\n⚠️ To avoid this, you must cover the entire project (coverage ≥ 80 %), not a single function. Otherwise, it is the global coverage that drives the score down."
   },
   {
     "objectID": "index_en.html#going-further-automate-the-fixes",
     "href": "index_en.html#going-further-automate-the-fixes",
     "title": "rsonar in practice",
     "section": "Going further: automate the fixes",
-    "text": "Going further: automate the fixes\nsonar_fix(\".\", create_mr = TRUE) opens a Merge/Pull Request directly.\nCI job rsonar-fix (optional manual task):\n\nInstalls air (install_air())\nFormats all R files (sonar_fix())\nOpens an MR/PR with the fixes\n\n→ No more manual reformatting: trigger, review, merge."
+    "text": "Going further: automate the fixes\nThe rsonar package can be integrated into a CI/CD pipeline to automate quality measurement and code reformatting.\n\nSee this repository\n\nsonar_fix(\".\", create_mr = TRUE) directly opens a Merge Request.\nCI job rsonar-fix:\n\nInstalls air (install_air())\nFormats all R files (sonar_fix())\nOpens an MR/PR with the fixes\n\nResult: no more need to reformat code by hand before committing, nor to go back and forth in code review over simple style questions. A developer triggers the job, and a ready-made MR arrives with the formatting diff — all that’s left is to review and merge it."
   },
   {
-    "objectID": "index_en.html#ci-pipeline-gitlab",
-    "href": "index_en.html#ci-pipeline-gitlab",
+    "objectID": "index_en.html#ci-pipeline-example-gitlab",
+    "href": "index_en.html#ci-pipeline-example-gitlab",
     "title": "rsonar in practice",
-    "section": "CI Pipeline (GitLab)",
-    "text": "CI Pipeline (GitLab)\nstages: [quality, autofix]\n\nrsonar-check:\n  stage: quality\n  script: R -e \"sonar_analyse('.'); export_junit()\"\n\nrsonar-fix:\n  stage: autofix\n  when: manual\n  script: R -e \"sonar_fix('.', create_mr = TRUE)\""
+    "section": "CI pipeline example (GitLab)",
+    "text": "CI pipeline example (GitLab)\n\nSee this repository\n\nMinimal excerpt from .gitlab-ci.yml:\nstages: [quality, autofix]\n\nrsonar-check:\n  stage: quality\n  script: R -e \"sonar_analyse('.'); export_junit()\"\n\nrsonar-fix:\n  stage: autofix\n  when: manual\n  script: R -e \"sonar_fix('.', create_mr = TRUE)\""
+  },
+  {
+    "objectID": "index_en.html#track-the-evolution-over-time",
+    "href": "index_en.html#track-the-evolution-over-time",
+    "title": "rsonar in practice",
+    "section": "Track the evolution over time",
+    "text": "Track the evolution over time\n# Compare two analyses (before / after)\nsonar_diff(res_v3, res_v0)\n\n# Store scores over time to track the trend\nsonar_trend(res, file = \"rsonar-history.json\")\n\nsonar_diff(): new issues, fixed issues\nsonar_trend(): evolution curve of the grade"
+  },
+  {
+    "objectID": "index_en.html#export-the-results-ci",
+    "href": "index_en.html#export-the-results-ci",
+    "title": "rsonar in practice",
+    "section": "Export the results (CI)",
+    "text": "Export the results (CI)\nexport_junit(res, \"junit-results.xml\")      # GitLab/Jenkins\nexport_sarif(res, \"results.sarif\")          # GitHub Code Scanning\nexport_sonar_json(res, \"sonar-issues.json\") # SonarQube\nStandard formats: JUnit XML, SARIF 2.1.0, SonarQube Generic Issue Import."
   },
   {
     "objectID": "index_en.html#key-takeaways",
     "href": "index_en.html#key-takeaways",
     "title": "rsonar in practice",
     "section": "Key takeaways",
-    "text": "Key takeaways\nrsonar = measure, fix, secure:\n\nLocally: quality_score() and debt_index() for instant feedback\nIn depth: sonar_analyse() + sonar_report() + sonar_hotspots()\nOver time: sonar_diff() / sonar_trend() to watch the rating improve\nIn CI: quality_gate() + exports + sonar_fix(create_mr = TRUE)"
-  },
-  {
-    "objectID": "index_en.html#conclusion",
-    "href": "index_en.html#conclusion",
-    "title": "rsonar in practice",
-    "section": "Conclusion",
-    "text": "Conclusion\nThe pedagogical loop:\n\nStart from problematic code\nMeasure quality (score, rating, debt)\nImprove step by step (style → refactor → tests)\nWatch the rating climb: 38% → 62% → 78% → 94%"
+    "text": "Key takeaways\nrsonar = measure, fix, secure:\n\nLocally: quality_score() and debt_index() for immediate feedback\nIn depth: sonar_analyse() + sonar_report() + sonar_hotspots()\nOver time: sonar_diff() / sonar_trend() to see the grade improve\nIn CI: quality_gate() + exports + sonar_fix(create_mr = TRUE)"
   },
   {
     "objectID": "article-rsonar.html#le-principe-un-sonarqube-pensé-pour-r",
@@ -235,70 +291,140 @@
     "href": "index.html#le-code-de-départ-version-0",
     "title": "rsonar en pratique",
     "section": "Le code de départ (version 0)",
-    "text": "Le code de départ (version 0)\nStructure du projet :\n├── 01_assignment_and_formatting.R ├── 02_boolean_and_naming.R ├── 03_cyclomatic_complexity.R ├── 04_unused_vars_and_syntax.R ├── 05_non_standard_evaluation.R ├── 06_function_length.R ├── 07_string_quote_and_infix.R ├── 08_unnecessary_concatenation.R ├── 09_implicit_returns_and_braces.R └── 10_duplicate_code_and_magic_numbers.R"
+    "text": "Le code de départ (version 0)\nStructure du projet :\n├── 01_assignment_and_formatting.R\n├── 02_boolean_and_naming.R\n├── 03_cyclomatic_complexity.R\n├── 04_unused_vars_and_syntax.R\n├── 05_non_standard_evaluation.R\n├── 06_function_length.R\n├── 07_string_quote_and_infix.R\n├── 08_unnecessary_concatenation.R\n├── 09_implicit_returns_and_braces.R\n└── 10_duplicate_code_and_magic_numbers.R"
   },
   {
     "objectID": "index.html#le-code-de-départ-version-0-1",
     "href": "index.html#le-code-de-départ-version-0-1",
     "title": "rsonar en pratique",
     "section": "Le code de départ (version 0)",
-    "text": "Le code de départ (version 0)\nExemple 01_assignment_and_formatting.R :\n# File 1: Assignment operator & formatting issues\ncalculate_tax &lt;- function(income, rate = 0.2) {\n  # Violation: '=' used instead of '&lt;-' for assignment\n  total_tax = income * rate\n  \n  # Violation: line over 80 characters limit with bad spacing around Operators and comma\n  result=data.frame(income=income,tax=total_tax,net=income-total_tax,note=\"Calculated automatically by custom financial routine\")\n  \n  return(result)\n}\nProblèmes : nommage, espaces, = vs &lt;-, T/F, pas de doc, ligne trop longue, aucun test."
+    "text": "Le code de départ (version 0)\nExemple 01_assignment_and_formatting.R :\n# File 1: Assignment operator & formatting issues\nPart_SAU = function( SAU_HA = 80 , surface_totale = 100 , unused_arg = 10 ){\n  var_inutile1 = 10\n  var_inutile2 = 20\n  \n    if( SAU_HA == NA || surface_totale == NA || SAU_HA == NULL ){ return( NULL ) }\n  \n  for( i in 1:length( SAU_HA ) ){ print( i ) }\n  \n    msg = paste( \"Part SAU: \" , SAU_HA , sep = \"\" )\n  \n   if( class( SAU_HA ) == \"numeric\" ){ warning( msg ) }\n\n  \n  if( SAU_HA &gt; 0 && surface_totale &gt; 0 ){\n    res = ( SAU_HA / surface_totale ) * 100\n  }\n  \n  return( round( res , 1 ) )\n    \n    print(\"Fini\"\n}\nProblèmes : nommage, espaces, = vs &lt;-, pas de doc, ligne trop longue, aucun test…"
   },
   {
-    "objectID": "index.html#étape-0-mesurer-létat-initial",
-    "href": "index.html#étape-0-mesurer-létat-initial",
+    "objectID": "index.html#version-0-scores",
+    "href": "index.html#version-0-scores",
     "title": "rsonar en pratique",
-    "section": "Étape 0 — Mesurer l’état initial",
-    "text": "Étape 0 — Mesurer l’état initial\nlibrary(rsonar)\nres &lt;- sonar_analyse(\".\")\nsonar_report(res)\nAffiche un rapport interactif global."
+    "section": "Version 0 — Scores",
+    "text": "Version 0 — Scores\nlibrary(rsonar)\nres &lt;- sonar_analyse(\".\")\nsonar_report(res)\nAffiche un rapport interactif global."
   },
   {
-    "objectID": "index.html#étape-0-score-note-et-hotspots",
-    "href": "index.html#étape-0-score-note-et-hotspots",
+    "objectID": "index.html#version-0-dette-technique",
+    "href": "index.html#version-0-dette-technique",
     "title": "rsonar en pratique",
-    "section": "Étape 0 — Score, note et hotspots",
-    "text": "Étape 0 — Score, note et hotspots"
+    "section": "Version 0 — Dette technique",
+    "text": "Version 0 — Dette technique"
+  },
+  {
+    "objectID": "index.html#version-0-hotspots",
+    "href": "index.html#version-0-hotspots",
+    "title": "rsonar en pratique",
+    "section": "Version 0 — Hotspots",
+    "text": "Version 0 — Hotspots"
+  },
+  {
+    "objectID": "index.html#version-0-lint-issues",
+    "href": "index.html#version-0-lint-issues",
+    "title": "rsonar en pratique",
+    "section": "Version 0 — Lint issues",
+    "text": "Version 0 — Lint issues"
   },
   {
     "objectID": "index.html#étape-1-corriger-le-style-automatiquement",
     "href": "index.html#étape-1-corriger-le-style-automatiquement",
     "title": "rsonar en pratique",
     "section": "Étape 1 — Corriger le style automatiquement",
-    "text": "Étape 1 — Corriger le style automatiquement\nsonar_fix() s’appuie sur air, le formateur R rapide de Posit.\n# Aperçu sans rien modifier\nsonar_fix(\".\", dry_run = TRUE)\n── rsonar Fix (dry-run) ────────────────────────────────────────────────────────────────────\nℹ Path: /var/data/nfs/CERISE/00-Espace-Personnel/damien.dotta/rsonar_tests\nℹ 10 R file(s) found\n✔ Report saved: sonar-fixes.json\n                               \n── rsonar Fix Report (dry-run - no files modified) ─────────────────────────────────────────\nℹ Path : /var/data/nfs/CERISE/00-Espace-Personnel/damien.dotta/rsonar_tests\nℹ Files : 10 scanned, 10 modified\nℹ Time : 2s\n                               \n── Fixes applied               \n  styler: 9fixes to 10 file(s)\n  spacing: 4\n  true_false: 3\n  commas: 2\n  cleanup: 29\n  assignment: 2\n  unused_vars: 1\nℹ Run `sonar_fix()` with `dry_run = FALSE` to apply fixes.\n✔ Applying fixes to 10 file(s) [2.2s]"
+    "text": "Étape 1 — Corriger le style automatiquement\nsonar_fix() s’appuie sur air, le formateur R rapide de Posit.\n# Aperçu sans rien modifier\nsonar_fix(\".\", dry_run = TRUE)\n── rsonar Fix (dry-run) ──────────────────────────────────────────────────────────────────────────────────────────────────\nℹ Path: /var/data/nfs/CERISE/00-Espace-Personnel/damien.dotta/rsonar_tests\nℹ 10 R file(s) found\n✔ Report saved: sonar-fixes.json\n                               \n── rsonar Fix Report (dry-run - no files modified) ───────────────────────────────────────────────────────────────────────\nℹ Path : /var/data/nfs/CERISE/00-Espace-Personnel/damien.dotta/rsonar_tests\nℹ Files : 10 scanned, 10 modified\nℹ Time : 1.8s\n                               \n── Fixes applied               \n  styler: 8fixes to 10 file(s)\n  spacing: 3\n  true_false: 3\n  commas: 1\n  cleanup: 35\n  assignment: 4\n  unused_vars: 3\nℹ Run `sonar_fix()` with `dry_run = FALSE` to apply fixes.\n✔ Applying fixes to 10 file(s) [2s]"
   },
   {
-    "objectID": "index.html#étape-1-résultat-version-1",
-    "href": "index.html#étape-1-résultat-version-1",
+    "objectID": "index.html#étape-1-corriger-le-style-automatiquement-1",
+    "href": "index.html#étape-1-corriger-le-style-automatiquement-1",
     "title": "rsonar en pratique",
-    "section": "Étape 1 — Résultat (version 1)",
-    "text": "Étape 1 — Résultat (version 1)\n# File 1: Assignment operator & formatting issues\ncalculate_tax &lt;- function(income, rate = 0.2) {\n  # Violation: '=' used instead of '&lt;-' for assignment\n  total_tax &lt;- income * rate\n\n  # Violation: line over 80 characters limit with bad spacing around Operators and comma\n  result &lt;- data.frame(income = income, tax = total_tax, net = income - total_tax, note = \"Calculated automatically by custom financial routine\")\n\n  return(result)\n}\nLe style est réglé, mais tout n’est pas réglé."
+    "section": "Étape 1 — Corriger le style automatiquement",
+    "text": "Étape 1 — Corriger le style automatiquement\nAvec dry_run à FALSE, les scripts sont modifiés :\n# Application des corrections de style\nsonar_fix(\".\", dry_run = FALSE)"
   },
   {
-    "objectID": "index.html#étape-2-refactoriser-et-documenter",
-    "href": "index.html#étape-2-refactoriser-et-documenter",
+    "objectID": "index.html#version-1-résultat",
+    "href": "index.html#version-1-résultat",
     "title": "rsonar en pratique",
-    "section": "Étape 2 — Refactoriser et documenter",
-    "text": "Étape 2 — Refactoriser et documenter\nAméliorations manuelles :\n\nrenommer total_tax → tax et extraire net\nfractionner le data.frame (ligne trop longue)\nsupprimer le return() explicite (retour implicite)\najouter la documentation roxygen2\n\n#' Calcule l'impôt et le revenu net\n#'\n#' @param income Revenu brut (numérique ou vecteur).\n#' @param rate Taux d'imposition, par défaut `0.2` (20 %).\n#'\n#' @return Un `data.frame` avec `income`, `tax`, `net` et `note`.\n#' @export\n#'\n#' @examples\n#' calculate_tax(c(1000, 2500))\ncalculate_tax &lt;- function(income, rate = 0.2) {\n  tax &lt;- income * rate\n  net &lt;- income - tax\n\n  data.frame(\n    income = income,\n    tax    = tax,\n    net    = net,\n    note   = \"Calculated automatically by custom financial routine\"\n  )\n}\nRe-mesure : Score 78% · Note C."
+    "section": "Version 1 — Résultat",
+    "text": "Version 1 — Résultat\n# File 1: Assignment operator & formatting issues\nPart_SAU = function( SAU_HA = 80 , surface_totale = 100 , unused_arg = 10 ){\n\n  if( SAU_HA == NA || surface_totale == NA || SAU_HA == NULL ){ return( NULL ) }\n\n  for( i in 1:length( SAU_HA ) ){ print( i ) }\n\n  msg = paste( \"Part SAU: \" , SAU_HA , sep = \"\" )\n\n  if( class( SAU_HA ) == \"numeric\" ){ warning( msg ) }\n\n  if( SAU_HA &gt; 0 && surface_totale &gt; 0 ){\n    res &lt;- ( SAU_HA / surface_totale ) * 100\n  }\n\n  return( round( res , 1 ) )\n\n  print(\"Fini\"\n        }\nC’est mieux mais tout n’est pas réglé."
   },
   {
-    "objectID": "index.html#étape-3-ajouter-des-tests",
-    "href": "index.html#étape-3-ajouter-des-tests",
+    "objectID": "index.html#version-1-résultats",
+    "href": "index.html#version-1-résultats",
     "title": "rsonar en pratique",
-    "section": "Étape 3 — Ajouter des tests",
-    "text": "Étape 3 — Ajouter des tests\ntests/testthat/test-calculate-tax.R :\ntest_that(\"calculate_tax calcule l'impôt et le net\", {\n  res &lt;- calculate_tax(c(1000, 2500), rate = 0.2)\n\n  expect_equal(res$tax, c(200, 500))\n  expect_equal(res$net, c(800, 2000))\n  expect_equal(res$income, c(1000, 2500))\n})\n\ntest_that(\"calculate_tax applique le taux par défaut\", {\n  res &lt;- calculate_tax(1000)\n\n  expect_equal(res$tax, 200)\n  expect_equal(res$net, 800)\n})\nLa couverture passe de 0% à 85%.\nRe-mesure : Score 94% · Note A."
+    "section": "Version 1 — Résultats",
+    "text": "Version 1 — Résultats\n\n\n\n\n\nSur notre script exemple :"
+  },
+  {
+    "objectID": "index.html#version-2-refactoriser-et-documenter",
+    "href": "index.html#version-2-refactoriser-et-documenter",
+    "title": "rsonar en pratique",
+    "section": "Version 2 — Refactoriser et documenter",
+    "text": "Version 2 — Refactoriser et documenter"
+  },
+  {
+    "objectID": "index.html#version-2-refactoriser-et-documenter-1",
+    "href": "index.html#version-2-refactoriser-et-documenter-1",
+    "title": "rsonar en pratique",
+    "section": "Version 2 — Refactoriser et documenter",
+    "text": "Version 2 — Refactoriser et documenter"
+  },
+  {
+    "objectID": "index.html#version-3-ajouter-des-tests",
+    "href": "index.html#version-3-ajouter-des-tests",
+    "title": "rsonar en pratique",
+    "section": "Version 3 — Ajouter des tests",
+    "text": "Version 3 — Ajouter des tests\ntests/testthat/test-calculer-part-sau.R :\nlibrary(testthat)\n\ntest_that(\"calculer_part_sau calcule la part de SAU sur un vecteur\", {\n  res &lt;- calculer_part_sau(sau_ha = c(80, 120), surface_totale = 200)\n\n  expect_equal(res, c(40, 60))\n})\n\ntest_that(\"calculer_part_sau applique les valeurs par défaut\", {\n  res &lt;- calculer_part_sau()\n\n  expect_equal(res, 80)\n})"
+  },
+  {
+    "objectID": "index.html#version-3-ajouter-des-tests-12",
+    "href": "index.html#version-3-ajouter-des-tests-12",
+    "title": "rsonar en pratique",
+    "section": "Version 3 — Ajouter des tests (1/2)",
+    "text": "Version 3 — Ajouter des tests (1/2)\nres &lt;- sonar_analyse(\".\",include_coverage = FALSE)"
+  },
+  {
+    "objectID": "index.html#version-3-ajouter-des-tests-22",
+    "href": "index.html#version-3-ajouter-des-tests-22",
+    "title": "rsonar en pratique",
+    "section": "Version 3 — Ajouter des tests (2/2)",
+    "text": "Version 3 — Ajouter des tests (2/2)\nres &lt;- sonar_analyse(\".\")"
+  },
+  {
+    "objectID": "index.html#pourquoi-le-score-tombe-à-0",
+    "href": "index.html#pourquoi-le-score-tombe-à-0",
+    "title": "rsonar en pratique",
+    "section": "Pourquoi le score tombe à 0 % ?",
+    "text": "Pourquoi le score tombe à 0 % ?\nsonar_analyse(\".\") sans include_coverage = FALSE mesure la couverture dès qu’un dossier tests/ existe. Ici, elle n’est que de 7 % : une seule fonction est testée sur les 10 scripts.\nLa pénalité de couverture s’applique alors :\n(80 − 7) × 5 = 365 min\nCette pénalité dépasse à elle seule l’effort de référence (11 fichiers × 30 = 330 min) :\nratio = dette / 330 ≥ 1\nscore = 100 × (1 − 1) = 0 %\n→ Score 0 % · Note E. C’est la couverture globale du projet qui compte, pas celle d’un seul fichier."
+  },
+  {
+    "objectID": "index.html#version-4---dépôt-complet-avec-tests-et-couverture-élevée",
+    "href": "index.html#version-4---dépôt-complet-avec-tests-et-couverture-élevée",
+    "title": "rsonar en pratique",
+    "section": "Version 4 - Dépôt complet avec tests et couverture élevée",
+    "text": "Version 4 - Dépôt complet avec tests et couverture élevée\n\nVoir ce dépôt pour obtenir un projet R complet avec tests et couverture trés élevés."
   },
   {
     "objectID": "index.html#la-progression-en-un-coup-dœil",
     "href": "index.html#la-progression-en-un-coup-dœil",
     "title": "rsonar en pratique",
     "section": "La progression en un coup d’œil",
-    "text": "La progression en un coup d’œil\n\n\n\nÉtape\nAction\nScore\nNote\nCouverture\n\n\n\n\n0\nCode initial\n38 %\nE\n0 %\n\n\n1\nStyle auto (sonar_fix)\n62 %\nD\n0 %\n\n\n2\nRefactorisation + doc\n78 %\nC\n0 %\n\n\n3\nTests ajoutés\n94 %\nA\n85 %\n\n\n\nChaque amélioration ciblée fait monter le score et baisser la dette."
+    "text": "La progression en un coup d’œil\n\n\n\nÉtape\nAction\nScore\nNote\nCouverture\n\n\n\n\n0\nCode initial\n0 %\nE\n0 %\n\n\n1\nStyle auto (sonar_fix)\n0 %\nE\n0 %\n\n\n2\nRefactorisation + doc\n49 %\nE\n0 %\n\n\n3\nTests ajoutés sans pénalité\n50 %\nD\n0 %\n\n\n3\nTests ajoutés avec pénalité\n0 %\nE\n7 %\n\n\n4\nDépôt complet\n98 %\nA\n100 %\n\n\n\nChaque amélioration fait monter le score et baisser la dette."
   },
   {
-    "objectID": "index.html#étape-4-bloquer-les-régressions-quality-gate",
-    "href": "index.html#étape-4-bloquer-les-régressions-quality-gate",
+    "objectID": "index.html#aller-plus-loin-automatiser-les-corrections",
+    "href": "index.html#aller-plus-loin-automatiser-les-corrections",
     "title": "rsonar en pratique",
-    "section": "Étape 4 — Bloquer les régressions (Quality Gate)",
-    "text": "Étape 4 — Bloquer les régressions (Quality Gate)\nquality_gate(res,\n  coverage_min    = 80,\n  lint_errors_max = 0,\n  rating_min      = \"B\",\n  fail_on_error   = TRUE)\nSi un seuil est franchi, la pipeline CI bloque automatiquement.\nC’est le garde-fou qui empêche la note de redescendre."
+    "section": "Aller plus loin : automatiser les corrections",
+    "text": "Aller plus loin : automatiser les corrections\nLe package rsonar peut être intégré dans un pipeline CI/CD pour automatiser la mesure de la qualité et le reformatage du code. Voir ce dépôt\nRésultat : plus besoin de reformater son code à la main avant de commiter, ni de faire des allers-retours en revue de code sur de simples questions de style. Un développeur déclenche le job, et une MR toute prête arrive avec le diff de mise en forme — il ne reste plus qu’à la relire et la fusionner."
+  },
+  {
+    "objectID": "index.html#exemple-de-pipeline-ci-gitlab",
+    "href": "index.html#exemple-de-pipeline-ci-gitlab",
+    "title": "rsonar en pratique",
+    "section": "Exemple de pipeline CI (GitLab)",
+    "text": "Exemple de pipeline CI (GitLab)\n\nVoir ce dépôt\n\nExtrait minimal de .gitlab-ci.yml :\nstages: [quality, autofix]\n\nrsonar-check:\n  stage: quality\n  script: R -e \"sonar_analyse('.'); export_junit()\"\n\nrsonar-fix:\n  stage: autofix\n  when: manual\n  script: R -e \"sonar_fix('.', create_mr = TRUE)\""
   },
   {
     "objectID": "index.html#suivre-lévolution-dans-le-temps",
@@ -315,20 +441,6 @@
     "text": "Exporter les résultats (CI)\nexport_junit(res, \"junit-results.xml\")      # GitLab/Jenkins\nexport_sarif(res, \"results.sarif\")          # GitHub Code Scanning\nexport_sonar_json(res, \"sonar-issues.json\") # SonarQube\nFormats standards : JUnit XML, SARIF 2.1.0, SonarQube Generic Issue Import."
   },
   {
-    "objectID": "index.html#aller-plus-loin-automatiser-les-corrections",
-    "href": "index.html#aller-plus-loin-automatiser-les-corrections",
-    "title": "rsonar en pratique",
-    "section": "Aller plus loin : automatiser les corrections",
-    "text": "Aller plus loin : automatiser les corrections\nsonar_fix(\".\", create_mr = TRUE) ouvre directement une Merge Request / Pull Request.\nJob CI rsonar-fix (tâche manuelle optionnelle) :\n\nInstalle air (install_air())\nFormate tous les fichiers R (sonar_fix())\nOuvre une MR/PR avec les corrections\n\n→ Plus de reformatage à la main : on déclenche, on relit, on fusionne."
-  },
-  {
-    "objectID": "index.html#pipeline-ci-gitlab",
-    "href": "index.html#pipeline-ci-gitlab",
-    "title": "rsonar en pratique",
-    "section": "Pipeline CI (GitLab)",
-    "text": "Pipeline CI (GitLab)\nstages: [quality, autofix]\n\nrsonar-check:\n  stage: quality\n  script: R -e \"sonar_analyse('.'); export_junit()\"\n\nrsonar-fix:\n  stage: autofix\n  when: manual\n  script: R -e \"sonar_fix('.', create_mr = TRUE)\""
-  },
-  {
     "objectID": "index.html#ce-quil-faut-retenir",
     "href": "index.html#ce-quil-faut-retenir",
     "title": "rsonar en pratique",
@@ -336,31 +448,31 @@
     "text": "Ce qu’il faut retenir\nrsonar = mesurer, corriger, sécuriser :\n\nLocalement : quality_score() et debt_index() pour un feedback immédiat\nEn profondeur : sonar_analyse() + sonar_report() + sonar_hotspots()\nDans la durée : sonar_diff() / sonar_trend() pour voir la note progresser\nEn CI : quality_gate() + exports + sonar_fix(create_mr = TRUE)"
   },
   {
-    "objectID": "index.html#conclusion",
-    "href": "index.html#conclusion",
+    "objectID": "index.html#version-2-refactoriserdocumenter",
+    "href": "index.html#version-2-refactoriserdocumenter",
     "title": "rsonar en pratique",
-    "section": "Conclusion",
-    "text": "Conclusion\nLa boucle pédagogique :\n\nPartir d’un code problématique\nMesurer la qualité (score, note, dette)\nAméliorer pas à pas (style → refactor → tests)\nVoir la note monter : 38% → 62% → 78% → 94%"
+    "section": "Version 2 — Refactoriser/documenter",
+    "text": "Version 2 — Refactoriser/documenter\nAméliorations manuelles :\n\nrenommer Part_SAU → calculer_part_sau et SAU_HA → sau_ha (snake_case)\nremplacer SAU_HA == NA → is.na() et class() == \"numeric\" → is.numeric()\nsupprimer la boucle for (i in 1:length(...)) print(i)\ncorriger l’erreur de syntaxe print(\"Fini\" et revenir au retour implicite\najouter la documentation roxygen2"
   },
   {
-    "objectID": "index.html#étape-0-score-note-et-hotspots-1",
-    "href": "index.html#étape-0-score-note-et-hotspots-1",
+    "objectID": "index.html#version-2-refactoriserdocumenter-1",
+    "href": "index.html#version-2-refactoriserdocumenter-1",
     "title": "rsonar en pratique",
-    "section": "Étape 0 — Score, note et hotspots",
-    "text": "Étape 0 — Score, note et hotspots"
+    "section": "Version 2 — Refactoriser/documenter",
+    "text": "Version 2 — Refactoriser/documenter\n#' Calculer la part de Surface Agricole Utile (SAU)\n#'\n#' @param sau_ha Numérique ou vecteur numérique. La SAU en hectares.\n#' @param surface_totale Numérique ou vecteur numérique. La surface totale en ha.\n#'\n#' @return La part de SAU en pourcentage.\n#' @export\ncalculer_part_sau &lt;- function(sau_ha = 80, surface_totale = 100) {\n  if (is.null(sau_ha) || is.null(surface_totale)) {\n    return(NULL)\n  }\n\n  if (any(is.na(sau_ha)) || any(is.na(surface_totale))) {\n    return(NULL)\n  }\n\n  if (any(sau_ha &lt; 0) || any(surface_totale &lt;= 0)) {\n    stop(\"Les surfaces doivent être positives et la surface totale &gt; 0.\")\n  }\n\n  res &lt;- (sau_ha / surface_totale) * 100\n\n  if (any(res &gt; 100)) {\n    warning(\"Au moins une valeur de SAU dépasse la surface totale.\")\n  }\n\n  return(res)\n}"
   },
   {
-    "objectID": "index.html#étape-1-corriger-le-style-automatiquement-1",
-    "href": "index.html#étape-1-corriger-le-style-automatiquement-1",
+    "objectID": "index.html#version-2-refactoriserdocumenter-2",
+    "href": "index.html#version-2-refactoriserdocumenter-2",
     "title": "rsonar en pratique",
-    "section": "Étape 1 — Corriger le style automatiquement",
-    "text": "Étape 1 — Corriger le style automatiquement\nAvec dry_run à FALSE, les scripts sont modifiés :\n# Application des corrections de style\nsonar_fix(\".\")"
+    "section": "Version 2 — Refactoriser/documenter",
+    "text": "Version 2 — Refactoriser/documenter"
   },
   {
-    "objectID": "index.html#étape-1-résultat-version-1-1",
-    "href": "index.html#étape-1-résultat-version-1-1",
+    "objectID": "index.html#a-propos-de-la-couverture",
+    "href": "index.html#a-propos-de-la-couverture",
     "title": "rsonar en pratique",
-    "section": "Étape 1 — Résultat (version 1)",
-    "text": "Étape 1 — Résultat (version 1)"
+    "section": "A propos de la couverture",
+    "text": "A propos de la couverture\n\n\n\n\n\n\n\nPourquoi la couverture ne bouge qu’à l’étape 3 ?\n\n\nLa couverture n’est mesurée que lorsqu’il existe des tests. Avant (étapes 0 à 2), elle vaut 0 % et n’engendre aucune pénalité. À l’étape 3, mesurer la couverture (7 %) déclenche la pénalité (80 − 7) × 5 = 365 min, qui fait retomber le score à 0 %.\n⚠️ Pour l’éviter, il faut couvrir tout le projet (couverture ≥ 80 %), pas une seule fonction. Sinon, c’est la couverture globale qui fait chuter le score."
   }
 ]
