@@ -224,6 +224,34 @@
     "text": "Key takeaways\nrsonar = measure, fix, secure:\n\nLocally: quality_score() and debt_index() for immediate feedback\nIn depth: sonar_analyse() + sonar_report() + sonar_hotspots()\nOver time: sonar_diff() / sonar_trend() to see the grade improve\nIn CI: quality_gate() + exports + sonar_fix(create_mr = TRUE)"
   },
   {
+    "objectID": "article-rsonar.html#le-principe-un-sonarqube-pensé-pour-r",
+    "href": "article-rsonar.html#le-principe-un-sonarqube-pensé-pour-r",
+    "title": "rsonar Presentation",
+    "section": "Le principe : un SonarQube pensé pour R",
+    "text": "Le principe : un SonarQube pensé pour R\nrsonar part d’un constat simple : l’écosystème R dispose déjà d’excellents outils d’analyse de qualité (lintr, styler, covr, goodpractice), mais chacun produit son propre rapport, dans son propre format, sans vue d’ensemble. rsonar vient les orchestrer et centraliser leurs résultats dans un rapport unique, interactif, avec une estimation de la dette technique — un peu comme le ferait SonarQube pour d’autres langages.\n\n\n\nOutil\nRôle\n\n\n\n\nlintr\nAnalyse statique — bugs, style, complexité\n\n\nstyler\nFormatage du code (style tidyverse)\n\n\ncovr\nCouverture de tests\n\n\ngoodpractice\nBonnes pratiques de packaging R\n\n\n\nLe package reprend même le vocabulaire de SonarQube pour rester familier aux équipes qui en ont l’habitude : les issues de lintr deviennent les “issues”, la couverture covr alimente le “Coverage”, et un véritable Quality Gate (quality_gate()) permet de fixer des seuils bloquants (couverture minimale, zéro erreur de lint, etc.)."
+  },
+  {
+    "objectID": "article-rsonar.html#un-usage-pensé-pour-tous-les-contextes",
+    "href": "article-rsonar.html#un-usage-pensé-pour-tous-les-contextes",
+    "title": "rsonar Presentation",
+    "section": "Un usage pensé pour tous les contextes",
+    "text": "Un usage pensé pour tous les contextes\nCe qui rend rsonar particulièrement pratique, c’est qu’il s’utilise aussi bien en local que dans une CI :\n\nEn local, pour un feedback instantané : la fonction quality_score(\".\") affiche directement un pourcentage de qualité et une note (A à E) dans la console de l’IDE, sans configuration de CI ni de forge.\nEn profondeur, pour une analyse complète : sonar_analyse() lance l’ensemble des outils sur un package et retourne un objet exploitable par toutes les autres fonctions.\n\nParmi les fonctionnalités clés :\n\nsonar_report() génère un rapport HTML interactif.\ndebt_index() calcule un indice de dette technique noté de A à E, à la manière du “Maintainability Rating” de SonarQube.\nsonar_hotspots() classe les fichiers à corriger en priorité, en fonction de leur dette technique.\nsonar_diff() compare deux analyses pour détecter des régressions de qualité entre deux versions.\nsonar_trend() permet de suivre l’évolution de la qualité dans le temps.\nexport_sonar_json(), export_sarif() et export_junit() exportent les résultats dans des formats standards, respectivement compatibles avec l’import générique d’issues SonarQube, le Code Scanning GitHub (SARIF), et les artefacts de tests GitLab CI (JUnit XML)."
+  },
+  {
+    "objectID": "article-rsonar.html#la-correction-automatique-avec-air",
+    "href": "article-rsonar.html#la-correction-automatique-avec-air",
+    "title": "rsonar Presentation",
+    "section": "La correction automatique avec air",
+    "text": "La correction automatique avec air\nAutre atout notable : l’intégration avec air, le formateur de code R rapide développé par Posit. Avec sonar_fix(), rsonar peut :\n\ninstaller air via install_air() ;\nformater automatiquement l’ensemble des fichiers R du projet ;\net, en une seule option, ouvrir directement une Merge Request ou une Pull Request avec les corrections.\n\nlibrary(rsonar)\n\n# Voir ce qui serait modifié, sans rien changer\nfix &lt;- sonar_fix(\".\", dry_run = TRUE)\n\n# Corriger automatiquement le style du code\nfix &lt;- sonar_fix(\".\")\n\n# Corriger ET ouvrir une Merge Request\nfix &lt;- sonar_fix(\".\", create_mr = TRUE)"
+  },
+  {
+    "objectID": "article-rsonar.html#le-point-fort-la-création-automatique-de-mrpr",
+    "href": "article-rsonar.html#le-point-fort-la-création-automatique-de-mrpr",
+    "title": "rsonar Presentation",
+    "section": "Le point fort : la création automatique de MR/PR",
+    "text": "Le point fort : la création automatique de MR/PR\nC’est sans doute la fonctionnalité la plus intéressante pour un usage en équipe : intégré dans une pipeline CI, rsonar peut ouvrir tout seul une Merge Request (GitLab) ou une Pull Request (GitHub) contenant les corrections de style. Le job rsonar-fix est conçu comme une tâche manuelle optionnelle de la pipeline :\n\ninstallation du formateur air ;\nexécution de sonar_fix() sur l’ensemble des fichiers R ;\nouverture automatique d’une MR/PR avec les changements.\n\nRésultat : plus besoin de reformater son code à la main avant de commiter, ni de faire des allers-retours en revue de code sur de simples questions de style. Un développeur déclenche le job, et une MR toute prête arrive avec le diff de mise en forme — il ne reste plus qu’à la relire et la fusionner.\nDeux dépôts GitLab illustrent concrètement ce fonctionnement :\n\nrproject_for_rsonar : un projet R d’exemple, qui sert de terrain de test pour exécuter rsonar “en conditions réelles” et déclencher la génération automatique de MR.\nci-templates-r : un dépôt de templates de pipelines CI réutilisables, dans lequel est notamment défini le job rsonar-fix qui orchestre l’installation d’air, le passage de sonar_fix() et la création de la Merge Request.\n\nEn combinant les deux, une équipe peut brancher rsonar sur n’importe quel projet R en quelques lignes de configuration GitLab CI, et bénéficier immédiatement d’un contrôle qualité centralisé… jusqu’à la correction automatisée du style de code, sans jamais quitter sa forge."
+  },
+  {
     "objectID": "index.html#rsonar-cest-quoi",
     "href": "index.html#rsonar-cest-quoi",
     "title": "rsonar en pratique",
@@ -446,33 +474,5 @@
     "title": "rsonar en pratique",
     "section": "Ce qu’il faut retenir",
     "text": "Ce qu’il faut retenir\nrsonar = mesurer, corriger, sécuriser :\n\nLocalement : quality_score() et debt_index() pour un feedback immédiat\nEn profondeur : sonar_analyse() + sonar_report() + sonar_hotspots()\nDans la durée : sonar_diff() / sonar_trend() pour voir la note progresser\nEn CI : quality_gate() + exports + sonar_fix(create_mr = TRUE)"
-  },
-  {
-    "objectID": "article-rsonar.html#le-principe-un-sonarqube-pensé-pour-r",
-    "href": "article-rsonar.html#le-principe-un-sonarqube-pensé-pour-r",
-    "title": "rsonar Presentation",
-    "section": "Le principe : un SonarQube pensé pour R",
-    "text": "Le principe : un SonarQube pensé pour R\nrsonar part d’un constat simple : l’écosystème R dispose déjà d’excellents outils d’analyse de qualité (lintr, styler, covr, goodpractice), mais chacun produit son propre rapport, dans son propre format, sans vue d’ensemble. rsonar vient les orchestrer et centraliser leurs résultats dans un rapport unique, interactif, avec une estimation de la dette technique — un peu comme le ferait SonarQube pour d’autres langages.\n\n\n\nOutil\nRôle\n\n\n\n\nlintr\nAnalyse statique — bugs, style, complexité\n\n\nstyler\nFormatage du code (style tidyverse)\n\n\ncovr\nCouverture de tests\n\n\ngoodpractice\nBonnes pratiques de packaging R\n\n\n\nLe package reprend même le vocabulaire de SonarQube pour rester familier aux équipes qui en ont l’habitude : les issues de lintr deviennent les “issues”, la couverture covr alimente le “Coverage”, et un véritable Quality Gate (quality_gate()) permet de fixer des seuils bloquants (couverture minimale, zéro erreur de lint, etc.)."
-  },
-  {
-    "objectID": "article-rsonar.html#un-usage-pensé-pour-tous-les-contextes",
-    "href": "article-rsonar.html#un-usage-pensé-pour-tous-les-contextes",
-    "title": "rsonar Presentation",
-    "section": "Un usage pensé pour tous les contextes",
-    "text": "Un usage pensé pour tous les contextes\nCe qui rend rsonar particulièrement pratique, c’est qu’il s’utilise aussi bien en local que dans une CI :\n\nEn local, pour un feedback instantané : la fonction quality_score(\".\") affiche directement un pourcentage de qualité et une note (A à E) dans la console de l’IDE, sans configuration de CI ni de forge.\nEn profondeur, pour une analyse complète : sonar_analyse() lance l’ensemble des outils sur un package et retourne un objet exploitable par toutes les autres fonctions.\n\nParmi les fonctionnalités clés :\n\nsonar_report() génère un rapport HTML interactif.\ndebt_index() calcule un indice de dette technique noté de A à E, à la manière du “Maintainability Rating” de SonarQube.\nsonar_hotspots() classe les fichiers à corriger en priorité, en fonction de leur dette technique.\nsonar_diff() compare deux analyses pour détecter des régressions de qualité entre deux versions.\nsonar_trend() permet de suivre l’évolution de la qualité dans le temps.\nexport_sonar_json(), export_sarif() et export_junit() exportent les résultats dans des formats standards, respectivement compatibles avec l’import générique d’issues SonarQube, le Code Scanning GitHub (SARIF), et les artefacts de tests GitLab CI (JUnit XML)."
-  },
-  {
-    "objectID": "article-rsonar.html#la-correction-automatique-avec-air",
-    "href": "article-rsonar.html#la-correction-automatique-avec-air",
-    "title": "rsonar Presentation",
-    "section": "La correction automatique avec air",
-    "text": "La correction automatique avec air\nAutre atout notable : l’intégration avec air, le formateur de code R rapide développé par Posit. Avec sonar_fix(), rsonar peut :\n\ninstaller air via install_air() ;\nformater automatiquement l’ensemble des fichiers R du projet ;\net, en une seule option, ouvrir directement une Merge Request ou une Pull Request avec les corrections.\n\nlibrary(rsonar)\n\n# Voir ce qui serait modifié, sans rien changer\nfix &lt;- sonar_fix(\".\", dry_run = TRUE)\n\n# Corriger automatiquement le style du code\nfix &lt;- sonar_fix(\".\")\n\n# Corriger ET ouvrir une Merge Request\nfix &lt;- sonar_fix(\".\", create_mr = TRUE)"
-  },
-  {
-    "objectID": "article-rsonar.html#le-point-fort-la-création-automatique-de-mrpr",
-    "href": "article-rsonar.html#le-point-fort-la-création-automatique-de-mrpr",
-    "title": "rsonar Presentation",
-    "section": "Le point fort : la création automatique de MR/PR",
-    "text": "Le point fort : la création automatique de MR/PR\nC’est sans doute la fonctionnalité la plus intéressante pour un usage en équipe : intégré dans une pipeline CI, rsonar peut ouvrir tout seul une Merge Request (GitLab) ou une Pull Request (GitHub) contenant les corrections de style. Le job rsonar-fix est conçu comme une tâche manuelle optionnelle de la pipeline :\n\ninstallation du formateur air ;\nexécution de sonar_fix() sur l’ensemble des fichiers R ;\nouverture automatique d’une MR/PR avec les changements.\n\nRésultat : plus besoin de reformater son code à la main avant de commiter, ni de faire des allers-retours en revue de code sur de simples questions de style. Un développeur déclenche le job, et une MR toute prête arrive avec le diff de mise en forme — il ne reste plus qu’à la relire et la fusionner.\nDeux dépôts GitLab illustrent concrètement ce fonctionnement :\n\nrproject_for_rsonar : un projet R d’exemple, qui sert de terrain de test pour exécuter rsonar “en conditions réelles” et déclencher la génération automatique de MR.\nci-templates-r : un dépôt de templates de pipelines CI réutilisables, dans lequel est notamment défini le job rsonar-fix qui orchestre l’installation d’air, le passage de sonar_fix() et la création de la Merge Request.\n\nEn combinant les deux, une équipe peut brancher rsonar sur n’importe quel projet R en quelques lignes de configuration GitLab CI, et bénéficier immédiatement d’un contrôle qualité centralisé… jusqu’à la correction automatisée du style de code, sans jamais quitter sa forge."
   }
 ]

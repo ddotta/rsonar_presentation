@@ -6,8 +6,8 @@
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-b85bc7c33db8c58e0ec93c3465666fed.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.10.18">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-b53751a350365c71b6c909e95f209ed1.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.6.42">
 
   <meta name="author" content="Damien Dotta">
   <title>rsonar Presentation – rsonar in practice</title>
@@ -17,16 +17,10 @@
   <link rel="stylesheet" href="site_libs/revealjs/dist/reset.css">
   <link rel="stylesheet" href="site_libs/revealjs/dist/reveal.css">
   <style>
-    /* Default styles provided by pandoc.
-    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
-    */
+    code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: 1.5em;}
-    div.column{flex: auto;}
-    @media screen {
-    div.columns{gap: min(4vw, 1.5em);}
-    div.column{overflow-x: auto;}
-    }
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
     ul.task-list li input[type="checkbox"] {
@@ -35,9 +29,8 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
-    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -48,7 +41,7 @@
     }
     @media print {
     pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
     }
     pre.numberSource code
       { counter-reset: source-line 0; }
@@ -70,7 +63,7 @@
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
     code span { color: #f8f8f2; } /* Normal */
-    code span.al { color: #f07178; } /* Alert */
+    code span.al { color: #f07178; background-color: #2a0f15; font-weight: bold; } /* Alert */
     code span.an { color: #d4d0ab; } /* Annotation */
     code span.at { color: #00e0e0; } /* Attribute */
     code span.bn { color: #d4d0ab; } /* BaseN */
@@ -101,7 +94,7 @@
     code span.vs { color: #abe338; } /* VerbatimString */
     code span.wa { color: #dcc6e0; } /* Warning */
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-4df01d85d5cf19cc6202400f4f043f84.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-949fcd71989a651394be00d684876026.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -205,7 +198,7 @@
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
 <div class="quarto-title-author-name">
-Damien Dotta
+Damien Dotta 
 </div>
 </div>
 </div>
@@ -304,13 +297,13 @@ Damien Dotta
 <section id="the-debt-ratio" class="slide level2">
 <h2>The debt ratio</h2>
 <p>Total debt is compared to a <strong>reference effort</strong>:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb1-1"><a aria-label="1"></a>ratio = D_total / (files × 30 min)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb1-1"><a></a>ratio = D_total / (files × 30 min)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
 <li><code>D_total</code>: sum of the penalties for all issues</li>
 <li><code>files × 30 min</code>: estimated effort to develop the files</li>
 </ul>
 <p>The <strong>quality score</strong> is derived from it:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb2-1"><a aria-label="1"></a>score = 100 × (1 - min(1, ratio))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb2-1"><a></a>score = 100 × (1 - min(1, ratio))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="the-sqale-rating-a-e" class="slide level2">
 <h2>The SQALE rating (A → E)</h2>
@@ -390,30 +383,30 @@ Damien Dotta
 <section id="the-starting-code-version-0-1" class="slide level2">
 <h2>The starting code (version 0)</h2>
 <p>Example <code>01_assignment_and_formatting.R</code>:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a aria-label="1"></a><span class="co"># File 1: Assignment operator &amp; formatting issues</span></span>
-<span id="cb4-2"><a aria-label="2"></a>Part_SAU <span class="ot">=</span> <span class="cf">function</span>( <span class="at">SAU_HA =</span> <span class="dv">80</span> , <span class="at">surface_totale =</span> <span class="dv">100</span> , <span class="at">unused_arg =</span> <span class="dv">10</span> ){</span>
-<span id="cb4-3"><a aria-label="3"></a>  var_inutile1 <span class="ot">=</span> <span class="dv">10</span></span>
-<span id="cb4-4"><a aria-label="4"></a>  var_inutile2 <span class="ot">=</span> <span class="dv">20</span></span>
-<span id="cb4-5"><a aria-label="5"></a>  </span>
-<span id="cb4-6"><a aria-label="6"></a>    <span class="cf">if</span>( SAU_HA <span class="sc">==</span> <span class="cn">NA</span> <span class="sc">||</span> surface_totale <span class="sc">==</span> <span class="cn">NA</span> <span class="sc">||</span> SAU_HA <span class="sc">==</span> <span class="cn">NULL</span> ){ <span class="fu">return</span>( <span class="cn">NULL</span> ) }</span>
-<span id="cb4-7"><a aria-label="7"></a>  </span>
-<span id="cb4-8"><a aria-label="8"></a>  <span class="cf">for</span>( i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>( SAU_HA ) ){ <span class="fu">print</span>( i ) }</span>
-<span id="cb4-9"><a aria-label="9"></a>  </span>
-<span id="cb4-10"><a aria-label="10"></a>    msg <span class="ot">=</span> <span class="fu">paste</span>( <span class="st">"SAU share: "</span> , SAU_HA , <span class="at">sep =</span> <span class="st">""</span> )</span>
-<span id="cb4-11"><a aria-label="11"></a>  </span>
-<span id="cb4-12"><a aria-label="12"></a>   <span class="cf">if</span>( <span class="fu">class</span>( SAU_HA ) <span class="sc">==</span> <span class="st">"numeric"</span> ){ <span class="fu">warning</span>( msg ) }</span>
-<span id="cb4-13"><a aria-label="13"></a></span>
-<span id="cb4-14"><a aria-label="14"></a>  <span class="fu">return</span>( <span class="fu">round</span>( res , <span class="dv">1</span> ) )</span>
-<span id="cb4-15"><a aria-label="15"></a>    </span>
-<span id="cb4-16"><a aria-label="16"></a>    <span class="fu">print</span>(<span class="st">"Done"</span></span>
-<span id="cb4-17"><a aria-label="17"></a><span class="er">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a></a><span class="co"># File 1: Assignment operator &amp; formatting issues</span></span>
+<span id="cb4-2"><a></a>Part_SAU <span class="ot">=</span> <span class="cf">function</span>( <span class="at">SAU_HA =</span> <span class="dv">80</span> , <span class="at">surface_totale =</span> <span class="dv">100</span> , <span class="at">unused_arg =</span> <span class="dv">10</span> ){</span>
+<span id="cb4-3"><a></a>  var_inutile1 <span class="ot">=</span> <span class="dv">10</span></span>
+<span id="cb4-4"><a></a>  var_inutile2 <span class="ot">=</span> <span class="dv">20</span></span>
+<span id="cb4-5"><a></a>  </span>
+<span id="cb4-6"><a></a>    <span class="cf">if</span>( SAU_HA <span class="sc">==</span> <span class="cn">NA</span> <span class="sc">||</span> surface_totale <span class="sc">==</span> <span class="cn">NA</span> <span class="sc">||</span> SAU_HA <span class="sc">==</span> <span class="cn">NULL</span> ){ <span class="fu">return</span>( <span class="cn">NULL</span> ) }</span>
+<span id="cb4-7"><a></a>  </span>
+<span id="cb4-8"><a></a>  <span class="cf">for</span>( i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>( SAU_HA ) ){ <span class="fu">print</span>( i ) }</span>
+<span id="cb4-9"><a></a>  </span>
+<span id="cb4-10"><a></a>    msg <span class="ot">=</span> <span class="fu">paste</span>( <span class="st">"SAU share: "</span> , SAU_HA , <span class="at">sep =</span> <span class="st">""</span> )</span>
+<span id="cb4-11"><a></a>  </span>
+<span id="cb4-12"><a></a>   <span class="cf">if</span>( <span class="fu">class</span>( SAU_HA ) <span class="sc">==</span> <span class="st">"numeric"</span> ){ <span class="fu">warning</span>( msg ) }</span>
+<span id="cb4-13"><a></a></span>
+<span id="cb4-14"><a></a>  <span class="fu">return</span>( <span class="fu">round</span>( res , <span class="dv">1</span> ) )</span>
+<span id="cb4-15"><a></a>    </span>
+<span id="cb4-16"><a></a>    <span class="fu">print</span>(<span class="st">"Done"</span></span>
+<span id="cb4-17"><a></a><span class="er">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Problems: naming, spacing, <code>=</code> vs <code>&lt;-</code>, no docs, line too long, no tests…</p>
 </section>
 <section id="version-0-scores" class="slide level2">
 <h2>Version 0 — Scores</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a aria-label="1"></a><span class="fu">library</span>(rsonar)</span>
-<span id="cb5-2"><a aria-label="2"></a>res <span class="ot">&lt;-</span> <span class="fu">sonar_analyse</span>(<span class="st">"."</span>)</span>
-<span id="cb5-3"><a aria-label="3"></a><span class="fu">sonar_report</span>(res)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a></a><span class="fu">library</span>(rsonar)</span>
+<span id="cb5-2"><a></a>res <span class="ot">&lt;-</span> <span class="fu">sonar_analyse</span>(<span class="st">"."</span>)</span>
+<span id="cb5-3"><a></a><span class="fu">sonar_report</span>(res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Displays a global interactive report.</p>
 
 <img data-src="images/report_version0.png" class="quarto-figure quarto-figure-center r-stretch"></section>
@@ -432,56 +425,56 @@ Damien Dotta
 <section id="step-1-fix-the-style-automatically" class="slide level2">
 <h2>Step 1 — Fix the style automatically</h2>
 <p><code>sonar_fix()</code> relies on <a href="https://github.com/posit-dev/air"><code>air</code></a>, Posit’s fast R formatter.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a aria-label="1"></a><span class="co"># Preview without modifying anything</span></span>
-<span id="cb6-2"><a aria-label="2"></a><span class="fu">sonar_fix</span>(<span class="st">"."</span>, <span class="at">dry_run =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a aria-label="1"></a>── rsonar <span class="fu">Fix</span> (dry<span class="sc">-</span>run) ──────────────────────────────────────────────────────────────────────────────────────────────────</span>
-<span id="cb7-2"><a aria-label="2"></a>ℹ Path<span class="sc">:</span> <span class="er">/</span>var<span class="sc">/</span>data<span class="sc">/</span>nfs<span class="sc">/</span>CERISE<span class="sc">/</span><span class="dv">00</span><span class="sc">-</span>Espace<span class="sc">-</span>Personnel<span class="sc">/</span>damien.dotta<span class="sc">/</span>rsonar_tests</span>
-<span id="cb7-3"><a aria-label="3"></a>ℹ <span class="dv">10</span> R <span class="fu">file</span>(s) found</span>
-<span id="cb7-4"><a aria-label="4"></a>✔ Report saved<span class="sc">:</span> sonar<span class="sc">-</span>fixes.json</span>
-<span id="cb7-5"><a aria-label="5"></a>                              </span>
-<span id="cb7-6"><a aria-label="6"></a>── rsonar Fix <span class="fu">Report</span> (dry<span class="sc">-</span>run <span class="sc">-</span> no files modified) ───────────────────────────────────────────────────────────────────────</span>
-<span id="cb7-7"><a aria-label="7"></a>ℹ Path <span class="sc">:</span> <span class="er">/</span>var<span class="sc">/</span>data<span class="sc">/</span>nfs<span class="sc">/</span>CERISE<span class="sc">/</span><span class="dv">00</span><span class="sc">-</span>Espace<span class="sc">-</span>Personnel<span class="sc">/</span>damien.dotta<span class="sc">/</span>rsonar_tests</span>
-<span id="cb7-8"><a aria-label="8"></a>ℹ Files <span class="sc">:</span> <span class="dv">10</span> scanned, <span class="dv">10</span> modified</span>
-<span id="cb7-9"><a aria-label="9"></a>ℹ Time <span class="sc">:</span> <span class="fl">1.8</span>s</span>
-<span id="cb7-10"><a aria-label="10"></a>                              </span>
-<span id="cb7-11"><a aria-label="11"></a>── Fixes applied               </span>
-<span id="cb7-12"><a aria-label="12"></a>  styler<span class="sc">:</span> <span class="dv">8</span>fixes to <span class="dv">10</span> <span class="fu">file</span>(s)</span>
-<span id="cb7-13"><a aria-label="13"></a>  spacing<span class="sc">:</span> <span class="dv">3</span></span>
-<span id="cb7-14"><a aria-label="14"></a>  true_false<span class="sc">:</span> <span class="dv">3</span></span>
-<span id="cb7-15"><a aria-label="15"></a>  commas<span class="sc">:</span> <span class="dv">1</span></span>
-<span id="cb7-16"><a aria-label="16"></a>  cleanup<span class="sc">:</span> <span class="dv">35</span></span>
-<span id="cb7-17"><a aria-label="17"></a>  assignment<span class="sc">:</span> <span class="dv">4</span></span>
-<span id="cb7-18"><a aria-label="18"></a>  unused_vars<span class="sc">:</span> <span class="dv">3</span></span>
-<span id="cb7-19"><a aria-label="19"></a>ℹ Run <span class="st">`</span><span class="at">sonar_fix()</span><span class="st">`</span> with <span class="st">`</span><span class="at">dry_run = FALSE</span><span class="st">`</span> to apply fixes.</span>
-<span id="cb7-20"><a aria-label="20"></a>✔ Applying fixes to <span class="dv">10</span> <span class="fu">file</span>(s) [<span class="dv">2</span>s]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a><span class="co"># Preview without modifying anything</span></span>
+<span id="cb6-2"><a></a><span class="fu">sonar_fix</span>(<span class="st">"."</span>, <span class="at">dry_run =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a>── rsonar <span class="fu">Fix</span> (dry<span class="sc">-</span>run) ──────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span id="cb7-2"><a></a>ℹ Path<span class="sc">:</span> <span class="er">/</span>var<span class="sc">/</span>data<span class="sc">/</span>nfs<span class="sc">/</span>CERISE<span class="sc">/</span><span class="dv">00</span><span class="sc">-</span>Espace<span class="sc">-</span>Personnel<span class="sc">/</span>damien.dotta<span class="sc">/</span>rsonar_tests</span>
+<span id="cb7-3"><a></a>ℹ <span class="dv">10</span> R <span class="fu">file</span>(s) found</span>
+<span id="cb7-4"><a></a>✔ Report saved<span class="sc">:</span> sonar<span class="sc">-</span>fixes.json</span>
+<span id="cb7-5"><a></a>                              </span>
+<span id="cb7-6"><a></a>── rsonar Fix <span class="fu">Report</span> (dry<span class="sc">-</span>run <span class="sc">-</span> no files modified) ───────────────────────────────────────────────────────────────────────</span>
+<span id="cb7-7"><a></a>ℹ Path <span class="sc">:</span> <span class="er">/</span>var<span class="sc">/</span>data<span class="sc">/</span>nfs<span class="sc">/</span>CERISE<span class="sc">/</span><span class="dv">00</span><span class="sc">-</span>Espace<span class="sc">-</span>Personnel<span class="sc">/</span>damien.dotta<span class="sc">/</span>rsonar_tests</span>
+<span id="cb7-8"><a></a>ℹ Files <span class="sc">:</span> <span class="dv">10</span> scanned, <span class="dv">10</span> modified</span>
+<span id="cb7-9"><a></a>ℹ Time <span class="sc">:</span> <span class="fl">1.8</span>s</span>
+<span id="cb7-10"><a></a>                              </span>
+<span id="cb7-11"><a></a>── Fixes applied               </span>
+<span id="cb7-12"><a></a>  styler<span class="sc">:</span> <span class="dv">8</span>fixes to <span class="dv">10</span> <span class="fu">file</span>(s)</span>
+<span id="cb7-13"><a></a>  spacing<span class="sc">:</span> <span class="dv">3</span></span>
+<span id="cb7-14"><a></a>  true_false<span class="sc">:</span> <span class="dv">3</span></span>
+<span id="cb7-15"><a></a>  commas<span class="sc">:</span> <span class="dv">1</span></span>
+<span id="cb7-16"><a></a>  cleanup<span class="sc">:</span> <span class="dv">35</span></span>
+<span id="cb7-17"><a></a>  assignment<span class="sc">:</span> <span class="dv">4</span></span>
+<span id="cb7-18"><a></a>  unused_vars<span class="sc">:</span> <span class="dv">3</span></span>
+<span id="cb7-19"><a></a>ℹ Run <span class="st">`</span><span class="at">sonar_fix()</span><span class="st">`</span> with <span class="st">`</span><span class="at">dry_run = FALSE</span><span class="st">`</span> to apply fixes.</span>
+<span id="cb7-20"><a></a>✔ Applying fixes to <span class="dv">10</span> <span class="fu">file</span>(s) [<span class="dv">2</span>s]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="step-1-fix-the-style-automatically-1" class="slide level2">
 <h2>Step 1 — Fix the style automatically</h2>
 <p>With dry_run set to FALSE, the scripts are modified:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a aria-label="1"></a><span class="co"># Apply style fixes</span></span>
-<span id="cb8-2"><a aria-label="2"></a><span class="fu">sonar_fix</span>(<span class="st">"."</span>, <span class="at">dry_run =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a><span class="co"># Apply style fixes</span></span>
+<span id="cb8-2"><a></a><span class="fu">sonar_fix</span>(<span class="st">"."</span>, <span class="at">dry_run =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="version-1-result" class="slide level2">
 <h2>Version 1 — Result</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a aria-label="1"></a><span class="co"># File 1: Assignment operator &amp; formatting issues</span></span>
-<span id="cb9-2"><a aria-label="2"></a>Part_SAU <span class="ot">=</span> <span class="cf">function</span>( <span class="at">SAU_HA =</span> <span class="dv">80</span> , <span class="at">surface_totale =</span> <span class="dv">100</span> , <span class="at">unused_arg =</span> <span class="dv">10</span> ){</span>
-<span id="cb9-3"><a aria-label="3"></a></span>
-<span id="cb9-4"><a aria-label="4"></a>  <span class="cf">if</span>( SAU_HA <span class="sc">==</span> <span class="cn">NA</span> <span class="sc">||</span> surface_totale <span class="sc">==</span> <span class="cn">NA</span> <span class="sc">||</span> SAU_HA <span class="sc">==</span> <span class="cn">NULL</span> ){ <span class="fu">return</span>( <span class="cn">NULL</span> ) }</span>
-<span id="cb9-5"><a aria-label="5"></a></span>
-<span id="cb9-6"><a aria-label="6"></a>  <span class="cf">for</span>( i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>( SAU_HA ) ){ <span class="fu">print</span>( i ) }</span>
-<span id="cb9-7"><a aria-label="7"></a></span>
-<span id="cb9-8"><a aria-label="8"></a>  msg <span class="ot">=</span> <span class="fu">paste</span>( <span class="st">"SAU share: "</span> , SAU_HA , <span class="at">sep =</span> <span class="st">""</span> )</span>
-<span id="cb9-9"><a aria-label="9"></a></span>
-<span id="cb9-10"><a aria-label="10"></a>  <span class="cf">if</span>( <span class="fu">class</span>( SAU_HA ) <span class="sc">==</span> <span class="st">"numeric"</span> ){ <span class="fu">warning</span>( msg ) }</span>
-<span id="cb9-11"><a aria-label="11"></a></span>
-<span id="cb9-12"><a aria-label="12"></a>  <span class="cf">if</span>( SAU_HA <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;&amp;</span> surface_totale <span class="sc">&gt;</span> <span class="dv">0</span> ){</span>
-<span id="cb9-13"><a aria-label="13"></a>    res <span class="ot">&lt;-</span> ( SAU_HA <span class="sc">/</span> surface_totale ) <span class="sc">*</span> <span class="dv">100</span></span>
-<span id="cb9-14"><a aria-label="14"></a>  }</span>
-<span id="cb9-15"><a aria-label="15"></a></span>
-<span id="cb9-16"><a aria-label="16"></a>  <span class="fu">return</span>( <span class="fu">round</span>( res , <span class="dv">1</span> ) )</span>
-<span id="cb9-17"><a aria-label="17"></a></span>
-<span id="cb9-18"><a aria-label="18"></a>  <span class="fu">print</span>(<span class="st">"Done"</span></span>
-<span id="cb9-19"><a aria-label="19"></a>        <span class="er">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="co"># File 1: Assignment operator &amp; formatting issues</span></span>
+<span id="cb9-2"><a></a>Part_SAU <span class="ot">=</span> <span class="cf">function</span>( <span class="at">SAU_HA =</span> <span class="dv">80</span> , <span class="at">surface_totale =</span> <span class="dv">100</span> , <span class="at">unused_arg =</span> <span class="dv">10</span> ){</span>
+<span id="cb9-3"><a></a></span>
+<span id="cb9-4"><a></a>  <span class="cf">if</span>( SAU_HA <span class="sc">==</span> <span class="cn">NA</span> <span class="sc">||</span> surface_totale <span class="sc">==</span> <span class="cn">NA</span> <span class="sc">||</span> SAU_HA <span class="sc">==</span> <span class="cn">NULL</span> ){ <span class="fu">return</span>( <span class="cn">NULL</span> ) }</span>
+<span id="cb9-5"><a></a></span>
+<span id="cb9-6"><a></a>  <span class="cf">for</span>( i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>( SAU_HA ) ){ <span class="fu">print</span>( i ) }</span>
+<span id="cb9-7"><a></a></span>
+<span id="cb9-8"><a></a>  msg <span class="ot">=</span> <span class="fu">paste</span>( <span class="st">"SAU share: "</span> , SAU_HA , <span class="at">sep =</span> <span class="st">""</span> )</span>
+<span id="cb9-9"><a></a></span>
+<span id="cb9-10"><a></a>  <span class="cf">if</span>( <span class="fu">class</span>( SAU_HA ) <span class="sc">==</span> <span class="st">"numeric"</span> ){ <span class="fu">warning</span>( msg ) }</span>
+<span id="cb9-11"><a></a></span>
+<span id="cb9-12"><a></a>  <span class="cf">if</span>( SAU_HA <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;&amp;</span> surface_totale <span class="sc">&gt;</span> <span class="dv">0</span> ){</span>
+<span id="cb9-13"><a></a>    res <span class="ot">&lt;-</span> ( SAU_HA <span class="sc">/</span> surface_totale ) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb9-14"><a></a>  }</span>
+<span id="cb9-15"><a></a></span>
+<span id="cb9-16"><a></a>  <span class="fu">return</span>( <span class="fu">round</span>( res , <span class="dv">1</span> ) )</span>
+<span id="cb9-17"><a></a></span>
+<span id="cb9-18"><a></a>  <span class="fu">print</span>(<span class="st">"Done"</span></span>
+<span id="cb9-19"><a></a>        <span class="er">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>It’s better, but not everything is fixed.</p>
 </section>
 <section id="version-1-results" class="slide level2">
@@ -511,34 +504,34 @@ Damien Dotta
 </section>
 <section id="version-2-refactordocument-1" class="slide level2">
 <h2>Version 2 — Refactor/document</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a aria-label="1"></a><span class="co">#' Calculate the Useful Agricultural Area (SAU) share</span></span>
-<span id="cb10-2"><a aria-label="2"></a><span class="co">#'</span></span>
-<span id="cb10-3"><a aria-label="3"></a><span class="co">#' @param sau_ha Numeric or numeric vector. The SAU in hectares.</span></span>
-<span id="cb10-4"><a aria-label="4"></a><span class="co">#' @param surface_totale Numeric or numeric vector. The total surface in ha.</span></span>
-<span id="cb10-5"><a aria-label="5"></a><span class="co">#'</span></span>
-<span id="cb10-6"><a aria-label="6"></a><span class="co">#' @return The SAU share as a percentage.</span></span>
-<span id="cb10-7"><a aria-label="7"></a><span class="co">#' @export</span></span>
-<span id="cb10-8"><a aria-label="8"></a>calculer_part_sau <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">sau_ha =</span> <span class="dv">80</span>, <span class="at">surface_totale =</span> <span class="dv">100</span>) {</span>
-<span id="cb10-9"><a aria-label="9"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(sau_ha) <span class="sc">||</span> <span class="fu">is.null</span>(surface_totale)) {</span>
-<span id="cb10-10"><a aria-label="10"></a>    <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
-<span id="cb10-11"><a aria-label="11"></a>  }</span>
-<span id="cb10-12"><a aria-label="12"></a></span>
-<span id="cb10-13"><a aria-label="13"></a>  <span class="cf">if</span> (<span class="fu">any</span>(<span class="fu">is.na</span>(sau_ha)) <span class="sc">||</span> <span class="fu">any</span>(<span class="fu">is.na</span>(surface_totale))) {</span>
-<span id="cb10-14"><a aria-label="14"></a>    <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
-<span id="cb10-15"><a aria-label="15"></a>  }</span>
-<span id="cb10-16"><a aria-label="16"></a></span>
-<span id="cb10-17"><a aria-label="17"></a>  <span class="cf">if</span> (<span class="fu">any</span>(sau_ha <span class="sc">&lt;</span> <span class="dv">0</span>) <span class="sc">||</span> <span class="fu">any</span>(surface_totale <span class="sc">&lt;=</span> <span class="dv">0</span>)) {</span>
-<span id="cb10-18"><a aria-label="18"></a>    <span class="fu">stop</span>(<span class="st">"Surfaces must be positive and the total surface must be &gt; 0."</span>)</span>
-<span id="cb10-19"><a aria-label="19"></a>  }</span>
-<span id="cb10-20"><a aria-label="20"></a></span>
-<span id="cb10-21"><a aria-label="21"></a>  res <span class="ot">&lt;-</span> (sau_ha <span class="sc">/</span> surface_totale) <span class="sc">*</span> <span class="dv">100</span></span>
-<span id="cb10-22"><a aria-label="22"></a></span>
-<span id="cb10-23"><a aria-label="23"></a>  <span class="cf">if</span> (<span class="fu">any</span>(res <span class="sc">&gt;</span> <span class="dv">100</span>)) {</span>
-<span id="cb10-24"><a aria-label="24"></a>    <span class="fu">warning</span>(<span class="st">"At least one SAU value exceeds the total surface."</span>)</span>
-<span id="cb10-25"><a aria-label="25"></a>  }</span>
-<span id="cb10-26"><a aria-label="26"></a></span>
-<span id="cb10-27"><a aria-label="27"></a>  <span class="fu">return</span>(res)</span>
-<span id="cb10-28"><a aria-label="28"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a><span class="co">#' Calculate the Useful Agricultural Area (SAU) share</span></span>
+<span id="cb10-2"><a></a><span class="co">#'</span></span>
+<span id="cb10-3"><a></a><span class="co">#' @param sau_ha Numeric or numeric vector. The SAU in hectares.</span></span>
+<span id="cb10-4"><a></a><span class="co">#' @param surface_totale Numeric or numeric vector. The total surface in ha.</span></span>
+<span id="cb10-5"><a></a><span class="co">#'</span></span>
+<span id="cb10-6"><a></a><span class="co">#' @return The SAU share as a percentage.</span></span>
+<span id="cb10-7"><a></a><span class="co">#' @export</span></span>
+<span id="cb10-8"><a></a>calculer_part_sau <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">sau_ha =</span> <span class="dv">80</span>, <span class="at">surface_totale =</span> <span class="dv">100</span>) {</span>
+<span id="cb10-9"><a></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(sau_ha) <span class="sc">||</span> <span class="fu">is.null</span>(surface_totale)) {</span>
+<span id="cb10-10"><a></a>    <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb10-11"><a></a>  }</span>
+<span id="cb10-12"><a></a></span>
+<span id="cb10-13"><a></a>  <span class="cf">if</span> (<span class="fu">any</span>(<span class="fu">is.na</span>(sau_ha)) <span class="sc">||</span> <span class="fu">any</span>(<span class="fu">is.na</span>(surface_totale))) {</span>
+<span id="cb10-14"><a></a>    <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb10-15"><a></a>  }</span>
+<span id="cb10-16"><a></a></span>
+<span id="cb10-17"><a></a>  <span class="cf">if</span> (<span class="fu">any</span>(sau_ha <span class="sc">&lt;</span> <span class="dv">0</span>) <span class="sc">||</span> <span class="fu">any</span>(surface_totale <span class="sc">&lt;=</span> <span class="dv">0</span>)) {</span>
+<span id="cb10-18"><a></a>    <span class="fu">stop</span>(<span class="st">"Surfaces must be positive and the total surface must be &gt; 0."</span>)</span>
+<span id="cb10-19"><a></a>  }</span>
+<span id="cb10-20"><a></a></span>
+<span id="cb10-21"><a></a>  res <span class="ot">&lt;-</span> (sau_ha <span class="sc">/</span> surface_totale) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb10-22"><a></a></span>
+<span id="cb10-23"><a></a>  <span class="cf">if</span> (<span class="fu">any</span>(res <span class="sc">&gt;</span> <span class="dv">100</span>)) {</span>
+<span id="cb10-24"><a></a>    <span class="fu">warning</span>(<span class="st">"At least one SAU value exceeds the total surface."</span>)</span>
+<span id="cb10-25"><a></a>  }</span>
+<span id="cb10-26"><a></a></span>
+<span id="cb10-27"><a></a>  <span class="fu">return</span>(res)</span>
+<span id="cb10-28"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="version-2-refactordocument-2" class="slide level2">
 <h2>Version 2 — Refactor/document</h2>
@@ -556,38 +549,38 @@ Damien Dotta
 <section id="version-3-add-tests" class="slide level2">
 <h2>Version 3 — Add tests</h2>
 <p><code>tests/testthat/test-calculer-part-sau.R</code>:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a aria-label="1"></a><span class="fu">library</span>(testthat)</span>
-<span id="cb11-2"><a aria-label="2"></a></span>
-<span id="cb11-3"><a aria-label="3"></a><span class="fu">test_that</span>(<span class="st">"calculer_part_sau computes the SAU share on a vector"</span>, {</span>
-<span id="cb11-4"><a aria-label="4"></a>  res <span class="ot">&lt;-</span> <span class="fu">calculer_part_sau</span>(<span class="at">sau_ha =</span> <span class="fu">c</span>(<span class="dv">80</span>, <span class="dv">120</span>), <span class="at">surface_totale =</span> <span class="dv">200</span>)</span>
-<span id="cb11-5"><a aria-label="5"></a></span>
-<span id="cb11-6"><a aria-label="6"></a>  <span class="fu">expect_equal</span>(res, <span class="fu">c</span>(<span class="dv">40</span>, <span class="dv">60</span>))</span>
-<span id="cb11-7"><a aria-label="7"></a>})</span>
-<span id="cb11-8"><a aria-label="8"></a></span>
-<span id="cb11-9"><a aria-label="9"></a><span class="fu">test_that</span>(<span class="st">"calculer_part_sau applies the default values"</span>, {</span>
-<span id="cb11-10"><a aria-label="10"></a>  res <span class="ot">&lt;-</span> <span class="fu">calculer_part_sau</span>()</span>
-<span id="cb11-11"><a aria-label="11"></a></span>
-<span id="cb11-12"><a aria-label="12"></a>  <span class="fu">expect_equal</span>(res, <span class="dv">80</span>)</span>
-<span id="cb11-13"><a aria-label="13"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a><span class="fu">library</span>(testthat)</span>
+<span id="cb11-2"><a></a></span>
+<span id="cb11-3"><a></a><span class="fu">test_that</span>(<span class="st">"calculer_part_sau computes the SAU share on a vector"</span>, {</span>
+<span id="cb11-4"><a></a>  res <span class="ot">&lt;-</span> <span class="fu">calculer_part_sau</span>(<span class="at">sau_ha =</span> <span class="fu">c</span>(<span class="dv">80</span>, <span class="dv">120</span>), <span class="at">surface_totale =</span> <span class="dv">200</span>)</span>
+<span id="cb11-5"><a></a></span>
+<span id="cb11-6"><a></a>  <span class="fu">expect_equal</span>(res, <span class="fu">c</span>(<span class="dv">40</span>, <span class="dv">60</span>))</span>
+<span id="cb11-7"><a></a>})</span>
+<span id="cb11-8"><a></a></span>
+<span id="cb11-9"><a></a><span class="fu">test_that</span>(<span class="st">"calculer_part_sau applies the default values"</span>, {</span>
+<span id="cb11-10"><a></a>  res <span class="ot">&lt;-</span> <span class="fu">calculer_part_sau</span>()</span>
+<span id="cb11-11"><a></a></span>
+<span id="cb11-12"><a></a>  <span class="fu">expect_equal</span>(res, <span class="dv">80</span>)</span>
+<span id="cb11-13"><a></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="version-3-add-tests-12" class="slide level2">
 <h2>Version 3 — Add tests (1/2)</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a aria-label="1"></a>res <span class="ot">&lt;-</span> <span class="fu">sonar_analyse</span>(<span class="st">"."</span>,<span class="at">include_coverage =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a></a>res <span class="ot">&lt;-</span> <span class="fu">sonar_analyse</span>(<span class="st">"."</span>,<span class="at">include_coverage =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 <img data-src="images/report_version3_ss_coverage.png" class="quarto-figure quarto-figure-center r-stretch"></section>
 <section id="version-3-add-tests-22" class="slide level2">
 <h2>Version 3 — Add tests (2/2)</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a aria-label="1"></a>res <span class="ot">&lt;-</span> <span class="fu">sonar_analyse</span>(<span class="st">"."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a></a>res <span class="ot">&lt;-</span> <span class="fu">sonar_analyse</span>(<span class="st">"."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 <img data-src="images/report_version3.png" class="quarto-figure quarto-figure-center r-stretch"></section>
 <section id="why-does-the-score-drop-to-0" class="slide level2">
 <h2>Why does the score drop to 0 %?</h2>
 <p><code>sonar_analyse(".")</code> <strong>without</strong> <code>include_coverage = FALSE</code> measures coverage as soon as a <code>tests/</code> folder exists. Here it is only <strong>7 %</strong>: only one function is tested among the 10 scripts.</p>
 <p>The coverage penalty then applies:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb14-1"><a aria-label="1"></a>(80 − 7) × 5 = 365 min</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb14-1"><a></a>(80 − 7) × 5 = 365 min</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>This penalty alone exceeds the reference effort (11 files × 30 = 330 min):</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb15-1"><a aria-label="1"></a>ratio = debt / 330 ≥ 1</span>
-<span id="cb15-2"><a aria-label="2"></a>score = 100 × (1 − 1) = 0 %</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb15-1"><a></a>ratio = debt / 330 ≥ 1</span>
+<span id="cb15-2"><a></a>score = 100 × (1 − 1) = 0 %</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>→ <strong>Score 0 % · Grade E</strong>. It is the <strong>global</strong> project coverage that matters, not that of a single file.</p>
 </section>
 <section id="version-4---complete-repository-with-tests-and-high-coverage" class="slide level2">
@@ -686,24 +679,24 @@ Damien Dotta
 <li>See <a href="https://gitlab.com/ddotta/ci-templates-r">this repository</a></li>
 </ul>
 <p>Minimal excerpt from <code>.gitlab-ci.yml</code>:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb16-1"><a aria-label="1"></a><span class="fu">stages</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">quality</span><span class="kw">,</span><span class="at"> autofix</span><span class="kw">]</span></span>
-<span id="cb16-2"><a aria-label="2"></a></span>
-<span id="cb16-3"><a aria-label="3"></a><span class="fu">rsonar-check</span><span class="kw">:</span></span>
-<span id="cb16-4"><a aria-label="4"></a><span class="at">  </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> quality</span></span>
-<span id="cb16-5"><a aria-label="5"></a><span class="at">  </span><span class="fu">script</span><span class="kw">:</span><span class="at"> R -e "sonar_analyse('.'); export_junit()"</span></span>
-<span id="cb16-6"><a aria-label="6"></a></span>
-<span id="cb16-7"><a aria-label="7"></a><span class="fu">rsonar-fix</span><span class="kw">:</span></span>
-<span id="cb16-8"><a aria-label="8"></a><span class="at">  </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> autofix</span></span>
-<span id="cb16-9"><a aria-label="9"></a><span class="at">  </span><span class="fu">when</span><span class="kw">:</span><span class="at"> manual</span></span>
-<span id="cb16-10"><a aria-label="10"></a><span class="at">  </span><span class="fu">script</span><span class="kw">:</span><span class="at"> R -e "sonar_fix('.', create_mr = TRUE)"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb16-1"><a></a><span class="fu">stages</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">quality</span><span class="kw">,</span><span class="at"> autofix</span><span class="kw">]</span></span>
+<span id="cb16-2"><a></a></span>
+<span id="cb16-3"><a></a><span class="fu">rsonar-check</span><span class="kw">:</span></span>
+<span id="cb16-4"><a></a><span class="at">  </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> quality</span></span>
+<span id="cb16-5"><a></a><span class="at">  </span><span class="fu">script</span><span class="kw">:</span><span class="at"> R -e "sonar_analyse('.'); export_junit()"</span></span>
+<span id="cb16-6"><a></a></span>
+<span id="cb16-7"><a></a><span class="fu">rsonar-fix</span><span class="kw">:</span></span>
+<span id="cb16-8"><a></a><span class="at">  </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> autofix</span></span>
+<span id="cb16-9"><a></a><span class="at">  </span><span class="fu">when</span><span class="kw">:</span><span class="at"> manual</span></span>
+<span id="cb16-10"><a></a><span class="at">  </span><span class="fu">script</span><span class="kw">:</span><span class="at"> R -e "sonar_fix('.', create_mr = TRUE)"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="track-the-evolution-over-time" class="slide level2">
 <h2>Track the evolution over time</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a aria-label="1"></a><span class="co"># Compare two analyses (before / after)</span></span>
-<span id="cb17-2"><a aria-label="2"></a><span class="fu">sonar_diff</span>(res_v3, res_v0)</span>
-<span id="cb17-3"><a aria-label="3"></a></span>
-<span id="cb17-4"><a aria-label="4"></a><span class="co"># Store scores over time to track the trend</span></span>
-<span id="cb17-5"><a aria-label="5"></a><span class="fu">sonar_trend</span>(res, <span class="at">file =</span> <span class="st">"rsonar-history.json"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a></a><span class="co"># Compare two analyses (before / after)</span></span>
+<span id="cb17-2"><a></a><span class="fu">sonar_diff</span>(res_v3, res_v0)</span>
+<span id="cb17-3"><a></a></span>
+<span id="cb17-4"><a></a><span class="co"># Store scores over time to track the trend</span></span>
+<span id="cb17-5"><a></a><span class="fu">sonar_trend</span>(res, <span class="at">file =</span> <span class="st">"rsonar-history.json"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
 <li><code>sonar_diff()</code>: new issues, fixed issues</li>
 <li><code>sonar_trend()</code>: evolution curve of the grade</li>
@@ -711,9 +704,9 @@ Damien Dotta
 </section>
 <section id="export-the-results-ci" class="slide level2">
 <h2>Export the results (CI)</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a aria-label="1"></a><span class="fu">export_junit</span>(res, <span class="st">"junit-results.xml"</span>)      <span class="co"># GitLab/Jenkins</span></span>
-<span id="cb18-2"><a aria-label="2"></a><span class="fu">export_sarif</span>(res, <span class="st">"results.sarif"</span>)          <span class="co"># GitHub Code Scanning</span></span>
-<span id="cb18-3"><a aria-label="3"></a><span class="fu">export_sonar_json</span>(res, <span class="st">"sonar-issues.json"</span>) <span class="co"># SonarQube</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a><span class="fu">export_junit</span>(res, <span class="st">"junit-results.xml"</span>)      <span class="co"># GitLab/Jenkins</span></span>
+<span id="cb18-2"><a></a><span class="fu">export_sarif</span>(res, <span class="st">"results.sarif"</span>)          <span class="co"># GitHub Code Scanning</span></span>
+<span id="cb18-3"><a></a><span class="fu">export_sonar_json</span>(res, <span class="st">"sonar-issues.json"</span>) <span class="co"># SonarQube</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Standard formats: JUnit XML, SARIF 2.1.0, SonarQube Generic Issue Import.</p>
 </section>
 <section id="key-takeaways" class="slide level2">
@@ -921,7 +914,7 @@ Damien Dotta
         margin: 0.1,
 
         math: {
-          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
           config: 'TeX-AMS_HTML-full',
           tex2jax: {
             inlineMath: [['\\(','\\)']],
@@ -948,173 +941,190 @@ Damien Dotta
       });
     </script>
     <script id="quarto-html-after-body" type="application/javascript">
-      window.document.addEventListener("DOMContentLoaded", function (event) {
-        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
-        tabsets.forEach(function(tabset) {
-          const tabby = new Tabby('#' + tabset.id);
-        });
-        const isCodeAnnotation = (el) => {
-          for (const clz of el.classList) {
-            if (clz.startsWith('code-annotation-')) {                     
-              return true;
-            }
-          }
-          return false;
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
         }
-        const onCopySuccess = function(e) {
-          // button target
-          const button = e.trigger;
-          // don't keep focus
-          button.blur();
-          // flash "checked"
-          button.classList.add('code-copy-button-checked');
-          var currentTitle = button.getAttribute("title");
-          button.setAttribute("title", "Copied!");
-          let tooltip;
-          if (window.bootstrap) {
-            button.setAttribute("data-bs-toggle", "tooltip");
-            button.setAttribute("data-bs-placement", "left");
-            button.setAttribute("data-bs-title", "Copied!");
-            tooltip = new bootstrap.Tooltip(button, 
-              { trigger: "manual", 
-                customClass: "code-copy-button-tooltip",
-                offset: [0, -8]});
-            tooltip.show();    
-          }
-          setTimeout(function() {
-            if (tooltip) {
-              tooltip.hide();
-              button.removeAttribute("data-bs-title");
-              button.removeAttribute("data-bs-toggle");
-              button.removeAttribute("data-bs-placement");
-            }
-            button.setAttribute("title", currentTitle);
-            button.classList.remove('code-copy-button-checked');
-          }, 1000);
-          // clear code selection
-          e.clearSelection();
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
         }
-        const getTextToCopy = function(trigger) {
-          const outerScaffold = trigger.parentElement.cloneNode(true);
-          const codeEl = outerScaffold.querySelector('code');
+      }
+      toggleBodyColorPrimary();  
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const isCodeAnnotation = (el) => {
+        for (const clz of el.classList) {
+          if (clz.startsWith('code-annotation-')) {                     
+            return true;
+          }
+        }
+        return false;
+      }
+      const onCopySuccess = function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute("data-bs-toggle", "tooltip");
+          button.setAttribute("data-bs-placement", "left");
+          button.setAttribute("data-bs-title", "Copied!");
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
+              customClass: "code-copy-button-tooltip",
+              offset: [0, -8]});
+          tooltip.show();    
+        }
+        setTimeout(function() {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute("data-bs-title");
+            button.removeAttribute("data-bs-toggle");
+            button.removeAttribute("data-bs-placement");
+          }
+          button.setAttribute("title", currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      }
+      const getTextToCopy = function(trigger) {
+          const codeEl = trigger.previousElementSibling.cloneNode(true);
           for (const childEl of codeEl.children) {
             if (isCodeAnnotation(childEl)) {
               childEl.remove();
             }
           }
           return codeEl.innerText;
-        }
-        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-          text: getTextToCopy
-        });
-        clipboard.on('success', onCopySuccess);
-        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-            text: getTextToCopy,
-            container: window.document.getElementById('quarto-embedded-source-code-modal')
-          });
-          clipboardModal.on('success', onCopySuccess);
-        }
-          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-          var mailtoRegex = new RegExp(/^mailto:/);
-            var filterRegex = new RegExp('/' + window.location.host + '/');
-          var isInternal = (href) => {
-              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-          }
-          // Inspect non-navigation links and adorn them if external
-         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-          for (var i=0; i<links.length; i++) {
-            const link = links[i];
-            if (!isInternal(link.href)) {
-              // undo the damage that might have been done by quarto-nav.js in the case of
-              // links that we want to consider external
-              if (link.dataset.originalHref !== undefined) {
-                link.href = link.dataset.originalHref;
-              }
-            }
-          }
-        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-          const config = {
-            allowHTML: true,
-            maxWidth: 500,
-            delay: 100,
-            arrow: false,
-            appendTo: function(el) {
-                return el.closest('section.slide') || el.parentElement;
-            },
-            interactive: true,
-            interactiveBorder: 10,
-            theme: 'light-border',
-            placement: 'bottom-start',
-          };
-          if (contentFn) {
-            config.content = contentFn;
-          }
-          if (onTriggerFn) {
-            config.onTrigger = onTriggerFn;
-          }
-          if (onUntriggerFn) {
-            config.onUntrigger = onUntriggerFn;
-          }
-            config['offset'] = [0,0];
-            config['maxWidth'] = 700;
-          window.tippy(el, config); 
-        }
-        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-        for (var i=0; i<noterefs.length; i++) {
-          const ref = noterefs[i];
-          tippyHover(ref, function() {
-            // use id or data attribute instead here
-            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-            try { href = new URL(href).hash; } catch {}
-            const id = href.replace(/^#\/?/, "");
-            const note = window.document.getElementById(id);
-            if (note) {
-              return note.innerHTML;
-            } else {
-              return "";
-            }
-          });
-        }
-        const findCites = (el) => {
-          const parentEl = el.parentElement;
-          if (parentEl) {
-            const cites = parentEl.dataset.cites;
-            if (cites) {
-              return {
-                el,
-                cites: cites.split(' ')
-              };
-            } else {
-              return findCites(el.parentElement)
-            }
-          } else {
-            return undefined;
-          }
-        };
-        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-        for (var i=0; i<bibliorefs.length; i++) {
-          const ref = bibliorefs[i];
-          const citeInfo = findCites(ref);
-          if (citeInfo) {
-            tippyHover(citeInfo.el, function() {
-              var popup = window.document.createElement('div');
-              citeInfo.cites.forEach(function(cite) {
-                var citeDiv = window.document.createElement('div');
-                citeDiv.classList.add('hanging-indent');
-                citeDiv.classList.add('csl-entry');
-                var biblioDiv = window.document.getElementById('ref-' + cite);
-                if (biblioDiv) {
-                  citeDiv.innerHTML = biblioDiv.innerHTML;
-                }
-                popup.appendChild(citeDiv);
-              });
-              return popup.innerHTML;
-            });
-          }
-        }
+      }
+      const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+        text: getTextToCopy
       });
-      </script>
+      clipboard.on('success', onCopySuccess);
+      if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+        const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+          text: getTextToCopy,
+          container: window.document.getElementById('quarto-embedded-source-code-modal')
+        });
+        clipboardModal.on('success', onCopySuccess);
+      }
+        var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+        var mailtoRegex = new RegExp(/^mailto:/);
+          var filterRegex = new RegExp("https:\/\/ddotta\.github\.io\/rsonar_presentation\/");
+        var isInternal = (href) => {
+            return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+        }
+        // Inspect non-navigation links and adorn them if external
+     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+        for (var i=0; i<links.length; i++) {
+          const link = links[i];
+          if (!isInternal(link.href)) {
+            // undo the damage that might have been done by quarto-nav.js in the case of
+            // links that we want to consider external
+            if (link.dataset.originalHref !== undefined) {
+              link.href = link.dataset.originalHref;
+            }
+          }
+        }
+      function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+        const config = {
+          allowHTML: true,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start',
+        };
+        if (contentFn) {
+          config.content = contentFn;
+        }
+        if (onTriggerFn) {
+          config.onTrigger = onTriggerFn;
+        }
+        if (onUntriggerFn) {
+          config.onUntrigger = onUntriggerFn;
+        }
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note) {
+            return note.innerHTML;
+          } else {
+            return "";
+          }
+        });
+      }
+      const findCites = (el) => {
+        const parentEl = el.parentElement;
+        if (parentEl) {
+          const cites = parentEl.dataset.cites;
+          if (cites) {
+            return {
+              el,
+              cites: cites.split(' ')
+            };
+          } else {
+            return findCites(el.parentElement)
+          }
+        } else {
+          return undefined;
+        }
+      };
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const citeInfo = findCites(ref);
+        if (citeInfo) {
+          tippyHover(citeInfo.el, function() {
+            var popup = window.document.createElement('div');
+            citeInfo.cites.forEach(function(cite) {
+              var citeDiv = window.document.createElement('div');
+              citeDiv.classList.add('hanging-indent');
+              citeDiv.classList.add('csl-entry');
+              var biblioDiv = window.document.getElementById('ref-' + cite);
+              if (biblioDiv) {
+                citeDiv.innerHTML = biblioDiv.innerHTML;
+              }
+              popup.appendChild(citeDiv);
+            });
+            return popup.innerHTML;
+          });
+        }
+      }
+    });
+    </script>
     
 
 </body></html>
