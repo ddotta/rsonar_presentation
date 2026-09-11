@@ -15,17 +15,17 @@ format:
 
 ::: columns
 ::: {.column width="70%"}
-[`rsonar`](https://github.com/ddotta/rsonar) is the R equivalent of SonarQube: it centralizes R code quality measurement into one interactive report.
+[`rsonar`](https://github.com/ddotta/rsonar) is the R equivalent of SonarQube: it centralizes R code quality measurement into a single, interactive report.
 
 | Tool | Role |
 |---|---|
 | `lintr` | Static analysis — bugs, style, complexity |
 | `styler` | Code formatting |
 | `covr` | Test coverage |
-| `goodpractice` | Package best practices |
+| `goodpractice` | Packaging best practices |
 :::
 ::: {.column width="30%"}
-![](images/hex_rsonar.png){width=90%}
+![](images/hex_rsonar.png){fig-align="center"}
 :::
 :::
 
@@ -35,14 +35,14 @@ SonarQube vocabulary: *issues*, *Coverage*, **Quality Gate**.
 
 **SQALE** = *Software Quality Assessment based on Lifecycle Expectations*.
 
-The method popularized by **SonarQube** — and reused by `rsonar` — to turn code defects into an **estimated cost**, expressed in minutes.
+It is the method popularized by **SonarQube** — and adopted by `rsonar` — to turn code defects into an **estimated cost**, expressed in minutes.
 
 Four key concepts:
 
-1. **Penalty per issue** (minutes)
-2. **Debt ratio** (%)
-3. **SQALE rating** (A to E)
-4. **How the estimated cost is calculated**
+1. The **penalty per issue** (minutes)
+2. The **debt ratio** (%)
+3. The **SQALE rating** (grade from A to E)
+4. The **method for calculating the estimated cost**
 
 ## The penalty per issue
 
@@ -61,13 +61,13 @@ Total debt = the **sum** of these penalties.
 
 ## The debt ratio
 
-Total debt is compared to a **baseline effort**:
+Total debt is compared to a **reference effort**:
 
 ```text
 ratio = D_total / (files × 30 min)
 ```
 
-- `D_total`: sum of penalties across all issues
+- `D_total`: sum of the penalties for all issues
 - `files × 30 min`: estimated effort to develop the files
 
 The **quality score** is derived from it:
@@ -78,9 +78,9 @@ score = 100 × (1 - min(1, ratio))
 
 ## The SQALE rating (A → E)
 
-The ratio is converted into a **maintainability rating**:
+The ratio is converted into a **maintainability grade**:
 
-| Ratio | Rating | Meaning |
+| Ratio | Grade | Meaning |
 |---|---|---|
 | < 5 % | A | Excellent |
 | 5 – 10 % | B | Good |
@@ -92,206 +92,323 @@ The ratio is converted into a **maintainability rating**:
 
 1. **Count** the issues (errors, warnings, style, coverage, goodpractice)
 2. **Sum** their penalties → total debt in minutes
-3. **Divide** by the baseline effort → debt ratio
-4. **Convert** the ratio into a SQALE rating (A → E)
+3. **Divide** by the reference effort → debt ratio
+4. **Convert** the ratio into a SQALE grade (A → E)
 
-Baseline effort: SonarQube → `lines of code × 30 min`; `rsonar` → `files × 30 min`.
+Reference effort: SonarQube → `lines of code × 30 min`; `rsonar` → `files × 30 min`.
 
-Example: 2 errors + 2 warnings + 5 style = 90 min, against 300 min (10 files) → ratio 30 % → **rating D**.
+Example: 2 errors + 2 warnings + 5 style = 90 min, compared to 300 min (10 files) → 30 % ratio → **grade D**.
 
 ## The plan: measure, improve, measure
 
-A loop, on a single running example:
+A loop approach, using a running example:
 
 1. Start from **problematic code**
-2. **Measure** quality with `rsonar` (score, rating, debt)
+2. **Measure** quality with `rsonar` (score, grade, debt)
 3. **Improve** the code step by step
-4. **Re-measure** and watch the score go up
+4. **Re-measure** and watch the grade go up
+
 
 ## The starting code (version 0)
 
-File `R/analysis.R`:
+Project structure:  
+
+├── 01_assignment_and_formatting.R
+├── 02_boolean_and_naming.R
+├── 03_cyclomatic_complexity.R
+├── 04_unused_vars_and_syntax.R
+├── 05_non_standard_evaluation.R
+├── 06_function_length.R
+├── 07_string_quote_and_infix.R
+├── 08_unnecessary_concatenation.R
+├── 09_implicit_returns_and_braces.R
+└── 10_duplicate_code_and_magic_numbers.R
+
+## The starting code (version 0)
+Example `01_assignment_and_formatting.R`:
 
 ```{.r}
-addcols <- function(d,a,b){
-  if(nrow(d)==0){stop("empty")}
-  total=d[[a]]+d[[b]]
-  positive <- ifelse(total>0,T,F)
-  result=list(total=total, positive=positive)
-  return(result)
+# File 1: Assignment operator & formatting issues
+Part_SAU = function( SAU_HA = 80 , surface_totale = 100 , unused_arg = 10 ){
+  var_inutile1 = 10
+  var_inutile2 = 20
+  
+    if( SAU_HA == NA || surface_totale == NA || SAU_HA == NULL ){ return( NULL ) }
+  
+  for( i in 1:length( SAU_HA ) ){ print( i ) }
+  
+    msg = paste( "SAU share: " , SAU_HA , sep = "" )
+  
+   if( class( SAU_HA ) == "numeric" ){ warning( msg ) }
+
+  
+  if( SAU_HA > 0 && surface_totale > 0 ){
+    res = ( SAU_HA / surface_totale ) * 100
+  }
+  
+  return( round( res , 1 ) )
+    
+    print("Done"
 }
 ```
 
-Problems: naming, spacing, `=` vs `<-`, `T`/`F`, no docs, **no tests**.
+Problems: naming, spacing, `=` vs `<-`, no docs, line too long, no tests...
 
-## Step 0 — Measure the initial state
+## Version 0 — Scores
 
 ```{.r}
 library(rsonar)
 res <- sonar_analyse(".")
-print(res)
+sonar_report(res)
 ```
 
-```
--- rsonar -- Quality Report --
-  Files       : 1 R
-  Lint        : 8 issues (0 err / 3 warn / 5 style)
-  Style       : 1 non-compliant file
-  Coverage    : 0%
-  Goodpractice: 3 failures
+Displays a global interactive report.  
 
--- Technical Debt --
-  SQALE: E | Score: 38% | Duration: 4.2h
-```
 
-## Step 0 — Score, rating and hotspots
+![](images/report_version0.png){fig-align="center"}
+
+
+## Version 0 — Technical debt
+
+![](images/technical_debt.png){fig-align="center"}
+
+## Version 0 — Hotspots
+
+![](images/hotspots_version0.png){fig-align="center"}
+
+## Version 0 — Lint issues
+
+![](images/lint_issues.png){fig-align="center"}
+
+## Step 1 — Fix the style automatically
+
+`sonar_fix()` relies on [`air`](https://github.com/posit-dev/air), Posit's fast R formatter.
 
 ```{.r}
-quality_score(".")   # Score: 38% | Rating: E
-debt_index(res)      # Rating: E (critical debt)
-sonar_hotspots(res)  # → R/analysis.R first
-```
-
-- `debt_index()`: technical debt rating (A to E)
-- `sonar_hotspots()`: files to fix first
-- `sonar_report(res)`: interactive HTML report
-
-## Step 1 — Fix style automatically
-
-`sonar_fix()` is powered by [`air`](https://github.com/posit-dev/air), Posit's fast R formatter.
-
-```{.r}
-# Preview without changing anything
+# Preview without modifying anything
 sonar_fix(".", dry_run = TRUE)
-
-# Apply the style fixes
-sonar_fix(".")
 ```
-
-Fixes: spacing, `=` → `<-`, braces, indentation.
-
-## Step 1 — Result (version 1)
 
 ```{.r}
-addcols <- function(d, a, b) {
-  if (nrow(d) == 0) {
-    stop("empty")
-  }
-  total <- d[[a]] + d[[b]]
-  positive <- ifelse(total > 0, T, F)
-  result <- list(total = total, positive = positive)
-  return(result)
-}
+── rsonar Fix (dry-run) ──────────────────────────────────────────────────────────────────────────────────────────────────
+ℹ Path: /var/data/nfs/CERISE/00-Espace-Personnel/damien.dotta/rsonar_tests
+ℹ 10 R file(s) found
+✔ Report saved: sonar-fixes.json
+                              
+── rsonar Fix Report (dry-run - no files modified) ───────────────────────────────────────────────────────────────────────
+ℹ Path : /var/data/nfs/CERISE/00-Espace-Personnel/damien.dotta/rsonar_tests
+ℹ Files : 10 scanned, 10 modified
+ℹ Time : 1.8s
+                              
+── Fixes applied               
+  styler: 8fixes to 10 file(s)
+  spacing: 3
+  true_false: 3
+  commas: 1
+  cleanup: 35
+  assignment: 4
+  unused_vars: 3
+ℹ Run `sonar_fix()` with `dry_run = FALSE` to apply fixes.
+✔ Applying fixes to 10 file(s) [2s]
 ```
 
-Style is fixed, but naming, complexity and docs remain.
+## Step 1 — Fix the style automatically
 
-Re-measure: **Score 62% · Rating D**.
+With dry_run set to FALSE, the scripts are modified:  
+  
+```{.r}
+# Apply style fixes
+sonar_fix(".", dry_run = FALSE)
+```
 
-## Step 2 — Refactor and document
+
+## Version 1 — Result
+
+```{.r}
+# File 1: Assignment operator & formatting issues
+Part_SAU = function( SAU_HA = 80 , surface_totale = 100 , unused_arg = 10 ){
+
+  if( SAU_HA == NA || surface_totale == NA || SAU_HA == NULL ){ return( NULL ) }
+
+  for( i in 1:length( SAU_HA ) ){ print( i ) }
+
+  msg = paste( "SAU share: " , SAU_HA , sep = "" )
+
+  if( class( SAU_HA ) == "numeric" ){ warning( msg ) }
+
+  if( SAU_HA > 0 && surface_totale > 0 ){
+    res <- ( SAU_HA / surface_totale ) * 100
+  }
+
+  return( round( res , 1 ) )
+
+  print("Done"
+        }
+```
+
+It's better, but not everything is fixed.
+
+## Version 1 — Results
+
+![](images/report_version1.png){fig-align="center"}
+
+On our example script:  
+  
+
+![](images/lint_issues_version1.png){fig-align="center"}
+
+## Version 2 — Refactor and document
 
 Manual improvements:
 
-- `addcols` → `add_columns`, `d/a/b` → `data/col1/col2`
-- `ifelse(x > 0, T, F)` → `x > 0`
-- roxygen documentation added
+- rename `Part_SAU` → `calculer_part_sau` and `SAU_HA` → `sau_ha` (snake_case)
+- remove the unused variables (`unused_arg`, `var_inutile1`, `var_inutile2`)
+- replace `SAU_HA == NA` → `is.na()` and `class() == "numeric"` → `is.numeric()`
+- remove the stray `for (i in 1:length(...)) print(i)` loop
+- fix the syntax error `print("Done"` and return to the implicit return
+- add **roxygen2** documentation
 
 ```{.r}
-#' Sum two columns and flag positive rows
+#' Calculate the Useful Agricultural Area (SAU) share
 #'
-#' @param data A data frame.
-#' @param col1,col2 Column names to sum.
-#' @return A list with `total` and `positive`.
-add_columns <- function(data, col1, col2) {
-  if (nrow(data) == 0) {
-    stop("`data` must contain at least one row.")
+#' @param sau_ha Numeric or numeric vector. The SAU in hectares.
+#' @param surface_totale Numeric or numeric vector. The total surface in ha.
+#'
+#' @return The SAU share as a percentage.
+#' @export
+calculer_part_sau <- function(sau_ha = 80, surface_totale = 100) {
+  if (is.null(sau_ha) || is.null(surface_totale)) {
+    return(NULL)
   }
-  total <- data[[col1]] + data[[col2]]
-  list(total = total, positive = total > 0)
+
+  if (any(is.na(sau_ha)) || any(is.na(surface_totale))) {
+    return(NULL)
+  }
+
+  if (any(sau_ha < 0) || any(surface_totale <= 0)) {
+    stop("Surfaces must be positive and the total surface must be > 0.")
+  }
+
+  res <- (sau_ha / surface_totale) * 100
+
+  if (any(res > 100)) {
+    warning("At least one SAU value exceeds the total surface.")
+  }
+
+  return(res)
 }
 ```
 
-Re-measure: **Score 78% · Rating C**.
+## Version 2 — Refactor and document
 
-## Step 3 — Add tests
+![](images/report_version2.png){fig-align="center"}
 
-`tests/testthat/test-analysis.R`:
+![](images/lint_issues_version2.png){fig-align="center"}
+
+## Version 3 — Add tests
+
+`tests/testthat/test-calculer-part-sau.R`:
 
 ```{.r}
-test_that("add_columns sums and flags", {
-  data <- data.frame(a = c(1, -2, 3), b = c(0, 5, -5))
-  res <- add_columns(data, "a", "b")
+library(testthat)
 
-  expect_equal(res$total, c(1, 3, -2))
-  expect_equal(res$positive, c(TRUE, TRUE, FALSE))
+test_that("calculer_part_sau computes the SAU share on a vector", {
+  res <- calculer_part_sau(sau_ha = c(80, 120), surface_totale = 200)
+
+  expect_equal(res, c(40, 60))
+})
+
+test_that("calculer_part_sau applies the default values", {
+  res <- calculer_part_sau()
+
+  expect_equal(res, 80)
 })
 ```
 
-Coverage goes from 0% to 85%.
+## Version 3 — Add tests (1/2)
 
-Re-measure: **Score 94% · Rating A**.
+```{.r}
+res <- sonar_analyse(".",include_coverage = FALSE)
+```
 
-## The progress at a glance
+![](images/report_version3_ss_coverage.png){fig-align="center"}
 
-| Step | Action | Score | Rating | Coverage |
+## Version 3 — Add tests (2/2)
+
+```{.r}
+res <- sonar_analyse(".")
+```
+
+![](images/report_version3.png){fig-align="center"}
+
+
+## Why does the score drop to 0 %?
+
+`sonar_analyse(".")` **without** `include_coverage = FALSE` measures coverage as soon as a `tests/` folder exists. Here it is only **7 %**: `calculer_part_sau` is the only function tested among the 10 scripts.
+
+The coverage penalty then applies:
+
+```text
+(80 − 7) × 5 = 365 min
+```
+
+This penalty alone exceeds the reference effort (11 files × 30 = 330 min):
+
+```text
+ratio = debt / 330 ≥ 1
+score = 100 × (1 − 1) = 0 %
+```
+
+→ **Score 0 % · Grade E**. It is the **global** project coverage that matters, not that of a single file.
+
+## Version 4 - Complete repository with tests and high coverage
+ 
+- See [this repository](https://gitlab.com/ddotta/rproject_for_rsonar_with_tests) to get a complete R project with tests and very high coverage.
+
+![](images/report_version_finale.png){fig-align="center"}
+
+## The progression at a glance
+
+| Step | Action | Score | Grade | Coverage | Lint issues |
 |---|---|---|---|---|
-| 0 | Starting code | 38 % | E | 0 % |
-| 1 | Auto style (`sonar_fix`) | 62 % | D | 0 % |
-| 2 | Refactor + docs | 78 % | C | 0 % |
-| 3 | Tests added | 94 % | A | 85 % |
+| 0 | Initial code | 0 % | E | 0 % | 139 |
+| 1 | Auto style (`sonar_fix`) | 0 % | E | 0 % | 86 |
+| 2 | Refactoring + docs | 49 % | E | 0 % | 34 |
+| 3 | Tests added without penalty | 50 % | D | 0 % | 37 |
+| 3 | Tests added with penalty | 0 % | E | 7 % | 37 |
+| 4 | Complete repository | 98 % | A | 100 % | 4 |
 
 Each targeted improvement raises the score and lowers the debt.
 
-## Step 4 — Block regressions (Quality Gate)
+::: {.callout-note title="Why does coverage only change at step 3?"}
+Coverage is only **measured** when tests exist. Before (steps 0 to 2), it is 0 % and generates **no penalty**. At step 3, measuring coverage (**7 %**) triggers the penalty `(80 − 7) × 5 = 365 min`, which drops the score back to **0 %**.
 
-```{.r}
-quality_gate(res,
-  coverage_min    = 80,
-  lint_errors_max = 0,
-  rating_min      = "B",
-  fail_on_error   = TRUE)
-```
+⚠️ To avoid this, you must cover the **entire project** (coverage ≥ 80 %), not a single function. Otherwise, it is the **global** coverage that drives the score down.
+:::
 
-If a threshold is crossed, the CI pipeline blocks automatically.
-
-This is the guard that **prevents the rating from dropping back**.
-
-## Track the evolution over time
-
-```{.r}
-# Compare two analyses (before / after)
-sonar_diff(res_v3, res_v0)
-
-# Save scores to plot the trend
-sonar_trend(res, file = "rsonar-history.json")
-```
-
-- `sonar_diff()`: new issues, fixed issues
-- `sonar_trend()`: rating evolution curve
-
-## Export results (CI)
-
-```{.r}
-export_junit(res, "junit-results.xml")      # GitLab/Jenkins
-export_sarif(res, "results.sarif")          # GitHub Code Scanning
-export_sonar_json(res, "sonar-issues.json") # SonarQube
-```
-
-Standard formats: JUnit XML, SARIF 2.1.0, SonarQube Generic Issue Import.
 
 ## Going further: automate the fixes
 
-`sonar_fix(".", create_mr = TRUE)` opens a Merge/Pull Request directly.
+The `rsonar` package can be integrated into a CI/CD pipeline to automate quality measurement and code reformatting.
 
-CI job `rsonar-fix` (optional manual task):
+- See [this repository](https://gitlab.com/ddotta/rproject_for_rsonar)
+
+`sonar_fix(".", create_mr = TRUE)` directly opens a Merge Request.
+
+CI job `rsonar-fix`:
 
 1. Installs `air` (`install_air()`)
 2. Formats all R files (`sonar_fix()`)
 3. Opens an MR/PR with the fixes
 
-→ No more manual reformatting: trigger, review, merge.
 
-## CI Pipeline (GitLab)
+Result: no more need to reformat code by hand before committing, nor to go back and forth in code review over simple style questions. A developer triggers the job, and a ready-made MR arrives with the formatting diff — all that's left is to review and merge it.
+
+## CI pipeline example (GitLab)
+
+- See [this repository](https://gitlab.com/ddotta/ci-templates-r)  
+
+Minimal excerpt from `.gitlab-ci.yml`:  
 
 ```yaml
 stages: [quality, autofix]
@@ -306,23 +423,38 @@ rsonar-fix:
   script: R -e "sonar_fix('.', create_mr = TRUE)"
 ```
 
+## Track the evolution over time
+
+```{.r}
+# Compare two analyses (before / after)
+sonar_diff(res_v3, res_v0)
+
+# Store scores over time to track the trend
+sonar_trend(res, file = "rsonar-history.json")
+```
+
+- `sonar_diff()`: new issues, fixed issues
+- `sonar_trend()`: evolution curve of the grade
+
+## Export the results (CI)
+
+```{.r}
+export_junit(res, "junit-results.xml")      # GitLab/Jenkins
+export_sarif(res, "results.sarif")          # GitHub Code Scanning
+export_sonar_json(res, "sonar-issues.json") # SonarQube
+```
+
+Standard formats: JUnit XML, SARIF 2.1.0, SonarQube Generic Issue Import.
+
 ## Key takeaways
 
 `rsonar` = measure, fix, secure:
 
-- **Locally**: `quality_score()` and `debt_index()` for instant feedback
+- **Locally**: `quality_score()` and `debt_index()` for immediate feedback
 - **In depth**: `sonar_analyse()` + `sonar_report()` + `sonar_hotspots()`
-- **Over time**: `sonar_diff()` / `sonar_trend()` to watch the rating improve
+- **Over time**: `sonar_diff()` / `sonar_trend()` to see the grade improve
 - **In CI**: `quality_gate()` + exports + `sonar_fix(create_mr = TRUE)`
 
-## Conclusion
-
-The pedagogical loop:
-
-1. Start from problematic code
-2. Measure quality (score, rating, debt)
-3. Improve step by step (style → refactor → tests)
-4. Watch the rating climb: **38% → 62% → 78% → 94%**
 
 ---
 

@@ -228,13 +228,13 @@ sonar_fix(".", dry_run = FALSE)
 # File 1: Assignment operator & formatting issues
 Part_SAU = function( SAU_HA = 80 , surface_totale = 100 , unused_arg = 10 ){
 
-    if( SAU_HA == NA || surface_totale == NA || SAU_HA == NULL ){ return( NULL ) }
+  if( SAU_HA == NA || surface_totale == NA || SAU_HA == NULL ){ return( NULL ) }
 
   for( i in 1:length( SAU_HA ) ){ print( i ) }
 
-    msg = paste( "Part SAU: " , SAU_HA , sep = "" )
+  msg = paste( "Part SAU: " , SAU_HA , sep = "" )
 
-   if( class( SAU_HA ) == "numeric" ){ warning( msg ) }
+  if( class( SAU_HA ) == "numeric" ){ warning( msg ) }
 
   if( SAU_HA > 0 && surface_totale > 0 ){
     res <- ( SAU_HA / surface_totale ) * 100
@@ -242,8 +242,8 @@ Part_SAU = function( SAU_HA = 80 , surface_totale = 100 , unused_arg = 10 ){
 
   return( round( res , 1 ) )
 
-    print("Fini"
-}
+  print("Fini"
+        }
 ```
 
 C'est mieux mais tout n'est pas réglé.
@@ -325,41 +325,103 @@ test_that("calculer_part_sau applique les valeurs par défaut", {
 })
 ```
 
-## Version 3 — Ajouter des tests
+## Version 3 — Ajouter des tests (1/2)
 
+```{.r}
+res <- sonar_analyse(".",include_coverage = FALSE)
+```
+
+![](images/report_version3_ss_coverage.png){fig-align="center"}
+
+## Version 3 — Ajouter des tests (2/2)
+
+```{.r}
+res <- sonar_analyse(".")
+```
 
 ![](images/report_version3.png){fig-align="center"}
 
+
+## Pourquoi le score tombe à 0 % ?
+
+`sonar_analyse(".")` **sans** `include_coverage = FALSE` mesure la couverture dès qu'un dossier `tests/` existe. Ici, elle n'est que de **7 %** : `calculer_part_sau` est la seule fonction testée sur les 10 scripts.
+
+La pénalité de couverture s'applique alors :
+
+```text
+(80 − 7) × 5 = 365 min
+```
+
+Cette pénalité dépasse à elle seule l'effort de référence (11 fichiers × 30 = 330 min) :
+
+```text
+ratio = dette / 330 ≥ 1
+score = 100 × (1 − 1) = 0 %
+```
+
+→ **Score 0 % · Note E**. C'est la couverture **globale** du projet qui compte, pas celle d'un seul fichier.
+
+## Version 4 - Dépôt complet avec tests et couverture élevée
+ 
+- Voir [ce dépôt](https://gitlab.com/ddotta/rproject_for_rsonar_with_tests) pour obtenir un projet R complet avec tests et couverture trés élevés.
+
+![](images/report_version_finale.png){fig-align="center"}
+
 ## La progression en un coup d'œil
 
-| Étape | Action | Score | Note | Couverture |
+| Étape | Action | Score | Note | Couverture | Lint issues |
 |---|---|---|---|---|
-| 0 | Code initial | 38 % | E | 0 % |
-| 1 | Style auto (`sonar_fix`) | 62 % | D | 0 % |
-| 2 | Refactorisation + doc | 82 % | C | 0 % |
-| 3 | Tests ajoutés | 96 % | A | 85 % |
+| 0 | Code initial | 0 % | E | 0 % | 139 |
+| 1 | Style auto (`sonar_fix`) | 0 % | E | 0 % | 86 |
+| 2 | Refactorisation + doc | 49 % | E | 0 % | 34 |
+| 3 | Tests ajoutés sans pénalité | 50 % | D | 0 % | 37
+| 3 | Tests ajoutés avec pénalité | 0 % | E | 7 % | 37
+| 4 | Dépôt complet | 98 % | A | 100 % | 4
 
 Chaque amélioration ciblée fait monter le score et baisser la dette.
 
 ::: {.callout-note title="Pourquoi la couverture ne bouge qu'à l'étape 3 ?"}
-La couverture n'est **mesurée** que lorsqu'il existe des tests. Avant (étapes 0 à 2), elle vaut 0 % et n'engendre **aucune pénalité**. À l'étape 3, les tests font passer la couverture **projet** à 85 % — au-dessus du seuil de 80 % — donc la pénalité `(80 − couverture) × 5 min` reste à **0**.
+La couverture n'est **mesurée** que lorsqu'il existe des tests. Avant (étapes 0 à 2), elle vaut 0 % et n'engendre **aucune pénalité**. À l'étape 3, mesurer la couverture (**7 %**) déclenche la pénalité `(80 − 7) × 5 = 365 min`, qui fait retomber le score à **0 %**.
 
-⚠️ Tester une seule fonction ne suffit pas : si la couverture projet restait faible (~10 %), la pénalité `(80 − 10) × 5 = 350 min` ferait retomber le score à **0 %**. C'est la couverture **globale** du projet qui compte.
+⚠️ Pour l'éviter, il faut couvrir **tout le projet** (couverture ≥ 80 %), pas une seule fonction. Sinon, c'est la couverture **globale** qui fait chuter le score.
 :::
 
-## Étape 4 — Bloquer les régressions (Quality Gate)
 
-```{.r}
-quality_gate(res,
-  coverage_min    = 80,
-  lint_errors_max = 0,
-  rating_min      = "B",
-  fail_on_error   = TRUE)
+## Aller plus loin : automatiser les corrections
+
+Le package `rsonar` peut être intégré dans un pipeline CI/CD pour automatiser la mesure de la qualité et le reformatage du code.
+
+- Voir [ce dépôt](https://gitlab.com/ddotta/rproject_for_rsonar)
+
+`sonar_fix(".", create_mr = TRUE)` ouvre directement une Merge Request.
+
+Job CI `rsonar-fix` :
+
+1. Installe `air` (`install_air()`)
+2. Formate tous les fichiers R (`sonar_fix()`)
+3. Ouvre une MR/PR avec les corrections
+
+
+Résultat : plus besoin de reformater son code à la main avant de commiter, ni de faire des allers-retours en revue de code sur de simples questions de style. Un développeur déclenche le job, et une MR toute prête arrive avec le diff de mise en forme — il ne reste plus qu'à la relire et la fusionner.
+
+## Exemple de pipeline CI (GitLab)
+
+- Voir [ce dépôt](https://gitlab.com/ddotta/ci-templates-r)  
+
+Extrait minimal de `.gitlab-ci.yml` :  
+
+```yaml
+stages: [quality, autofix]
+
+rsonar-check:
+  stage: quality
+  script: R -e "sonar_analyse('.'); export_junit()"
+
+rsonar-fix:
+  stage: autofix
+  when: manual
+  script: R -e "sonar_fix('.', create_mr = TRUE)"
 ```
-
-Si un seuil est franchi, la pipeline CI bloque automatiquement.
-
-C'est le garde-fou qui **empêche la note de redescendre**.
 
 ## Suivre l'évolution dans le temps
 
@@ -384,33 +446,6 @@ export_sonar_json(res, "sonar-issues.json") # SonarQube
 
 Formats standards : JUnit XML, SARIF 2.1.0, SonarQube Generic Issue Import.
 
-## Aller plus loin : automatiser les corrections
-
-`sonar_fix(".", create_mr = TRUE)` ouvre directement une Merge Request / Pull Request.
-
-Job CI `rsonar-fix` (tâche manuelle optionnelle) :
-
-1. Installe `air` (`install_air()`)
-2. Formate tous les fichiers R (`sonar_fix()`)
-3. Ouvre une MR/PR avec les corrections
-
-→ Plus de reformatage à la main : on déclenche, on relit, on fusionne.
-
-## Pipeline CI (GitLab)
-
-```yaml
-stages: [quality, autofix]
-
-rsonar-check:
-  stage: quality
-  script: R -e "sonar_analyse('.'); export_junit()"
-
-rsonar-fix:
-  stage: autofix
-  when: manual
-  script: R -e "sonar_fix('.', create_mr = TRUE)"
-```
-
 ## Ce qu'il faut retenir
 
 `rsonar` = mesurer, corriger, sécuriser :
@@ -420,14 +455,6 @@ rsonar-fix:
 - **Dans la durée** : `sonar_diff()` / `sonar_trend()` pour voir la note progresser
 - **En CI** : `quality_gate()` + exports + `sonar_fix(create_mr = TRUE)`
 
-## Conclusion
-
-La boucle pédagogique :
-
-1. Partir d'un code problématique
-2. Mesurer la qualité (score, note, dette)
-3. Améliorer pas à pas (style → refactor → tests)
-4. Voir la note monter : **38% → 62% → 82% → 96%**
 
 ---
 
