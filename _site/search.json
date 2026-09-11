@@ -53,7 +53,7 @@
     "href": "index_en.html#the-starting-code-version-0",
     "title": "rsonar in practice",
     "section": "The starting code (version 0)",
-    "text": "The starting code (version 0)\nProject structure:\n├── 01_assignment_and_formatting.R ├── 02_boolean_and_naming.R ├── 03_cyclomatic_complexity.R ├── 04_unused_vars_and_syntax.R ├── 05_non_standard_evaluation.R ├── 06_function_length.R ├── 07_string_quote_and_infix.R ├── 08_unnecessary_concatenation.R ├── 09_implicit_returns_and_braces.R └── 10_duplicate_code_and_magic_numbers.R"
+    "text": "The starting code (version 0)\nProject structure:\n├── 01_assignment_and_formatting.R\n├── 02_boolean_and_naming.R\n├── 03_cyclomatic_complexity.R\n├── 04_unused_vars_and_syntax.R\n├── 05_non_standard_evaluation.R\n├── 06_function_length.R\n├── 07_string_quote_and_infix.R\n├── 08_unnecessary_concatenation.R\n├── 09_implicit_returns_and_braces.R\n└── 10_duplicate_code_and_magic_numbers.R"
   },
   {
     "objectID": "index_en.html#the-starting-code-version-0-1",
@@ -119,18 +119,25 @@
     "text": "Version 1 — Results\n\n\n\n\n\nOn our example script:"
   },
   {
-    "objectID": "index_en.html#version-2-refactor-and-document",
-    "href": "index_en.html#version-2-refactor-and-document",
+    "objectID": "index_en.html#version-2-refactordocument",
+    "href": "index_en.html#version-2-refactordocument",
     "title": "rsonar in practice",
-    "section": "Version 2 — Refactor and document",
-    "text": "Version 2 — Refactor and document\nManual improvements:\n\nrename Part_SAU → calculer_part_sau and SAU_HA → sau_ha (snake_case)\nremove the unused variables (unused_arg, var_inutile1, var_inutile2)\nreplace SAU_HA == NA → is.na() and class() == \"numeric\" → is.numeric()\nremove the stray for (i in 1:length(...)) print(i) loop\nfix the syntax error print(\"Done\" and return to the implicit return\nadd roxygen2 documentation\n\n#' Calculate the Useful Agricultural Area (SAU) share\n#'\n#' @param sau_ha Numeric or numeric vector. The SAU in hectares.\n#' @param surface_totale Numeric or numeric vector. The total surface in ha.\n#'\n#' @return The SAU share as a percentage.\n#' @export\ncalculer_part_sau &lt;- function(sau_ha = 80, surface_totale = 100) {\n  if (is.null(sau_ha) || is.null(surface_totale)) {\n    return(NULL)\n  }\n\n  if (any(is.na(sau_ha)) || any(is.na(surface_totale))) {\n    return(NULL)\n  }\n\n  if (any(sau_ha &lt; 0) || any(surface_totale &lt;= 0)) {\n    stop(\"Surfaces must be positive and the total surface must be &gt; 0.\")\n  }\n\n  res &lt;- (sau_ha / surface_totale) * 100\n\n  if (any(res &gt; 100)) {\n    warning(\"At least one SAU value exceeds the total surface.\")\n  }\n\n  return(res)\n}"
+    "section": "Version 2 — Refactor/document",
+    "text": "Version 2 — Refactor/document\nManual improvements:\n\nrename Part_SAU → calculer_part_sau and SAU_HA → sau_ha (snake_case)\nreplace SAU_HA == NA → is.na() and class() == \"numeric\" → is.numeric()\nremove the stray for (i in 1:length(...)) print(i) loop\nfix the syntax error print(\"Done\" and return to the implicit return\nadd roxygen2 documentation"
   },
   {
-    "objectID": "index_en.html#version-2-refactor-and-document-1",
-    "href": "index_en.html#version-2-refactor-and-document-1",
+    "objectID": "index_en.html#version-2-refactordocument-1",
+    "href": "index_en.html#version-2-refactordocument-1",
     "title": "rsonar in practice",
-    "section": "Version 2 — Refactor and document",
-    "text": "Version 2 — Refactor and document"
+    "section": "Version 2 — Refactor/document",
+    "text": "Version 2 — Refactor/document\n#' Calculate the Useful Agricultural Area (SAU) share\n#'\n#' @param sau_ha Numeric or numeric vector. The SAU in hectares.\n#' @param surface_totale Numeric or numeric vector. The total surface in ha.\n#'\n#' @return The SAU share as a percentage.\n#' @export\ncalculer_part_sau &lt;- function(sau_ha = 80, surface_totale = 100) {\n  if (is.null(sau_ha) || is.null(surface_totale)) {\n    return(NULL)\n  }\n\n  if (any(is.na(sau_ha)) || any(is.na(surface_totale))) {\n    return(NULL)\n  }\n\n  if (any(sau_ha &lt; 0) || any(surface_totale &lt;= 0)) {\n    stop(\"Surfaces must be positive and the total surface must be &gt; 0.\")\n  }\n\n  res &lt;- (sau_ha / surface_totale) * 100\n\n  if (any(res &gt; 100)) {\n    warning(\"At least one SAU value exceeds the total surface.\")\n  }\n\n  return(res)\n}"
+  },
+  {
+    "objectID": "index_en.html#version-2-refactordocument-2",
+    "href": "index_en.html#version-2-refactordocument-2",
+    "title": "rsonar in practice",
+    "section": "Version 2 — Refactor/document",
+    "text": "Version 2 — Refactor/document"
   },
   {
     "objectID": "index_en.html#version-3-add-tests",
@@ -158,7 +165,7 @@
     "href": "index_en.html#why-does-the-score-drop-to-0",
     "title": "rsonar in practice",
     "section": "Why does the score drop to 0 %?",
-    "text": "Why does the score drop to 0 %?\nsonar_analyse(\".\") without include_coverage = FALSE measures coverage as soon as a tests/ folder exists. Here it is only 7 %: calculer_part_sau is the only function tested among the 10 scripts.\nThe coverage penalty then applies:\n(80 − 7) × 5 = 365 min\nThis penalty alone exceeds the reference effort (11 files × 30 = 330 min):\nratio = debt / 330 ≥ 1\nscore = 100 × (1 − 1) = 0 %\n→ Score 0 % · Grade E. It is the global project coverage that matters, not that of a single file."
+    "text": "Why does the score drop to 0 %?\nsonar_analyse(\".\") without include_coverage = FALSE measures coverage as soon as a tests/ folder exists. Here it is only 7 %: only one function is tested among the 10 scripts.\nThe coverage penalty then applies:\n(80 − 7) × 5 = 365 min\nThis penalty alone exceeds the reference effort (11 files × 30 = 330 min):\nratio = debt / 330 ≥ 1\nscore = 100 × (1 − 1) = 0 %\n→ Score 0 % · Grade E. It is the global project coverage that matters, not that of a single file."
   },
   {
     "objectID": "index_en.html#version-4---complete-repository-with-tests-and-high-coverage",
@@ -172,14 +179,21 @@
     "href": "index_en.html#the-progression-at-a-glance",
     "title": "rsonar in practice",
     "section": "The progression at a glance",
-    "text": "The progression at a glance\n\n\n\nStep\nAction\nScore\nGrade\nCoverage\n\n\n\n\n0\nInitial code\n0 %\nE\n0 %\n\n\n1\nAuto style (sonar_fix)\n0 %\nE\n0 %\n\n\n2\nRefactoring + docs\n49 %\nE\n0 %\n\n\n3\nTests added without penalty\n50 %\nD\n0 %\n\n\n3\nTests added with penalty\n0 %\nE\n7 %\n\n\n4\nComplete repository\n98 %\nA\n100 %\n\n\n\nEach targeted improvement raises the score and lowers the debt.\n\n\n\n\n\n\n\nWhy does coverage only change at step 3?\n\n\nCoverage is only measured when tests exist. Before (steps 0 to 2), it is 0 % and generates no penalty. At step 3, measuring coverage (7 %) triggers the penalty (80 − 7) × 5 = 365 min, which drops the score back to 0 %.\n⚠️ To avoid this, you must cover the entire project (coverage ≥ 80 %), not a single function. Otherwise, it is the global coverage that drives the score down."
+    "text": "The progression at a glance\n\n\n\nStep\nAction\nScore\nGrade\nCoverage\n\n\n\n\n0\nInitial code\n0 %\nE\n0 %\n\n\n1\nAuto style (sonar_fix)\n0 %\nE\n0 %\n\n\n2\nRefactoring + docs\n49 %\nE\n0 %\n\n\n3\nTests added without penalty\n50 %\nD\n0 %\n\n\n3\nTests added with penalty\n0 %\nE\n7 %\n\n\n4\nComplete repository\n98 %\nA\n100 %\n\n\n\nEach improvement raises the score and lowers the debt."
+  },
+  {
+    "objectID": "index_en.html#about-coverage",
+    "href": "index_en.html#about-coverage",
+    "title": "rsonar in practice",
+    "section": "About coverage",
+    "text": "About coverage\n\n\n\n\n\n\n\nWhy does coverage only change at step 3?\n\n\nCoverage is only measured when tests exist. Before (steps 0 to 2), it is 0 % and generates no penalty. At step 3, measuring coverage (7 %) triggers the penalty (80 − 7) × 5 = 365 min, which drops the score back to 0 %.\n⚠️ To avoid this, you must cover the entire project (coverage ≥ 80 %), not a single function. Otherwise, it is the global coverage that drives the score down."
   },
   {
     "objectID": "index_en.html#going-further-automate-the-fixes",
     "href": "index_en.html#going-further-automate-the-fixes",
     "title": "rsonar in practice",
     "section": "Going further: automate the fixes",
-    "text": "Going further: automate the fixes\nThe rsonar package can be integrated into a CI/CD pipeline to automate quality measurement and code reformatting.\n\nSee this repository\n\nsonar_fix(\".\", create_mr = TRUE) directly opens a Merge Request.\nCI job rsonar-fix:\n\nInstalls air (install_air())\nFormats all R files (sonar_fix())\nOpens an MR/PR with the fixes\n\nResult: no more need to reformat code by hand before committing, nor to go back and forth in code review over simple style questions. A developer triggers the job, and a ready-made MR arrives with the formatting diff — all that’s left is to review and merge it."
+    "text": "Going further: automate the fixes\nThe rsonar package can be integrated into a CI/CD pipeline to automate quality measurement and code reformatting. See this repository\nResult: no more need to reformat code by hand before committing, nor to go back and forth in code review over simple style questions. A developer triggers the job, and a ready-made MR arrives with the formatting diff and all that’s left is to review and merge it."
   },
   {
     "objectID": "index_en.html#ci-pipeline-example-gitlab",
@@ -357,18 +371,25 @@
     "text": "Version 1 — Résultats\n\n\n\n\n\nSur notre script exemple :"
   },
   {
-    "objectID": "index.html#version-2-refactoriser-et-documenter",
-    "href": "index.html#version-2-refactoriser-et-documenter",
+    "objectID": "index.html#version-2-refactoriserdocumenter",
+    "href": "index.html#version-2-refactoriserdocumenter",
     "title": "rsonar en pratique",
-    "section": "Version 2 — Refactoriser et documenter",
-    "text": "Version 2 — Refactoriser et documenter"
+    "section": "Version 2 — Refactoriser/documenter",
+    "text": "Version 2 — Refactoriser/documenter\nAméliorations manuelles :\n\nrenommer Part_SAU → calculer_part_sau et SAU_HA → sau_ha (snake_case)\nremplacer SAU_HA == NA → is.na() et class() == \"numeric\" → is.numeric()\nsupprimer la boucle for (i in 1:length(...)) print(i)\ncorriger l’erreur de syntaxe print(\"Fini\" et revenir au retour implicite\najouter la documentation roxygen2"
   },
   {
-    "objectID": "index.html#version-2-refactoriser-et-documenter-1",
-    "href": "index.html#version-2-refactoriser-et-documenter-1",
+    "objectID": "index.html#version-2-refactoriserdocumenter-1",
+    "href": "index.html#version-2-refactoriserdocumenter-1",
     "title": "rsonar en pratique",
-    "section": "Version 2 — Refactoriser et documenter",
-    "text": "Version 2 — Refactoriser et documenter"
+    "section": "Version 2 — Refactoriser/documenter",
+    "text": "Version 2 — Refactoriser/documenter\n#' Calculer la part de Surface Agricole Utile (SAU)\n#'\n#' @param sau_ha Numérique ou vecteur numérique. La SAU en hectares.\n#' @param surface_totale Numérique ou vecteur numérique. La surface totale en ha.\n#'\n#' @return La part de SAU en pourcentage.\n#' @export\ncalculer_part_sau &lt;- function(sau_ha = 80, surface_totale = 100) {\n  if (is.null(sau_ha) || is.null(surface_totale)) {\n    return(NULL)\n  }\n\n  if (any(is.na(sau_ha)) || any(is.na(surface_totale))) {\n    return(NULL)\n  }\n\n  if (any(sau_ha &lt; 0) || any(surface_totale &lt;= 0)) {\n    stop(\"Les surfaces doivent être positives et la surface totale &gt; 0.\")\n  }\n\n  res &lt;- (sau_ha / surface_totale) * 100\n\n  if (any(res &gt; 100)) {\n    warning(\"Au moins une valeur de SAU dépasse la surface totale.\")\n  }\n\n  return(res)\n}"
+  },
+  {
+    "objectID": "index.html#version-2-refactoriserdocumenter-2",
+    "href": "index.html#version-2-refactoriserdocumenter-2",
+    "title": "rsonar en pratique",
+    "section": "Version 2 — Refactoriser/documenter",
+    "text": "Version 2 — Refactoriser/documenter"
   },
   {
     "objectID": "index.html#version-3-ajouter-des-tests",
@@ -413,11 +434,18 @@
     "text": "La progression en un coup d’œil\n\n\n\nÉtape\nAction\nScore\nNote\nCouverture\n\n\n\n\n0\nCode initial\n0 %\nE\n0 %\n\n\n1\nStyle auto (sonar_fix)\n0 %\nE\n0 %\n\n\n2\nRefactorisation + doc\n49 %\nE\n0 %\n\n\n3\nTests ajoutés sans pénalité\n50 %\nD\n0 %\n\n\n3\nTests ajoutés avec pénalité\n0 %\nE\n7 %\n\n\n4\nDépôt complet\n98 %\nA\n100 %\n\n\n\nChaque amélioration fait monter le score et baisser la dette."
   },
   {
+    "objectID": "index.html#a-propos-de-la-couverture",
+    "href": "index.html#a-propos-de-la-couverture",
+    "title": "rsonar en pratique",
+    "section": "A propos de la couverture",
+    "text": "A propos de la couverture\n\n\n\n\n\n\n\nPourquoi la couverture ne bouge qu’à l’étape 3 ?\n\n\nLa couverture n’est mesurée que lorsqu’il existe des tests. Avant (étapes 0 à 2), elle vaut 0 % et n’engendre aucune pénalité. À l’étape 3, mesurer la couverture (7 %) déclenche la pénalité (80 − 7) × 5 = 365 min, qui fait retomber le score à 0 %.\n⚠️ Pour l’éviter, il faut couvrir tout le projet (couverture ≥ 80 %), pas une seule fonction. Sinon, c’est la couverture globale qui fait chuter le score."
+  },
+  {
     "objectID": "index.html#aller-plus-loin-automatiser-les-corrections",
     "href": "index.html#aller-plus-loin-automatiser-les-corrections",
     "title": "rsonar en pratique",
     "section": "Aller plus loin : automatiser les corrections",
-    "text": "Aller plus loin : automatiser les corrections\nLe package rsonar peut être intégré dans un pipeline CI/CD pour automatiser la mesure de la qualité et le reformatage du code. Voir ce dépôt\nRésultat : plus besoin de reformater son code à la main avant de commiter, ni de faire des allers-retours en revue de code sur de simples questions de style. Un développeur déclenche le job, et une MR toute prête arrive avec le diff de mise en forme — il ne reste plus qu’à la relire et la fusionner."
+    "text": "Aller plus loin : automatiser les corrections\nLe package rsonar peut être intégré dans un pipeline CI/CD pour automatiser la mesure de la qualité et le reformatage du code. Voir ce dépôt\nRésultat : plus besoin de reformater son code à la main avant de commiter, ni de faire des allers-retours en revue de code sur de simples questions de style. Un développeur déclenche le job, et une MR toute prête arrive avec le diff de mise en forme et il ne reste plus qu’à la relire et la fusionner."
   },
   {
     "objectID": "index.html#exemple-de-pipeline-ci-gitlab",
@@ -446,33 +474,5 @@
     "title": "rsonar en pratique",
     "section": "Ce qu’il faut retenir",
     "text": "Ce qu’il faut retenir\nrsonar = mesurer, corriger, sécuriser :\n\nLocalement : quality_score() et debt_index() pour un feedback immédiat\nEn profondeur : sonar_analyse() + sonar_report() + sonar_hotspots()\nDans la durée : sonar_diff() / sonar_trend() pour voir la note progresser\nEn CI : quality_gate() + exports + sonar_fix(create_mr = TRUE)"
-  },
-  {
-    "objectID": "index.html#version-2-refactoriserdocumenter",
-    "href": "index.html#version-2-refactoriserdocumenter",
-    "title": "rsonar en pratique",
-    "section": "Version 2 — Refactoriser/documenter",
-    "text": "Version 2 — Refactoriser/documenter\nAméliorations manuelles :\n\nrenommer Part_SAU → calculer_part_sau et SAU_HA → sau_ha (snake_case)\nremplacer SAU_HA == NA → is.na() et class() == \"numeric\" → is.numeric()\nsupprimer la boucle for (i in 1:length(...)) print(i)\ncorriger l’erreur de syntaxe print(\"Fini\" et revenir au retour implicite\najouter la documentation roxygen2"
-  },
-  {
-    "objectID": "index.html#version-2-refactoriserdocumenter-1",
-    "href": "index.html#version-2-refactoriserdocumenter-1",
-    "title": "rsonar en pratique",
-    "section": "Version 2 — Refactoriser/documenter",
-    "text": "Version 2 — Refactoriser/documenter\n#' Calculer la part de Surface Agricole Utile (SAU)\n#'\n#' @param sau_ha Numérique ou vecteur numérique. La SAU en hectares.\n#' @param surface_totale Numérique ou vecteur numérique. La surface totale en ha.\n#'\n#' @return La part de SAU en pourcentage.\n#' @export\ncalculer_part_sau &lt;- function(sau_ha = 80, surface_totale = 100) {\n  if (is.null(sau_ha) || is.null(surface_totale)) {\n    return(NULL)\n  }\n\n  if (any(is.na(sau_ha)) || any(is.na(surface_totale))) {\n    return(NULL)\n  }\n\n  if (any(sau_ha &lt; 0) || any(surface_totale &lt;= 0)) {\n    stop(\"Les surfaces doivent être positives et la surface totale &gt; 0.\")\n  }\n\n  res &lt;- (sau_ha / surface_totale) * 100\n\n  if (any(res &gt; 100)) {\n    warning(\"Au moins une valeur de SAU dépasse la surface totale.\")\n  }\n\n  return(res)\n}"
-  },
-  {
-    "objectID": "index.html#version-2-refactoriserdocumenter-2",
-    "href": "index.html#version-2-refactoriserdocumenter-2",
-    "title": "rsonar en pratique",
-    "section": "Version 2 — Refactoriser/documenter",
-    "text": "Version 2 — Refactoriser/documenter"
-  },
-  {
-    "objectID": "index.html#a-propos-de-la-couverture",
-    "href": "index.html#a-propos-de-la-couverture",
-    "title": "rsonar en pratique",
-    "section": "A propos de la couverture",
-    "text": "A propos de la couverture\n\n\n\n\n\n\n\nPourquoi la couverture ne bouge qu’à l’étape 3 ?\n\n\nLa couverture n’est mesurée que lorsqu’il existe des tests. Avant (étapes 0 à 2), elle vaut 0 % et n’engendre aucune pénalité. À l’étape 3, mesurer la couverture (7 %) déclenche la pénalité (80 − 7) × 5 = 365 min, qui fait retomber le score à 0 %.\n⚠️ Pour l’éviter, il faut couvrir tout le projet (couverture ≥ 80 %), pas une seule fonction. Sinon, c’est la couverture globale qui fait chuter le score."
   }
 ]

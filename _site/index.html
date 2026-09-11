@@ -677,7 +677,7 @@ Damien Dotta
 <section id="aller-plus-loin-automatiser-les-corrections" class="slide level2">
 <h2>Aller plus loin : automatiser les corrections</h2>
 <p>Le package <code>rsonar</code> peut être intégré dans un pipeline CI/CD pour automatiser la mesure de la qualité et le reformatage du code. Voir <a href="https://gitlab.com/ddotta/rproject_for_rsonar">ce dépôt</a></p>
-<p><strong>Résultat :</strong> plus besoin de reformater son code à la main avant de commiter, ni de faire des allers-retours en revue de code sur de simples questions de style. Un développeur déclenche le job, et une MR toute prête arrive avec le diff de mise en forme — il ne reste plus qu’à la relire et la fusionner.</p>
+<p><strong>Résultat :</strong> plus besoin de reformater son code à la main avant de commiter, ni de faire des allers-retours en revue de code sur de simples questions de style. Un développeur déclenche le job, et une MR toute prête arrive avec le diff de mise en forme et il ne reste plus qu’à la relire et la fusionner.</p>
 </section>
 <section id="exemple-de-pipeline-ci-gitlab" class="slide level2">
 <h2>Exemple de pipeline CI (GitLab)</h2>
@@ -1033,7 +1033,7 @@ Damien Dotta
       }
         var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
         var mailtoRegex = new RegExp(/^mailto:/);
-          var filterRegex = new RegExp('/' + window.location.host + '/');
+          var filterRegex = new RegExp("https:\/\/ddotta\.github\.io\/rsonar_presentation\/");
         var isInternal = (href) => {
             return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
         }

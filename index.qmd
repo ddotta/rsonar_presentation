@@ -30,8 +30,6 @@ format:
 :::
 :::
 
-Vocabulaire SonarQube : *issues*, *Coverage*, **Quality Gate**.
-
 ## SQALE : quantifier la dette technique
 
 **SQALE** = *Software Quality Assessment based on Lifecycle Expectations*.
@@ -143,11 +141,6 @@ Part_SAU = function( SAU_HA = 80 , surface_totale = 100 , unused_arg = 10 ){
     msg = paste( "Part SAU: " , SAU_HA , sep = "" )
   
    if( class( SAU_HA ) == "numeric" ){ warning( msg ) }
-
-  
-  if( SAU_HA > 0 && surface_totale > 0 ){
-    res = ( SAU_HA / surface_totale ) * 100
-  }
   
   return( round( res , 1 ) )
     
